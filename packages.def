@@ -1,0 +1,52 @@
+\RequirePackage[british]{babel}  % Sprache
+\RequirePackage{csquotes}  % Anführungszeichen
+
+\RequirePackage{geometry}  % Seitenlayout (insbesondere Ränder)
+
+\RequirePackage{amssymb, amsthm}  % mathematische Grundlagen
+\RequirePackage[intlimits]{mathtools}  % stellt u. a. \DeclarePairedDelimiter zur Verfügung + weitere Verbesserungen für amsmath
+\RequirePackage[
+	math-style=ISO,
+	bold-style=ISO,
+	partial=upright,
+	warnings-off={mathtools-colon,mathtools-overbracket},
+]{unicode-math}  % für kursive gr. Großbuchstaben und aufrechtes ∂ benützt
+\RequirePackage{xfrac}  % schräge Brüche; vor fontspec zu laden!
+\RequirePackage{mleftright}  % behebt falschen Freiraum um \left und \right
+\mleftright  % aktiviere Freiraumbehebung für \left und \right (ansonsten benutze \mleft und \mright)
+
+\RequirePackage[protrusion]{microtype}  % für hängende Interpunktion
+\RequirePackage{tabularx}  % bessere Trenner und Zeilentypen
+\makeatletter
+\@ifclassloaded{beamer}{}{\RequirePackage[inline]{enumitem}}  % bessere Aufzählung (mit *-Variante für Aufzählungen innerhalb eines Textes); für 'beamer' ausgeschaltet
+\makeatother
+
+\RequirePackage{subcaption}  % Unterabbildungen
+
+\PassOptionsToPackage{dvipsnames}{xcolor}  % mehr benannte Farben
+\RequirePackage{tikz} % Grafikpaket
+\RequirePackage{tikzpagenodes}  % benötig für current page
+\usetikzlibrary{positioning, calc}
+\RequirePackage{pgfplots}  % tikz-Erweiterung
+\pgfplotsset{compat=1.18}
+
+\RequirePackage{algorithm2e}  % Algorithmen setzen
+
+\RequirePackage{hyperref}  % klickbare Verweise
+\hypersetup{final}  % nicht direkt geladen, da 'beamer' vorher schon 'hyperref' lädt
+\RequirePackage[nameinlink, capitalize]{cleveref}  % Namen in Verweisen
+
+\RequirePackage{fixdif}  % bessere Ableitungsoperatoren; benötigt 'unicode-math'; nach 'hyperref' zu laden
+
+\RequirePackage[backend=biber, style=numeric-comp, sortcites]{biblatex}  % Quellenverzeichnis
+\addbibresource{../sources.bib}
+
+\makeatletter
+\@ifclassloaded{beamer}{}{
+\RequirePackage{lipsum}  % lorem ipsum dolor sit amet
+\RequirePackage[obeyDraft, colorinlistoftodos, tickmarkheight=.25em, textwidth=2.1cm]{todonotes}  % Notizen
+\todostyle{info}{color=CornflowerBlue, textcolor=white}
+\RequirePackage{marginnote}  % benötigt, um \todo in Gleitobjekten benutzen zu können
+\renewcommand{\marginpar}{\marginnote}
+}
+\makeatother

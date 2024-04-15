@@ -1,0 +1,146 @@
+% !TeX program = lualatex
+\documentclass[final]{../garticle}
+
+\input{../macros.sty}
+\RequirePackage{pgfplotstable}
+
+\titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
+\subject{Master's Thesis}
+%\title{Sorting \\ for a \\ Processing-in-Memory \\ Architecture}
+%\title{Sorting \\ on a \\ Processing-in-Memory \\ Architecture}
+%\title{On Sorting for Processing-in-Memory}
+\title{On Efficient Sorting Through In-Memory Processing}
+%\title{Engineering Sorting Algorithms \\ for a Processing-in-Memory Architecture}
+%\title{Engineering Sorting Algorithms \\ for Processing-in-Memory}
+%\subtitle{Some cool subtitle if need be}
+\subtitle{Implementation and Evaluation \dots{} / Engineering \dots{} / Exploring \dots{}}
+%\subtitle{Engineering Algorithms for UPMEM-based DRAM Processing Units}
+\author{\texorpdfstring{Ƶ}{Z}eno Adrian \texorpdfstring{\Lss05{W\kern-1.5pt}}{W}eil}
+\publishers{\begin{tabular}{r @{~}l}
+	Supervisor: & Dr Manuel Penschuck
+\end{tabular}}
+
+\makeatletter
+\hypersetup{
+	pdfauthor=\@author,
+	pdftitle=\@title,
+	pdfsubject=\@subject,
+}
+\makeatother
+
+\tikzset{
+	legend 3 cols/.style = {
+		/pgfplots/legend columns=3,
+		/pgfplots/legend style={
+			/tikz/column 2/.style={
+				column sep=5pt,
+			},
+			/tikz/column 4/.style={
+				column sep=5pt,
+			},
+		},
+	},
+}
+
+\begin{document}
+	\pagenumbering{gobble}  % turn off pagenumbering
+
+%	\maketitle
+
+%	\include{abstract}
+
+%	\tableofcontents
+
+%	\listoftodos
+
+	\begingroup
+	\clearpage
+	\pagenumbering{arabic}  % turn on pagenumbering
+	\endgroup
+
+	\pgfplotstableread{data/test2.dat}{\tabletest}
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+			xlabel=Input Length \(n\),
+			ylabel=Cycles,
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tabletest}{n},
+			log ticks with fixed point,
+			grid,
+			legend 3 cols,
+			legend pos=south east,
+		]
+			\pgfplotsinvokeforeach{1,...,9}{
+				\linewithbars[select coords between index={1}{5}]{#1}{\tabletest}
+				\addlegendentry{\(#1\)}
+			}
+		\end{loglogaxis}
+	\end{tikzpicture}
+
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+			xlabel=Input Length \(n\),
+			ylabel=Cycles / \((n \lb n )\),
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tabletest}{n},
+			log ticks with fixed point,
+			grid,
+			legend 3 cols,
+			legend pos=north west,
+		]
+			\pgfplotsinvokeforeach{1,...,9}{
+				\linepernlogn{#1}{\tabletest}
+				\addlegendentry{\(#1\)}
+			}
+		\end{loglogaxis}
+	\end{tikzpicture}
+
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+			xlabel=Input Length \(n\),
+			ylabel=Cycles / \(n\)²,
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tabletest}{n},
+			log ticks with fixed point,
+			grid,
+			legend 3 cols,
+			legend pos=south west,
+		]
+			\pgfplotsinvokeforeach{1,...,9}{
+				\linepernn{#1}{\tabletest}
+				\addlegendentry{\(#1\)}
+			}
+		\end{loglogaxis}
+	\end{tikzpicture}
+
+	\begin{tikzpicture}
+		\pgfplotsset{cycle list shift=1}  % skip over colour of first plot
+		\begin{semilogxaxis}[
+			xlabel=Input Length \(n\),
+			ylabel=Speed-Up,
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tabletest}{n},
+			log ticks with fixed point,
+			grid,
+			legend 3 cols,
+			legend pos=north west,
+		]
+			\pgfplotsinvokeforeach{2,...,9}{
+				\linespeedup[select coords between index={1}{5}]{#1}{1}{\tabletest}
+				\addlegendentry{\(#1\)}
+			}
+		\end{semilogxaxis}
+	\end{tikzpicture}
+
+%	\clearpage
+
+%	\mybibliography
+\end{document}

@@ -1,0 +1,225 @@
+\usetheme{default}
+\usecolortheme{orchid}
+
+\definecolor{goetheblau}{rgb}{0.000,0.380,0.561}
+\definecolor{hellgrau}{rgb}{0.973,0.965,0.961}
+\definecolor{sandgrau}{rgb}{0.894,0.890,0.867}
+\definecolor{dunkelgrau}{rgb}{0.302,0.294,0.275}
+\definecolor{purple}{rgb}{0.525,0.000,0.278}
+\definecolor{emorot}{rgb}{0.702,0.024,0.173}
+\definecolor{senfgelb}{rgb}{0.890,0.729,0.059}
+\definecolor{gruen}{rgb}{0.451,0.786,0.371}
+\definecolor{dunkelgruen}{rgb}{0.251,0.586,0.171}
+\definecolor{magenta}{rgb}{0.678,0.231,0.463}
+\definecolor{orange}{rgb}{0.788,0.384,0.082}
+\definecolor{sonnengelb}{rgb}{0.969,0.851,0.149}
+\definecolor{hellgruen}{cmyk}{0.4,0.17,.81,.07}
+\definecolor{lichtblau}{rgb}{0.282,0.663,0.855}
+
+
+
+\useinnertheme{rectangles}  % shape of labels
+\useinnertheme[showtitle=false]{tcolorbox}  % turning off background of boxes without title
+\beamertemplatenavigationsymbolsempty
+
+
+%%% Font.
+\RequirePackage[osf, defaultfeatures={Ligatures=Rare}]{libertinus}
+\NewDocumentCommand{\tlffont}{}{\LibertinusSansTLF}  % font with lining numbers
+
+\usefonttheme[stillsansserifsmall, stillsansseriflarge]{serif}  % serif text, sans-serif structures (title, footer, etc.)
+\usefonttheme[onlylarge]{structurebold}  % structures in bold
+
+\setbeamercolor{structure}{fg=goetheblau}  % structure in goetheblau
+\setbeamercolor{block title}{fg=white, bg=goetheblau}  % normal block header background in goetheblau (body colour automatically altered)
+\setbeamercolor{alerted text}{fg=emorot}  % also affects alert block
+\colorlet{alert}{emorot}  % needed for example for TikZ images
+\setbeamercolor{block title example}{bg=dunkelgruen}  % `block body example` automatically recoloured
+
+\setbeamerfont{section number projected}{family=\tlffont}  % section numbers in toc in lining figures
+\setbeamerfont{item projected}{family=\tlffont}  % number of enumerate labels in lining figures
+\setbeamerfont{alerted text}{series=\bfseries}
+
+\NewDocumentCommand{\abb}{m}{\text{#1}}  % abbreviations
+
+% To be used instead of \alert{} in math mode, since \bfseries is not allowed then.
+\NewDocumentCommand{\alertmath}{D<>{1-} m}{\alt<#1>{\usebeamercolor[fg]{alerted text}\boldsymbol{#2}}{#2}}
+
+
+%%% Background graphics.
+\newlength{\goethelogotopmargin}
+\setlength{\goethelogotopmargin}{0.3cm}
+\newlength{\goethelogoheight}
+\AtBeginDocument{  % Since \vbox only works after \begin{document}, the height cannot be set in the preamble.
+	\settoheight{\goethelogoheight}{\vbox{
+		\usebeamerfont{framesubtitle}\strut \\
+		\usebeamerfont{frametitle}\strut
+	}}
+}
+\def\goetheheadopacity{0.25}
+\makeatletter
+\usebackgroundtemplate{
+	% Logo in top right corner
+	\begin{tikzpicture}[overlay,remember picture]
+		\node[at=(current page.north east), anchor=north east, inner sep=0, xshift=-\beamer@rightmargin, yshift=-\goethelogotopmargin] (fglogo){  % 1ex comes from beamertemplate 'frametitle'
+			\includegraphics[height=\goethelogoheight]{../gu_logo_blau.pdf}
+		};
+		\path[draw, goetheblau, thick, line cap=butt] ($(fglogo.south west) - (\beamer@rightmargin, 0)$) -- ($(fglogo.north west) - (\beamer@rightmargin, -100)$);
+	\end{tikzpicture}
+	% Head in bottom left corner
+	\begin{tikzpicture}[overlay,remember picture]
+		\node[at=(current page.south west), anchor=south west, inner sep=0, xshift=-0.19\paperheight, opacity=\goetheheadopacity] {
+			\includegraphics[width=0.66\paperheight]{../gu_logo_sandgrau.pdf}
+		};
+	\end{tikzpicture}
+}
+\makeatother
+
+
+%%% Headline and Footline.
+% Modification of infolines theme with right-aligned author and broader title.
+% Infolines is still loaded due to its other settings.
+\useoutertheme{infolines}
+\setbeamertemplate{headline}[default]  % empty headline
+
+\setbeamercolor*{author in head/foot}{parent=block body}
+\setbeamercolor*{title in head/foot}{parent=block body}
+\setbeamercolor*{date in head/foot}{parent=block body}
+
+\makeatletter
+\defbeamertemplate*{footline}{customized}
+{%
+	\leavevmode%
+	\hbox{%
+		\begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,leftskip=2ex]{author in head/foot}%
+			\usebeamerfont{author in head/foot}\insertshortauthor\expandafter\ifblank\expandafter{\beamer@shortinstitute}{}{~~(\insertshortinstitute)}
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+			\usebeamerfont{title in head/foot}\insertshorttitle
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,leftskip=2ex,rightskip=2ex,sep=0pt]{date in head/foot}%
+			\hfill%
+			\usebeamerfont{date in head/foot}%
+			\insertshortdate{}%
+			\hfill%
+			\usebeamercolor[fg]{page number in head/foot}%
+			\usebeamerfont{page number in head/foot}%
+			\usebeamertemplate{page number in head/foot}%
+	\end{beamercolorbox}}%
+	\vskip0pt%
+}
+\makeatother
+
+
+%%% Frame title with sub title above.
+\makeatletter
+\defbeamertemplate*{frametitle}{customized}[1][left]
+{%
+	\ifbeamercolorempty[bg]{frametitle}{}{\nointerlineskip}%
+	\@tempdima=\textwidth%
+	\advance\@tempdima by\beamer@leftmargin%
+	\advance\@tempdima by\beamer@rightmargin%
+	\begin{beamercolorbox}[sep=0.3cm,#1,wd=\the\@tempdima]{frametitle}
+		\usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}%
+		\vbox{}\vskip-1ex%
+		{%
+			\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}
+			\ifx\insertframesubtitle\@empty%
+			{%
+				\ifx\insertsection\@empty%
+				{\strut\par}%  to prevent the frame title from jumping up
+				\else%
+				{\strut\insertsection\strut\par}%
+				\fi%
+			}%
+			\else%
+			{\strut\insertframesubtitle\strut\par}%
+			\fi%
+		}%
+		\if@tempswa\else\csname beamer@fte#1\endcsname\fi%
+		\strut\insertframetitle\strut\par%
+		\vskip-1ex%
+		\if@tempswa\else\vskip-.3cm\fi% set inside beamercolorbox... evil here...
+	\end{beamercolorbox}%
+}
+\makeatother
+
+
+%%% Title page.
+\setbeamercolor{subject}{parent={subtitle}, fg=emorot}
+\setbeamercolor{subtitle}{use={normal text}, fg=normal text.fg}  % better contrast to main title
+\setbeamercolor{author}{use={normal text}, fg=normal text.fg}
+\setbeamercolor{supervisor}{use={normal text}, fg=normal text.fg}
+\setbeamercolor{date}{parent={normal text}}
+\setbeamercolor{institute}{parent={normal text}}
+
+\setbeamerfont{subject}{series=\bfseries}
+\setbeamerfont{author}{}
+\setbeamerfont{supervisor}{size=\footnotesize}
+%\setbeamerfont{date}{size=\normalsize}  % explicitely set size of date
+\makeatletter
+\@ifpackageloaded{libertinus}{
+	\setbeamerfont{date}{family=\LibertinusSerifSB, series=\bfseries}
+}{}
+\makeatother
+\setbeamerfont{institute}{parent={date}}
+
+\defbeamertemplate*{title page}{customized}[1][]
+{%
+	\vspace{0.25\paperheight}
+	\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par%
+	\usebeamerfont*{subject}\usebeamercolor[fg]{subject}\insertsubject\par%
+	\IfEmptyF{\insertsubject}{\smallskip}%
+	\usebeamerfont*{title}\usebeamercolor[fg]{title}\inserttitle\par%
+	\usebeamerfont*{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par%
+	\bigskip%
+	\usebeamerfont*{author}\usebeamercolor[fg]{author}\insertauthor\par%
+	\usebeamerfont*{supervisor}\usebeamercolor[fg]{supervisor}\insertsupervisor\par%
+	\medskip
+	\usebeamerfont*{date}\usebeamercolor[fg]{date}\insertdate\IfEmptyF{\insertinstitute}{\usebeamercolor[fg]{normal text}~·~\usebeamerfont*{institute}\usebeamercolor[fg]{institute}\insertinstitute} \par%
+}
+
+
+%%% Frame at section beginning.
+\setbeamercolor{section name}{fg=sandgrau, bg=red}
+
+\setbeamerfont{section name}{size=\Huge}
+
+\defbeamertemplate*{section page}{customized}[1][]{
+	\begin{tikzpicture}[overlay, remember picture]
+		\node[opacity=\goetheheadopacity] at (current page.center) {\scalebox{5}{\usebeamerfont{section name}\usebeamercolor[fg]{section name}\liningnums{\insertsectionnumber}}};
+		\node[align=center] at (current page.center) {\usebeamerfont{section title}\usebeamercolor[fg]{section title} \insertsection};
+	\end{tikzpicture}
+}
+
+\AtBeginSection[]{\begin{frame}[plain, noframenumbering]
+%		\tableofcontents[currentsection]
+		\sectionpage
+\end{frame}}
+
+
+%%% Boxes.
+% overwrite the style of `problem` environment
+\makeatletter
+\def\cleartheorem#1{%
+	\expandafter\let\csname#1\endcsname\relax
+	\expandafter\let\csname c@#1\endcsname\relax
+}
+\makeatother
+
+\cleartheorem{problem}
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+
+% removes the dot after 'Proof'
+\makeatletter
+\AtBeginEnvironment{proof}{\let\@addpunct\@gobble}
+\makeatother
+
+
+%%% PDF options.
+\hypersetup{
+	pdfdisplaydoctitle=true,
+}
+
+% TODO: Opaqueness? (Beamer manual p. 186)

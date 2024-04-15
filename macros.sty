@@ -1,0 +1,40 @@
+% Maths & Algorithms.
+\DeclareMathOperator{\lb}{lb}
+
+% Figures.
+% taken from: https://tex.stackexchange.com/a/199396
+\pgfplotsset{
+	select coords between index/.style 2 args={
+		x filter/.code={
+			\ifnum\coordindex<#1\def\pgfmathresult{}\fi
+			\ifnum\coordindex>#2\def\pgfmathresult{}\fi
+		},
+	},
+}
+
+\NewDocumentCommand{\linewithbars}{O{} m m}{
+	\addplot+
+	plot [#1, error bars/.cd, y dir=both, y explicit]
+%	table [x=n, y=µ_#2, y error=σ_#2] {#3};
+	table [x=n, y=µ_#2, y error expr={2 * \thisrow{σ_#2}}] {#3};
+}
+
+\NewDocumentCommand{\linepernlogn}{O{} m m}{
+	\addplot+
+	plot [#1]
+	table [x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}] {#3};
+}
+
+\NewDocumentCommand{\linepernn}{O{} m m}{
+	\addplot+
+	plot [#1]
+	table [x=n, y expr={\thisrow{µ_#2} / \thisrow{n}^2}] {#3};
+}
+
+\NewDocumentCommand{\linespeedup}{O{} m m m}{
+	\addplot+
+	plot [#1]
+	table [x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}] {#4};
+}
+
+% Texts.

@@ -1,0 +1,233 @@
+%%% Font.
+\RequirePackage[osf]{libertinus}
+%\setmathfont[range={\mathcal,\mathbfcal}]{Cambria Math}  % destroys positioning of super-/subscript, fractions, etc.‽
+%\RequirePackage[regular]{newcomputermodern}  % newest version of Computer Modern (regular: display weight)
+
+\NewDocumentCommand{\abb}{m}{\text{#1}}  % abbreviations
+\setkomafont{captionlabel}{\usekomafont{descriptionlabel}}
+
+\RenewDocumentCommand{\caseintextfont}{}{\maybesffamily\itshape}  % font used for case labels (e. g., Case 1 -- x > 1; Case 1 -- x <= 1)
+
+\renewcommand{\qedsymbol}{\accentcolor\square}  % coloured proof sign (tombstone)
+%\renewcommand{\qedsymbol}{  % coloured proof sign (bold tombstone)
+%	\accentcolor\ensuremath{%
+%		\setlength\fboxrule{0.3ex}%
+%		\setlength\fboxsep{0ex}%
+%		\raisebox{0.3ex}{\fbox{\phantom{\rule{1ex}{1ex}}}}%
+%	}%
+%}
+
+% Colours in titles.
+%\DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred's red
+\DefineNamedColor{named}{accentcolor}{RGB}{51, 0, 102}  % algo's violet
+\NewDocumentCommand{\accentcolor}{}{\color[named]{accentcolor}}
+\addtokomafont{captionlabel}{\accentcolor}
+\addtokomafont{disposition}{\accentcolor}
+\addtokomafont{labelinglabel}{\accentcolor}
+\addtokomafont{itemizelabel}{\accentcolor\maybesffamily}
+\addtokomafont{descriptionlabel}{\accentcolor\maybesffamily}
+
+\setlist[enumerate,1]{font=\usekomafont{labelitemi}}
+\setlist[enumerate,2]{font=\usekomafont{labelitemii}}
+\setlist[enumerate,3]{font=\usekomafont{labelitemiii}}
+\setlist[enumerate,4]{font=\usekomafont{labelitemiv}}
+
+% Title page.
+%\addtokomafont{author}{\LibertinusSerifSB\bfseries\color{white}}
+%\addtokomafont{date}{\LibertinusSerifSB\bfseries\color{white}}
+%\addtokomafont{dedication}{\LibertinusSerifSB\bfseries\color{white}}
+%\addtokomafont{subject}{\color{white}}
+%\addtokomafont{subtitle}{\color{white}}
+\addtokomafont{title}{\color{black}}
+\setkomafont{publishers}{\color{black}}  % \publishers in normalsized font
+%\addtokomafont{titlehead}{\LibertinusSerifSB\bfseries\color{white}}
+
+% Links.
+\hypersetup{
+	colorlinks,
+	bookmarksopen,
+	bookmarksnumbered,
+	linkcolor=black,
+	plainpages=false,
+	hypertexnames=false,
+	citecolor=blue!80!black,
+	urlcolor=blue!80!black,
+}
+
+%% Set style of operators.
+%% taken from: https://tex.stackexchange.com/a/604317
+%\DeclareSymbolFont{sansops}{T1}{\sfdefault}{m}{n}
+%\SetSymbolFont{sansops}{bold}{T1}{\sfdefault}{b}{n}
+%
+%\makeatletter
+%\renewcommand\operator@font{\mathgroup\symsansops}
+%\makeatother
+
+
+%%% Lists.
+\setlist[itemize]{leftmargin=*, nosep}
+\setlist[enumerate]{topsep=0.1em, itemsep=0.1em, parsep=0pt, left=0.5em}
+\setlist[description]{topsep=0.15em, itemsep=0.1em, parsep=0.1em}
+
+
+%%% Page style.
+\geometry{margin=3cm}
+\flushbottom  % the last line of all non-final pages flushed to bottom margin
+
+\captionsetup{format=plain}
+\KOMAoptions{
+	abstract,  % heading for abstract
+	titlepage,  % dedicated titlepage without abstract
+	bibliography=totocnumbered,  % add numbered bibliography to table of contents
+}
+
+% Foot notes.
+\deffootnote[1em]{1em}{1em}{\thefootnotemark.~}
+
+
+%%% Theory environments.
+% Environments in roman style with bold title.
+\newtheoremstyle{definition}
+	{\topsep}   % ABOVESPACE
+	{\topsep}   % BELOWSPACE
+	{\normalfont}  % BODYFONT
+	{0pt}       % INDENT (empty value is the same as 0pt)
+	{\accentcolor\maybesffamily\bfseries} % HEADFONT
+	{.}         % HEADPUNCT
+	{5pt plus 1pt minus 1pt} % HEADSPACE
+	{}          % CUSTOM-HEAD-SPEC
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+%\AfterEndEnvironment{definition}{\noindent\ignorespaces}
+\newtheorem{example}[definition]{Example}
+\newtheorem{condition}[definition]{Condition}
+\newtheorem{problem}[definition]{Problem}
+
+% Environments in italic style with bold title.
+\newtheoremstyle{plain}
+	{\topsep}   % ABOVESPACE
+	{0.2\topsep}   % BELOWSPACE
+	{\itshape}  % BODYFONT
+	{0pt}       % INDENT (empty value is the same as 0pt)
+	{\accentcolor\maybesffamily\bfseries} % HEADFONT
+	{.}         % HEADPUNCT
+	{5pt plus 1pt minus 1pt} % HEADSPACE
+	{}          % CUSTOM-HEAD-SPEC
+
+\theoremstyle{plain}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{observation}[definition]{Observation}
+\newtheorem{conjecture}[definition]{Conjecture}
+
+% Environments in roman style with italic title.
+\newtheoremstyle{remark}
+	{0.5\topsep}   % ABOVESPACE
+	{0.5\topsep}   % BELOWSPACE
+	{\normalfont}  % BODYFONT
+	{0pt}       % INDENT (empty value is the same as 0pt)
+	{\accentcolor\maybesffamily\itshape} % HEADFONT
+	{.}         % HEADPUNCT
+	{5pt plus 1pt minus 1pt} % HEADSPACE
+	{}          % CUSTOM-HEAD-SPEC
+
+\theoremstyle{remark}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{annotation}[definition]{Annotation}
+\newtheorem{claim}[definition]{Claim}
+\newtheorem*{note}{Note}  % No numbering
+\newtheorem{case}[definition]{Case}
+\newtheorem{acknowledgment}[definition]{Acknowledgment}
+\newtheorem{conclusion}[definition]{Conclusion}
+
+% Proof marker in roman style.
+\xpatchcmd{\proof}{\itshape}{\maybesffamily\accentcolor}{}{}
+\xpatchcmd{\proof}{.}{{\maybesffamily\accentcolor.}}{}{}
+
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{\par
+	\pushQED{\qed}%
+	\normalfont
+	\topsep0pt \partopsep0pt % no space before
+	\trivlist
+	\item[\hskip\labelsep
+	\maybesffamily\accentcolor  % ‘Proof’ upright and in colour
+	#1\@addpunct{\maybesffamily\accentcolor.}]\ignorespaces  % ‘.’ upright and in colour
+}{%
+	\popQED\endtrivlist\@endpefalse
+	\addvspace{6pt plus 6pt} % some space after
+}
+\makeatother
+
+
+%%% Algorithms.
+\RestyleAlgo{plainruled}  % bar above and below algo + after caption
+\AtBeginDocument{\SetAlgoLined}  % vertical lines indicating blocks
+\AtBeginDocument{\SetAlgoLongEnd}  % end if, end while, ...
+\DontPrintSemicolon  % semicolon at end of lines not printed
+\SetFillComment  % end mark of comment put directly at end
+\LinesNumbered  % numbered lines
+\SetNlSty{texttt}{}{}
+\SetAlgoNlRelativeSize{-1}  % size of line numbers
+\IncMargin{0.4em}  % increase margin such that two-digit line numbers do not extend outwards
+\SetAlCapHSkip{0em}  % no skip in front of algorithm label
+\SetAlCapSkip{0.0em}  % skip between caption and body
+\SetAlgoSkip{}  % remove extra skip above and below algorithm floats
+\SetAlCapFnt{\accentcolor\maybesffamily}  % print algorithm label like a caption label
+\SetKwComment{tct}{\raisebox{0.10em}{\scriptsize\(\rhd\)}\,}{}  % triangle as comment symbol
+\SetFuncSty{textrm}  % print function names like usual operators
+\SetCommentSty{emph}  % print comments as set with \emph
+%\SetKwInOut{KwIn}{\maybesffamily Input}
+%\SetKwInOut{KwOut}{\maybesffamily Output\!}
+\SetKwInOut{KwIn}{Input}  % colon of Input and Output aligned
+\SetKwInOut{KwOut}{Output\!}
+
+\makeatletter
+% Remove right-hand margin in algorithm
+% taken from: https://tex.stackexchange.com/a/520407
+\patchcmd{\@algocf@start}% <cmd>
+	{-1.5em}% <search>
+	{-0.0em}% <replace>
+	{}{}% <success><failure>
+
+% Put caption on top and add whitespace between caption and body.
+\renewcommand{\@algocf@pre@plainruled}{\kern\interspacealgoruled\hrule  height\algoheightrule\kern3pt\relax}%
+\renewcommand{\@algocf@capt@plainruled}{above}% formerly {bottom}
+\makeatother
+
+
+%%% Bibliography.
+% Correct placement of dots and capitalisation when using doi+urldate.
+% taken from: https://github.com/plk/biblatex/issues/112#issuecomment-17075734
+\renewbibmacro*{doi+eprint+url}{%
+	\iftoggle{bbx:doi}
+		{\printfield{doi}}
+		{}%
+	\newunit\newblock
+	\iftoggle{bbx:eprint}
+		{\usebibmacro{eprint}}
+		{}%
+	\ifboolexpr{test {\iftoggle{bbx:url}} and test {\iffieldundef{url}} and not test {\iffieldundef{urlyear}}}
+		{\setunit{\addspace}}
+		{\newunit\newblock}%
+	\iftoggle{bbx:url}
+		{\usebibmacro{url+urldate}}
+		{}
+}
+\NewDocumentCommand{\mybibliography}{O{}}{
+	\begingroup
+%	\renewcommand*\ttdefault{cmvtt}  % proportional type writer font
+%	\renewcommand*\ttdefault{newcmvtt}  % proportional type writer font
+	\sloppy  % for justified urls
+	\printbibliography[#1]
+	\endgroup
+}
+
+
+%%% PDF options.
+\hypersetup{
+	pdfdisplaydoctitle=true,
+}

@@ -1,0 +1,280 @@
+%%% General notation in math.
+\mathtoolsset{mathic=true}  % italic correction (use \(..\) instead of $..$)
+
+% A ⇔  (or other symbol) on the left side of an align environment without affecting the width of the formula.
+% modelled after: https://tex.stackexchange.com/a/574795
+\NewDocumentCommand{\liff}{O{\!\!\iff}}{
+	\begin{tikzpicture}[baseline=(tmp.base), remember picture]
+		\node[inner sep=0pt] (tmp) {\vphantom{}};
+		\begin{scope}[overlay]
+			\path (current page text area.west|-tmp.base)
+				node[anchor=base west, inner sep=0pt, outer sep=0pt]{\(#1\)}
+			;
+		\end{scope}
+	\end{tikzpicture}
+}
+
+% The same as above but with an additional horizontal shift.
+\NewDocumentCommand{\liffsh}{m O{\!\!\iff}}{
+	\begin{tikzpicture}[baseline=(tmp.base), remember picture]
+		\node[inner sep=0pt] (tmp) {\vphantom{}};
+		\begin{scope}[overlay]
+			\path (current page text area.west|-tmp.base)
+				node[anchor=base west, inner sep=0pt, outer sep=0pt, xshift=#1]{\(#2\)}
+			;
+		\end{scope}
+	\end{tikzpicture}
+}
+
+
+% A tag on the right. To be used with 'leqno' option for amsmath
+% taken from: https://tex.stackexchange.com/a/574795
+\NewDocumentCommand{\rtag}{m}{
+	\begin{tikzpicture}[baseline=(tmp.base), remember picture]
+		\node[inner sep=0pt](tmp){\vphantom{1}};
+		\begin{scope}[overlay]
+			\path (current page text area.east|-tmp.base)
+				node[anchor=base east,inner sep=0pt,outer sep=0pt]{(#1)}
+			;
+		\end{scope}
+	\end{tikzpicture}
+}
+
+
+%%% Delimiters.
+\DeclarePairedDelimiter{\abs}{\vert}{\vert}
+\DeclarePairedDelimiter{\braces}{\{}{\}}
+\DeclarePairedDelimiter{\brackets}{[}{]}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\NewDocumentCommand{\given}{O{}}{\mathrel{#1\vert}}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\paren}{\lparen}{\rparen}
+
+
+%%% Operators.
+% Cups with dots inside for disjoint unions.
+% taken from: https://tex.stackexchange.com/questions/110976/is-a-cupdot-symbol-available-in-amsmath?noredirect=1&lq=1
+\makeatletter
+\providecommand*{\cupdot}{%
+	\mathbin{%
+		\mathpalette\@cupdot{}%
+	}%
+}
+\newcommand*{\@cupdot}[2]{%
+	\ooalign{%
+		$\m@th#1\cup$\cr
+		\sbox0{$#1\cup$}%
+		\dimen@=\ht0 %
+		\sbox0{$\m@th#1\cdot$}%
+		\advance\dimen@ by -\ht0 %
+		\dimen@=.5\dimen@
+		\hidewidth\raise\dimen@\box0\hidewidth
+	}%
+}
+
+\providecommand*{\bigcupdot}{%
+	\mathop{%
+		\vphantom{\bigcup}%
+		\mathpalette\@bigcupdot{}%
+	}%
+}
+\newcommand*{\@bigcupdot}[2]{%
+	\ooalign{%
+		$\m@th#1\bigcup$\cr
+		\sbox0{$#1\bigcup$}%
+		\dimen@=\ht0 %
+		\advance\dimen@ by -\dp0 %
+		\sbox0{\scalebox{2}{$\m@th#1\cdot$}}%
+		\advance\dimen@ by -\ht0 %
+		\dimen@=.5\dimen@
+		\hidewidth\raise\dimen@\box0\hidewidth
+	}%
+}
+\makeatother
+
+% Differential operators
+\letdif*{\dif}{d}  % \d is redefined by fixdif. This line is just for renaming.
+\letdif*{\diff}{updelta}  % * = spacing correction; perhaps remove the asterisks if changing the math font
+\letdif*{\difp}{partial}
+\newdif*{\D}{\mathrm{D}}
+\letdif*{\grad}{nabla}
+\letdif*{\nabla}{nabla}
+\DeclareDocumentCommand{\laplacian}{s}{
+	\IfBooleanTF{#1}{\mathdif*{\Delta}}{\nabla^2}
+}
+
+% Minima and maxima.
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+%%% Constants and specifiers.
+\NewDocumentCommand{\compAPX}{}{\ensuremath{\mathcal{APX}}}
+\NewDocumentCommand{\euler}{}{\ensuremath{\symup{e}}}
+\NewDocumentCommand{\compNP}{}{\ensuremath{\mathcal{N\kern-0.02em P}}}
+\NewDocumentCommand{\compP}{}{\ensuremath{\mathcal{P}}}
+
+% Sets of numbers.
+\NewDocumentCommand{\nat}{}{\symbb{N}}
+\NewDocumentCommand{\natzero}{}{\symbb{N}_{0}}
+\NewDocumentCommand{\natnozero}{}{\symbb{N}_{>0}}
+\NewDocumentCommand{\real}{}{\symbb{R}}
+\NewDocumentCommand{\realpos}{}{\symbb{R}^+}
+\NewDocumentCommand{\realposzero}{}{\symbb{R}_0^+}
+
+% Custom \bar.
+% taken from: https://tex.stackexchange.com/a/583573
+\NewDocumentCommand{\mybar}{m m m}{%
+	\mathrlap{\hspace{#2}\overline{\scalebox{#1}[1]{\phantom{\ensuremath{#3}}}}}\ensuremath{#3}
+}
+
+
+%%% Power set.
+\NewDocumentCommand{\powerset}{O{} m}{
+%	\symcal{P}\paren[#1]{#2}
+	2^{#2}
+}
+
+
+%%% Bachmann-Landau notation.
+\makeatletter
+\NewDocumentCommand{\l@nd@usymbol}{s O{} m m}{%
+	#4\IfBooleanTF{#1}{%
+		\paren*{#3}%
+	}{%
+		\IfEmptyTF{#2}{%
+			\paren{#3}%
+		}{%
+			\paren[#2]{#3}%
+		}%
+	}%
+}
+\NewDocumentCommand{\bigomega}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upOmega}}
+\NewDocumentCommand{\bigomicron}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\symup{O}}}
+\NewDocumentCommand{\bigtheta}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upTheta}}
+\NewDocumentCommand{\smallomega}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upomega}}
+\NewDocumentCommand{\smallomicron}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\symup{o}}}
+\makeatother
+
+
+%%% Stochastic notation.
+\makeatletter
+\NewDocumentCommand{\prob@bility}{s O{} m m}{%
+	#4\IfBooleanTF{#1}{%
+		\brackets*{#3}%
+	}{%
+		\IfEmptyTF{#2}{%
+			\brackets{#3}%
+		}{%
+			\brackets[#2]{#3}%
+		}%
+	}%
+}
+\NewDocumentCommand{\Cov}{s o m}{\IfBooleanTF{#1}{\prob@bility*}{\prob@bility}[#2]{#3}{\operatorname{Cov}}}
+\NewDocumentCommand{\Prob}{s o m}{\IfBooleanTF{#1}{\prob@bility*}{\prob@bility}[#2]{#3}{\symbb{P}}}
+\NewDocumentCommand{\Erw}{s o m}{\IfBooleanTF{#1}{\prob@bility*}{\prob@bility}[#2]{#3}{\symbb{E}}}
+\NewDocumentCommand{\Var}{s o m}{\IfBooleanTF{#1}{\prob@bility*}{\prob@bility}[#2]{#3}{\operatorname{Var}}}
+\makeatother
+
+\NewDocumentCommand{\Norm}{}{\symfrak{N}}
+\NewDocumentCommand{\Unif}{}{\symfrak{U}}
+
+
+%%% Period in math environments.
+\NewDocumentCommand{\mperiod}{O{.}}{%
+	\relax\ifmmode{\rlap{\,#1}}\else{\thinspace#1}\fi%
+}
+
+
+%%% Abbreviation in texts.
+\NewDocumentCommand{\eg}{}{\mbox{e.\thinskip g.}\@}  % mbox to prevent breaks
+\NewDocumentCommand{\ie}{}{\mbox{i.\thinskip e.}\@}
+
+\NewDocumentCommand{\pp}{}{\nobreak pp}  % percentage points
+
+%%% Notation in texts.
+\NewDocumentCommand{\caseintextfont}{}{}  % actually defined in theme.sty
+\NewDocumentEnvironment{caseintext}{m m}{\par\smallskip\noindent{\caseintextfont Case #1 \Dash #2:}}{\par\smallskip}
+
+\NewDocumentCommand{\hairspace}{}{\hskip .125em\relax}
+\NewDocumentCommand{\itordinal}{}{\hairspace}
+
+% Thin spaces around en dash (\dash) and em dash(\Dash). Use only for English texts!
+% taken from: https://tex.stackexchange.com/questions/268111/automated-spacing
+\makeatletter
+\DeclareRobustCommand{\thinskip}{\hskip 0.16667em\relax}
+\def\endash{--}
+\def\emdash{\endash-}
+\def\d@sh#1#2{\unskip#1\thinskip#2\thinskip\ignorespaces}
+\def\dash{\d@sh\nobreak\endash}
+\def\Dash{\d@sh\nobreak\emdash}
+\def\ldash{\d@sh\empty{\hbox{\endash}\nobreak}}
+\def\rdash{\d@sh\nobreak\endash}
+\def\Ldash{\d@sh\empty{\hbox{\emdash}\nobreak}}
+\def\Rdash{\d@sh\nobreak\emdash}
+\makeatother
+
+
+%%% Tables.
+% Column types for tabularx (X = justified)
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}  % left-aligned
+\newcolumntype{C}{>{\centering\arraybackslash}X}  % centered
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}  % right-aligned
+
+
+%%% Algorithms.
+% Removes line number for one line. Best use with \nosemic
+% taken from: https://tex.stackexchange.com/a/153906
+\makeatletter
+\newcommand{\nosemic}{\renewcommand{\@endalgocfline}{\relax}}  % Drop semi-colon ;
+\newcommand{\dosemic}{\renewcommand{\@endalgocfline}{\algocf@endline}}  % Reinstate semi-colon ;
+\newcommand{\pushline}{\Indp}  % indent
+\newcommand{\popline}{\Indm\dosemic}  % undent
+\let\oldnl\nl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
+\makeatother
+
+
+%%% Beamer specific.
+\makeatletter
+\@ifclassloaded{beamer}{
+	% to position images more easily
+	% ex.: \beamerimage at (12cm, 0.25cm) {\includegraphics[height=3cm, page=62]{example-image-duck}};
+	\NewDocumentCommand{\beamerimage}{}{\tikz[baseline,overlay]\node}
+
+	% \subject additionally creates a suiting string variable, which is used on the title page.
+	\let\oldsubject\subject
+	\RenewDocumentCommand{\subject}{m}{%
+		\oldsubject{#1}%
+		\NewDocumentCommand{\insertsubject}{}{#1}%
+	}
+
+	% \supervisor creates a suiting string variable, which is used on the title page.
+	\NewDocumentCommand{\supervisor}{m}{%
+		\NewDocumentCommand{\insertsupervisor}{}{#1}%
+	}
+
+	% For resuming enumerations like with the package `enumitem`. Use `\seti` after the last `item` and `\conti` before the first.
+	\newcounter{saveenumi}
+	\newcommand{\seti}{\setcounter{saveenumi}{\value{enumi}}}
+	\newcommand{\conti}{\setcounter{enumi}{\value{saveenumi}}}
+
+	% Emphasising defined words.
+	\NewDocumentCommand{\emphdef}{m}{\@ifpackageloaded{libertinus}{\textsbf}{\textbf}{\emph{#1}}}
+
+	% to remove space above blocks on top of frame
+	\NewDocumentCommand{\adjustfortopblock}{}{\vspace{-\medskipamount}}
+
+	% to remove space above blocks on top of frame
+	\NewDocumentCommand{\adjustfortopblockincolumn}{}{\vspace{-4.175ex}}
+
+	% to correct space above minipages
+	\NewDocumentCommand{\adjustforminipage}{}{\vspace{4pt}}  % Dirty! Whence does this number come? Sould there not be a better solution?
+}{}
+\makeatother
+
+
+%%% Junk for playing around.
+\NewDocumentCommand{\ABC}{}{ABCDEFGHIJKLMNOPQRSTUVWXYZ}
+\NewDocumentCommand{\abc}{}{abcdefghijklmnopqrstuvwxyz}
