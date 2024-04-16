@@ -29,6 +29,7 @@
 \usetikzlibrary{positioning, calc}
 \RequirePackage{pgfplots}  % tikz-Erweiterung
 \pgfplotsset{compat=1.18}
+\RequirePackage{pgfplotstable}  % erlaubt es, Daten aus Textdateien in Tabellen und Grafiken umzuwandeln
 
 \RequirePackage{algorithm2e}  % Algorithmen setzen
 

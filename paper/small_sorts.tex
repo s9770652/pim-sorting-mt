@@ -1,19 +1,21 @@
 \pgfplotstableread{data/small_sorts.txt}{\tablesmallsorts}
 \begin{figure}
-	\begin{tikzpicture}
+	\begin{tikzpicture}[trim axis left, trim axis right]
 		\pgfplotsset{cycle list shift=1}  % skip over colour of first plot
 		\begin{axis}[
+			width=\linewidth,
+			enlargelimits=false,
 			xlabel=Input Length \(n\),
 			ylabel=Speed-Up,
-			width=\linewidth,
-			height=5cm,
 			xtick=data,
-			xticklabels from table={\tablesmallsorts}{n},
+%			xticklabels from table={\tablesmallsorts}{n},
+			ymin=0.6,
+			ymax=1.2,
 			legend columns=3,
 			legend pos=south east,
 		]
 			\pgfplotsinvokeforeach{2,...,9}{
-				\linespeedup{#1}{1}{\tablesmallsorts}
+				\plotspeedup{#1}{1}{\tablesmallsorts}
 				\addlegendentry{\(#1\)}
 			}
 		\end{axis}
@@ -24,29 +26,32 @@
 	}
 \end{figure}
 
-
 \begin{figure}
-	\begin{tikzpicture}
+	\begin{tikzpicture}[trim axis group left, trim axis group right]
 		\begin{groupplot}[
-			width=\linewidth,
-			height=5cm,
-			xtick=data,
-			xticklabels from table={\tablesmallsorts}{n},
+			width=0.4358\linewidth,
+			enlargelimits=auto,
+%			xtick=data,
+%			xticklabels from table={\tablesmallsorts}{n},
+			xtick distance=3,
+%			minor x tick num=2,
+			minor xtick=data,
 			legend columns=-1,
 			legend entries={\(1\), \(...\), \(9\)},
 			legend to name={leg:shell_sort},
-			group style={group size=1 by 2},
+			group style={group size=2 by 1, horizontal sep=5em},
 			groupplot xlabel={Input Length \(n\)},
 		]
 			\nextgroupplot[ylabel=Cycles, ymin=0, ymax=1e4]
 			\pgfplotsinvokeforeach{1,...,9}{
-				\linewithbars{#1}{\tablesmallsorts}
+%				\plotwithbars{#1}{\tablesmallsorts}
+				\plotruntime{#1}{\tablesmallsorts}
 			}
 			%
 			\nextgroupplot[ylabel=Speed-Up, ymin=0.6, ymax=1.2]
-			\linespeedup[no markers, draw=none]{1}{1}{\tablesmallsorts}  % invisible but needed to *properly* skip over first colour (even in the legend!)
+			\plotspeedup[no markers, draw=none]{1}{1}{\tablesmallsorts}  % invisible but needed to *properly* skip over first colour (even in the legend!)
 			\pgfplotsinvokeforeach{2,...,9}{
-				\linespeedup{#1}{1}{\tablesmallsorts}
+				\plotspeedup{#1}{1}{\tablesmallsorts}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -58,3 +63,22 @@
 		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
 	}
 \end{figure}
+
+%\paragraph{InsertionSort}
+%This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
+%Even though in both the average case and the worst case, InsertionSort has a runtime of \(\bigomicron{n^2}\), it displays quite some advantages:
+%\begin{enumerate*}
+%	\item
+%	It works in-place, requiring only \(\bigomicron{1}\) additional space.
+%
+%	\item
+%	It is inherently adaptive:
+%	If the input array is already (mostly) sorted, the runtime drops down to \(\bigomicron{n}\).
+%
+%	\item
+%	Its program code is rather short, lending itself to inlining.
+%
+%	\item
+%	The overhead is small.
+%\end{enumerate*}
+%Especially the last two points make InsertionSort a good candidate for being a

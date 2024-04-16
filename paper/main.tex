@@ -1,9 +1,6 @@
-% !TeX program = lualatex
 \documentclass[final]{../garticle}
 
 \input{../macros.sty}
-\RequirePackage{pgfplotstable}
-\RequirePackage{etoolbox}
 
 \titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
 \subject{Master's Thesis}
@@ -32,6 +29,8 @@
 \usetikzlibrary{matrix}
 \usepgfplotslibrary{groupplots}
 \pgfplotsset{
+	scale only axis,
+	height=4cm,
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
 	ymajorgrids,  % grey, horizontal background lines at each y-tick
 	/pgfplots/legend style={  % adds padding to legends with multiple columns

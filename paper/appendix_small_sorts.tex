@@ -1,10 +1,10 @@
 \begin{figure}
-	\begin{tikzpicture}
+	\begin{tikzpicture}[trim axis left, trim axis right]
 		\begin{axis}[
 			xlabel=Input Length \(n\),
 			ylabel=Speed-Up,
+			enlargelimits=auto,
 			width=\linewidth,
-			height=5cm,
 			xtick=data,
 			xticklabels from table={\tablesmallsorts}{n},
 			ymax=1,
@@ -13,11 +13,11 @@
 			legend columns=-1,
 			legend pos=north east,
 		]
-			\linespeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
+			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
 			\addlegendentry{Bubble}
-			\linespeedup{BubbleAdapt}{1}{\tablesmallsorts}
+			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
 			\addlegendentry{Bubble (adaptive)}
-			\linespeedup{Selection}{1}{\tablesmallsorts}
+			\plotspeedup{Selection}{1}{\tablesmallsorts}
 			\addlegendentry{Selection}
 		\end{axis}
 	\end{tikzpicture}
