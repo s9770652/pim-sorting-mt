@@ -3,6 +3,7 @@
 
 \input{../macros.sty}
 \RequirePackage{pgfplotstable}
+\RequirePackage{etoolbox}
 
 \titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
 \subject{Master's Thesis}
@@ -28,19 +29,46 @@
 }
 \makeatother
 
-\tikzset{
-	legend 3 cols/.style = {
-		/pgfplots/legend columns=3,
-		/pgfplots/legend style={
-			/tikz/column 2/.style={
-				column sep=5pt,
-			},
-			/tikz/column 4/.style={
-				column sep=5pt,
-			},
-		},
+\usetikzlibrary{matrix}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{
+	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
+	ymajorgrids,  % grey, horizontal background lines at each y-tick
+	/pgfplots/legend style={  % adds padding to legends with multiple columns
+		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},
 	},
 }
+
+% taken from: https://tex.stackexchange.com/a/117935
+\makeatletter
+\pgfplotsset{
+	groupplot xlabel/.initial={},
+	every groupplot x label/.style={
+		at={($({\pgfplots@group@name\space c1r\pgfplots@group@rows.west}|-{\pgfplots@group@name\space c1r\pgfplots@group@rows.outer south})!0.5!({\pgfplots@group@name\space c\pgfplots@group@columns r\pgfplots@group@rows.east}|-{\pgfplots@group@name\space c\pgfplots@group@columns r\pgfplots@group@rows.outer south})$)},
+		anchor=north,
+	},
+	groupplot ylabel/.initial={},
+	every groupplot y label/.style={
+		rotate=90,
+		at={($({\pgfplots@group@name\space c1r1.north}-|{\pgfplots@group@name\space c1r1.outer
+				west})!0.5!({\pgfplots@group@name\space c1r\pgfplots@group@rows.south}-|{\pgfplots@group@name\space c1r\pgfplots@group@rows.outer west})$)},
+		anchor=south
+	},
+	execute at end groupplot/.code={%
+		\node [/pgfplots/every groupplot x label]
+		{\pgfkeysvalueof{/pgfplots/groupplot xlabel}};
+		\node [/pgfplots/every groupplot y label]
+		{\pgfkeysvalueof{/pgfplots/groupplot ylabel}};
+	}
+}
+
+\def\endpgfplots@environment@groupplot{%
+	\endpgfplots@environment@opt%
+	\pgfkeys{/pgfplots/execute at end groupplot}%
+	\endgroup%
+}
+\makeatother
+
 
 \begin{document}
 	\pagenumbering{gobble}  % turn off pagenumbering
@@ -58,87 +86,9 @@
 	\pagenumbering{arabic}  % turn on pagenumbering
 	\endgroup
 
-	\pgfplotstableread{data/test2.dat}{\tabletest}
-	\begin{tikzpicture}
-		\begin{loglogaxis}[
-			xlabel=Input Length \(n\),
-			ylabel=Cycles,
-			width=\linewidth,
-			height=5cm,
-			xtick=data,
-			xticklabels from table={\tabletest}{n},
-			log ticks with fixed point,
-			grid,
-			legend 3 cols,
-			legend pos=south east,
-		]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\linewithbars[select coords between index={1}{5}]{#1}{\tabletest}
-				\addlegendentry{\(#1\)}
-			}
-		\end{loglogaxis}
-	\end{tikzpicture}
+	\include{small_sorts}
 
-	\begin{tikzpicture}
-		\begin{loglogaxis}[
-			xlabel=Input Length \(n\),
-			ylabel=Cycles / \((n \lb n )\),
-			width=\linewidth,
-			height=5cm,
-			xtick=data,
-			xticklabels from table={\tabletest}{n},
-			log ticks with fixed point,
-			grid,
-			legend 3 cols,
-			legend pos=north west,
-		]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\linepernlogn{#1}{\tabletest}
-				\addlegendentry{\(#1\)}
-			}
-		\end{loglogaxis}
-	\end{tikzpicture}
-
-	\begin{tikzpicture}
-		\begin{loglogaxis}[
-			xlabel=Input Length \(n\),
-			ylabel=Cycles / \(n\)²,
-			width=\linewidth,
-			height=5cm,
-			xtick=data,
-			xticklabels from table={\tabletest}{n},
-			log ticks with fixed point,
-			grid,
-			legend 3 cols,
-			legend pos=south west,
-		]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\linepernn{#1}{\tabletest}
-				\addlegendentry{\(#1\)}
-			}
-		\end{loglogaxis}
-	\end{tikzpicture}
-
-	\begin{tikzpicture}
-		\pgfplotsset{cycle list shift=1}  % skip over colour of first plot
-		\begin{semilogxaxis}[
-			xlabel=Input Length \(n\),
-			ylabel=Speed-Up,
-			width=\linewidth,
-			height=5cm,
-			xtick=data,
-			xticklabels from table={\tabletest}{n},
-			log ticks with fixed point,
-			grid,
-			legend 3 cols,
-			legend pos=north west,
-		]
-			\pgfplotsinvokeforeach{2,...,9}{
-				\linespeedup[select coords between index={1}{5}]{#1}{1}{\tabletest}
-				\addlegendentry{\(#1\)}
-			}
-		\end{semilogxaxis}
-	\end{tikzpicture}
+	\include{appendix_small_sorts}
 
 %	\clearpage
 

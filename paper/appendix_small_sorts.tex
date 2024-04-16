@@ -1,0 +1,28 @@
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{axis}[
+			xlabel=Input Length \(n\),
+			ylabel=Speed-Up,
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tablesmallsorts}{n},
+			ymax=1,
+			ytick={0.3333, 0.6666, 1},
+			yticklabels={\(0.\bar{3}\), \(0.\bar{6}\), \(1\)},
+			legend columns=-1,
+			legend pos=north east,
+		]
+			\linespeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
+			\addlegendentry{Bubble}
+			\linespeedup{BubbleAdapt}{1}{\tablesmallsorts}
+			\addlegendentry{Bubble (adaptive)}
+			\linespeedup{Selection}{1}{\tablesmallsorts}
+			\addlegendentry{Selection}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{
+		The speed-up of BubbleSort and SelectionSort over regular InsertionSort with uniform input distribution.
+		The adaptive BubbleSort terminates prematurely if no changes were made to the input array during an iteration.
+	}
+\end{figure}

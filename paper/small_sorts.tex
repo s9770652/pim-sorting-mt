@@ -1,0 +1,60 @@
+\pgfplotstableread{data/small_sorts.txt}{\tablesmallsorts}
+\begin{figure}
+	\begin{tikzpicture}
+		\pgfplotsset{cycle list shift=1}  % skip over colour of first plot
+		\begin{axis}[
+			xlabel=Input Length \(n\),
+			ylabel=Speed-Up,
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tablesmallsorts}{n},
+			legend columns=3,
+			legend pos=south east,
+		]
+			\pgfplotsinvokeforeach{2,...,9}{
+				\linespeedup{#1}{1}{\tablesmallsorts}
+				\addlegendentry{\(#1\)}
+			}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{
+		The speed-ups of various ShellSorts over regular InsertionSort with uniform input distribution.
+		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
+	}
+\end{figure}
+
+
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{groupplot}[
+			width=\linewidth,
+			height=5cm,
+			xtick=data,
+			xticklabels from table={\tablesmallsorts}{n},
+			legend columns=-1,
+			legend entries={\(1\), \(...\), \(9\)},
+			legend to name={leg:shell_sort},
+			group style={group size=1 by 2},
+			groupplot xlabel={Input Length \(n\)},
+		]
+			\nextgroupplot[ylabel=Cycles, ymin=0, ymax=1e4]
+			\pgfplotsinvokeforeach{1,...,9}{
+				\linewithbars{#1}{\tablesmallsorts}
+			}
+			%
+			\nextgroupplot[ylabel=Speed-Up, ymin=0.6, ymax=1.2]
+			\linespeedup[no markers, draw=none]{1}{1}{\tablesmallsorts}  % invisible but needed to *properly* skip over first colour (even in the legend!)
+			\pgfplotsinvokeforeach{2,...,9}{
+				\linespeedup{#1}{1}{\tablesmallsorts}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell_sort}\hfil
+
+	\caption{
+		The runtime of InsertionSort and various ShellSorts as well as the speed-ups of the ShellSorts over InsertionSort with uniform input distribution.
+		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
+	}
+\end{figure}
