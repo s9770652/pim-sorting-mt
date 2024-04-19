@@ -26,18 +26,27 @@
 }
 \makeatother
 
-\usetikzlibrary{matrix}
 \usepgfplotslibrary{groupplots}
 \pgfplotsset{
-	scale only axis,
 	height=4cm,
+	/tikz/trim axis group left, /tikz/trim axis group right,  % Only axes define the bounding box. Thus, lables can extend into the margins.
+	/pgfplots/every legend to name picture/.append style={  % Legends outside (added via \pgfplotslegendfromname) have their bounding box reset.
+		trim left=(current bounding box.west),
+		trim right=(current bounding box.east),
+	},
+	scale only axis,  % height and width apply only to the axes, not the labels
+	enlargelimits=auto,  % for axes without specified limits, the limits are a bit bigger than neeeded (→ padding)
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
 	ymajorgrids,  % grey, horizontal background lines at each y-tick
-	/pgfplots/legend style={  % adds padding to legends with multiple columns
+	legend style={  % adds padding to legends with multiple columns
+		cells={anchor=west},  % left aligned labels
 		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},
 	},
+	group style={horizontal sep=5em},
 }
 
+% Adds groupplot xlabel and groupplot ylabel, i.e. common axis labels for groupplots.
+% groupplot xlabel should also be used if there is only one plot in the group plot for margin reasons.
 % taken from: https://tex.stackexchange.com/a/117935
 \makeatletter
 \pgfplotsset{

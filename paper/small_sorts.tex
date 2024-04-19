@@ -1,51 +1,81 @@
 \pgfplotstableread{data/small_sorts.txt}{\tablesmallsorts}
 \begin{figure}
-	\begin{tikzpicture}[trim axis left, trim axis right]
-		\pgfplotsset{cycle list shift=1}  % skip over colour of first plot
-		\begin{axis}[
+	\begin{tikzpicture}
+		\begin{groupplot}[
 			width=\linewidth,
-			enlargelimits=false,
-			xlabel=Input Length \(n\),
+			groupplot xlabel={Input Length \(n\)},
 			ylabel=Speed-Up,
 			xtick=data,
-%			xticklabels from table={\tablesmallsorts}{n},
-			ymin=0.6,
-			ymax=1.2,
-			legend columns=3,
-			legend pos=south east,
-		]
-			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tablesmallsorts}
-				\addlegendentry{\(#1\)}
-			}
-		\end{axis}
+			ymin=0.2,
+			ymax=1,
+			legend columns=2,
+			legend pos=north east,
+			]
+			\nextgroupplot
+			\plotspeedup{1NoSentinel}{1}{\tablesmallsorts}
+			\addlegendentry{Insertion (no sentinel)}
+			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
+			\addlegendentry{Bubble}
+			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
+			\addlegendentry{Bubble (adaptive)}
+			\plotspeedup{Selection}{1}{\tablesmallsorts}
+			\addlegendentry{Selection}
+		\end{groupplot}
 	\end{tikzpicture}
 	\caption{
-		The speed-ups of various ShellSorts over regular InsertionSort with uniform input distribution.
-		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
+		The speed-ups of some sorting algorithms over an InsertionSort using sentinel values with uniform input distribution.
+		Compared to normal BubbleSort, the adaptive version terminates prematurely if no changes were made to the input array during an iteration.
+		Speed-ups below \(1\) indicate slow-downs.
 	}
+	\label{fig:speed-up_over_is}
 \end{figure}
 
+\paragraph{InsertionSort}
+This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
+Even though in both the average case and the worst case, InsertionSort has a runtime of \(\bigomicron{n^2}\)\todo{Beleg?}, it displays quite some advantages:
+\begin{enumerate*}
+	\item
+	It works in-place, needing only \(\bigomicron{1}\) additional space.
+
+	\item
+	It is inherently adaptive:
+	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigomicron{n}\).
+
+	\item
+	Its program code is short, lending itself to inlining.
+
+	\item
+	The overhead is small.
+\end{enumerate*}
+Especially the last two points make InsertionSort a good base algorithm for asymptotically better sorting algorithms to use on very small subarrays.
+
+When moving an element to the left, two checks are needed:
+Does the left neighbour exist and is it smaller than the element?
+The first check can be omitted through the use of \emph{sentinel values}:
+If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
+Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\% (\cref{fig:speed-up_over_is}).
+
+
+Other known simple sorting algorithm with similar runtimes are SelectionSort and BubbleSort.
+The asymptoticity, however, hides much higher constant factors such that even for as little as three elements InsertionSort is superior (\cref{fig:speed-up_over_is}).
+
+
+
 \begin{figure}
-	\begin{tikzpicture}[trim axis group left, trim axis group right]
+	\begin{tikzpicture}%[trim axis group left, trim axis group right]
 		\begin{groupplot}[
 			width=0.4358\linewidth,
-			enlargelimits=auto,
-%			xtick=data,
-%			xticklabels from table={\tablesmallsorts}{n},
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
-%			minor x tick num=2,
 			minor xtick=data,
 			legend columns=-1,
 			legend entries={\(1\), \(...\), \(9\)},
 			legend to name={leg:shell_sort},
-			group style={group size=2 by 1, horizontal sep=5em},
-			groupplot xlabel={Input Length \(n\)},
-		]
-			\nextgroupplot[ylabel=Cycles, ymin=0, ymax=1e4]
+			]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80]
 			\pgfplotsinvokeforeach{1,...,9}{
-%				\plotwithbars{#1}{\tablesmallsorts}
-				\plotruntime{#1}{\tablesmallsorts}
+				\plotpernn{#1}{\tablesmallsorts}
 			}
 			%
 			\nextgroupplot[ylabel=Speed-Up, ymin=0.6, ymax=1.2]
@@ -61,24 +91,6 @@
 	\caption{
 		The runtime of InsertionSort and various ShellSorts as well as the speed-ups of the ShellSorts over InsertionSort with uniform input distribution.
 		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
+		Speed-ups below \(1\) indicate slow-downs.
 	}
 \end{figure}
-
-%\paragraph{InsertionSort}
-%This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
-%Even though in both the average case and the worst case, InsertionSort has a runtime of \(\bigomicron{n^2}\), it displays quite some advantages:
-%\begin{enumerate*}
-%	\item
-%	It works in-place, requiring only \(\bigomicron{1}\) additional space.
-%
-%	\item
-%	It is inherently adaptive:
-%	If the input array is already (mostly) sorted, the runtime drops down to \(\bigomicron{n}\).
-%
-%	\item
-%	Its program code is rather short, lending itself to inlining.
-%
-%	\item
-%	The overhead is small.
-%\end{enumerate*}
-%Especially the last two points make InsertionSort a good candidate for being a

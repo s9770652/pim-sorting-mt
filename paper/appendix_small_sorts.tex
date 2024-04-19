@@ -1,28 +1,57 @@
-\begin{figure}
-	\begin{tikzpicture}[trim axis left, trim axis right]
-		\begin{axis}[
-			xlabel=Input Length \(n\),
-			ylabel=Speed-Up,
-			enlargelimits=auto,
-			width=\linewidth,
-			xtick=data,
-			xticklabels from table={\tablesmallsorts}{n},
-			ymax=1,
-			ytick={0.3333, 0.6666, 1},
-			yticklabels={\(0.\bar{3}\), \(0.\bar{6}\), \(1\)},
-			legend columns=-1,
-			legend pos=north east,
-		]
-			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
-			\addlegendentry{Bubble}
-			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
-			\addlegendentry{Bubble (adaptive)}
-			\plotspeedup{Selection}{1}{\tablesmallsorts}
-			\addlegendentry{Selection}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{
-		The speed-up of BubbleSort and SelectionSort over regular InsertionSort with uniform input distribution.
-		The adaptive BubbleSort terminates prematurely if no changes were made to the input array during an iteration.
-	}
-\end{figure}
+\begin{description}
+	\item[r0] start
+	\item[r1] end
+	\item[r23] return address
+\end{description}
+\begin{verbatim}
+insertion_sort_nosentinel:
+    jleu r0, r1, .LBB2_1  // Continue if array of positive length …
+.LBB2_8:
+    jump r23  // … else leave the function.
+.LBB2_1:
+    move r2, r0, true, .LBB2_2  // i ← start; Jump to beginning of outer loop.
+.LBB2_5:
+    move r4, r5  // ?
+.LBB2_7:
+    add r2, r2, 4  // i++
+    sw r4, 0, r3  // *curr ← to_sort
+    jgtu r2, r1, .LBB2_8  // If i > end, terminate.
+.LBB2_2:  // Beginning of outer loop.
+    lw r3, r2, 0  // to_sort ← *i;
+    add r5, r2, -4  // prev ← i - 1
+    move r4, r2  // curr ← i
+    jltu r5, r0, .LBB2_7  // If prev < start, skip to the next iteration of the outer loop.
+    move r5, r2  // (prev + 1) ← i
+.LBB2_4:
+    lw r6, r5, -4  // *prev
+    jleu r6, r3, .LBB2_5  // If *prev > to_sort, terminate inner loop.
+    add r4, r5, -4  // Store prev.
+    add r7, r5, -8  // Store prev--.
+    sw r5, 0, r6  // *curr ← *prev
+    move r5, r4  // curr ← prev
+    jgeu r7, r0, .LBB2_4  // If prev >= start, continue with the next iteration of the inner loop.
+    jump .LBB2_7  // Continue with the next iteration of the outer loop.
+\end{verbatim}
+
+\begin{verbatim}
+insertion_sort_sentinel:
+    jleu r0, r1, .LBB3_1  // Continue if array of positive length …
+.LBB3_5:
+    jump r23  // … else leave the function.
+.LBB3_4:
+    add r0, r0, 4  // i++
+    sw r3, 0, r2  // *curr ← to_sort
+    jgtu r0, r1, .LBB3_5  // If i > end, leave the function.
+.LBB3_1:
+    lw r2, r0, 0  // to_sort ← *i
+    lw r4, r0, -4  // *prev
+    move r3, r0  // curr ← i
+    jleu r4, r2, .LBB3_4  // If *prev > to_sort, terminate inner loop.
+    move r3, r0  // ???
+.LBB3_3:
+    sw r3, 0, r4  // *curr ← *prev
+    lw r4, r3, -8  // *(prev - 1)
+    add r3, r3, -4  // curr ← prev
+    jgtu r4, r2, .LBB3_3  // If *(prev - 1) > to_sort, continue with the next iteration of the inner loop.
+    jump .LBB3_4  // Leave inner loop.
+\end{verbatim}
