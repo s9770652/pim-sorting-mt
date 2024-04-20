@@ -1,4 +1,4 @@
-\RequirePackage[british]{babel}  % Sprache
+\RequirePackage{babel}  % Sprache
 \RequirePackage{csquotes}  % Anführungszeichen
 
 \RequirePackage{geometry}  % Seitenlayout (insbesondere Ränder)
