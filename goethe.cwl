@@ -54,6 +54,8 @@
 
 \hairspace
 
+\RemoveSpaces{text}#n
+
 # environments
 \begin{caseintext}{%|number%text}{condition%text}%\\end{caseintext}#n
 \end{caseintext}#n

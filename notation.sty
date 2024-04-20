@@ -200,6 +200,15 @@
 \NewDocumentCommand{\hairspace}{}{\hskip .125em\relax}
 \NewDocumentCommand{\itordinal}{}{\hairspace}
 
+% Removes spaces between words
+\NewDocumentCommand{\RemoveSpaces}{m}{%
+	\begingroup%
+	\spaceskip=1sp%
+	\xspaceskip=1sp%
+	#1%
+	\endgroup%
+}
+
 % Thin spaces around en dash (\dash) and em dash(\Dash). Use only for English texts!
 % taken from: https://tex.stackexchange.com/questions/268111/automated-spacing
 \makeatletter

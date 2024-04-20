@@ -12,12 +12,16 @@
 	},
 }
 
+% Draws a plot of data in column µ_#2 of the table #3.
+% A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotruntime}{O{} m m}{
 	\addplot+
 	plot [#1]
 	table [x=n, y=µ_#2] {#3};
 }
 
+% Draws a plot of column µ_#2 with error bars loaded from σ_#2 of table #3.
+% A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotwithbars}{O{} m m}{
 	\addplot+
 	plot [#1, error bars/.cd, y dir=both, y explicit]
@@ -25,22 +29,42 @@
 	table [x=n, y=µ_#2, y error expr={2 * \thisrow{σ_#2}}] {#3};
 }
 
+% Draws a plot of column µ_#2 of table #3, divided by n log n.
+% A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernlogn}{O{} m m}{
 	\addplot+
 	plot [#1]
 	table [x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}] {#3};
 }
 
+% Draws a plot of column µ_#2 of table #3, divided by n² (a column n must be present).
+% A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernn}{O{} m m}{
 	\addplot+
 	plot [#1]
 	table [x=n, y expr={\thisrow{µ_#2} / \thisrow{n}^2}] {#3};
 }
 
+% Draws a plot of column µ_#3 divided by column µ_#2 of table #4.
+% A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotspeedup}{O{} m m m}{
 	\addplot+
 	plot [#1]
 	table [x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}] {#4};
 }
 
+% Draws a plot where each y-value is set to #2.
+% Useful if something like xtick=data is set and the first plot is not present in the last groupplot, as this allows for a correct legend.
+% A column n must be present. Applies custom options #1.
+\NewDocumentCommand{\plotonlyforticks}{O{} m m}{
+	\addplot+
+	plot [#1]
+	table [x=n, y expr={#2}] {#3};
+}
+
 % Texts.
+\NewDocumentCommand{\sortalgo}{m}{\RemoveSpaces{\capitalisewords{#1}}}  % removes white space
+\NewDocumentCommand{\BS}{s}{\sortalgo{bubble sort\IfBooleanT{#1}{s}}}
+\NewDocumentCommand{\IS}{s}{\sortalgo{insertion sort\IfBooleanT{#1}{s}}}
+\NewDocumentCommand{\SelS}{s}{\sortalgo{selection sort\IfBooleanT{#1}{s}}}
+\NewDocumentCommand{\ShS}{s}{\sortalgo{shell sort\IfBooleanT{#1}{s}}}
