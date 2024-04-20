@@ -86,11 +86,20 @@
 \compNP
 \compP
 
-\bigomega#g
-\bigomicron#g
-\bigtheta#g
-\smallomega#g
-\smallomicron#g
+\bigomega{formula}#m
+\bigomega*[size]{formula}#m
+\bigomicron{formula}#m
+\bigomicron*[size]{formula}#m
+\bigoh{formula}#m
+\bigoh*[size]{formula}#m
+\bigtheta{formula}#m
+\bigtheta*[size]{formula}#m
+\smallomega{formula}#m
+\smallomega*[size]{formula}#m
+\smallomicron{formula}#m
+\smallomicron*[size]{formula}#m
+\smalloh{formula}#m
+\smalloh*[size]{formula}#m
 
 # constants
 \euler#m

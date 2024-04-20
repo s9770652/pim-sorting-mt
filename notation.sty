@@ -152,9 +152,11 @@
 }
 \NewDocumentCommand{\bigomega}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upOmega}}
 \NewDocumentCommand{\bigomicron}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\symup{O}}}
+\let\bigoh\bigomicron
 \NewDocumentCommand{\bigtheta}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upTheta}}
 \NewDocumentCommand{\smallomega}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\upomega}}
 \NewDocumentCommand{\smallomicron}{s o m}{\IfBooleanTF{#1}{\l@nd@usymbol*}{\l@nd@usymbol}[#2]{#3}{\symup{o}}}
+\let\smalloh\smallomicron
 \makeatother
 
 
