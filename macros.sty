@@ -53,15 +53,6 @@
 	table [x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}] {#4};
 }
 
-% Draws a plot where each y-value is set to #2.
-% Useful if something like xtick=data is set and the first plot is not present in the last groupplot, as this allows for a correct legend.
-% A column n must be present. Applies custom options #1.
-\NewDocumentCommand{\plotonlyforticks}{O{} m m}{
-	\addplot+
-	plot [#1]
-	table [x=n, y expr={#2}] {#3};
-}
-
 % Texts.
 \NewDocumentCommand{\sortalgo}{m}{\RemoveSpaces{\capitalisewords{#1}}}  % removes white space
 \NewDocumentCommand{\BS}{s}{\sortalgo{bubble sort\IfBooleanT{#1}{s}}}
