@@ -1,45 +1,53 @@
 \pgfplotstableread{data/small_sorts.txt}{\tablesmallsorts}
+
 \begin{figure}
-	\begin{tikzpicture}
+	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=\linewidth,
+			width=0.4358\linewidth,
+			group/group size=2 by 1,
 			groupplot xlabel={Input Length \(n\)},
-			ylabel=Speed-Up,
-			xtick=data,
-			ymin=0.2,
-			ymax=1,
-			legend columns=2,
-			legend pos=north east,
-			]
-			\nextgroupplot
+			xtick distance=3,
+			minor xtick=data,
+			legend entries={Insertion (sentinel), Insertion (no sentinel), Bubble, Bubble (adaptive), Selection},
+			legend columns=3,
+			legend to name={leg:speed-up_over_is},
+		]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80]
+			\plotpernn{1}{\tablesmallsorts}
+			\plotpernn{1NoSentinel}{\tablesmallsorts}
+			\plotpernn{BubbleNonAdapt}{\tablesmallsorts}
+			\plotpernn{BubbleAdapt}{\tablesmallsorts}
+			\plotpernn{Selection}{\tablesmallsorts}
+			%
+			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
+			\plotonlyforticks{0}{\tablesmallsorts}  % Hacky: Invisible but needed to *properly* skip over first colour (even in the legend!)
 			\plotspeedup{1NoSentinel}{1}{\tablesmallsorts}
-			\addlegendentry{Insertion (no sentinel)}
 			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
-			\addlegendentry{Bubble}
 			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
-			\addlegendentry{Bubble (adaptive)}
 			\plotspeedup{Selection}{1}{\tablesmallsorts}
-			\addlegendentry{Selection}
 		\end{groupplot}
 	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:speed-up_over_is}\hfil
 	\caption{
-		The speed-ups of some sorting algorithms over an InsertionSort using sentinel values with uniform input distribution.
-		Compared to normal BubbleSort, the adaptive version terminates prematurely if no changes were made to the input array during an iteration.
-		Speed-ups below \(1\) indicate slow-downs.
+		Comparison of sorting algorithms with \(\bigoh{n^2}\) runtime on a uniform input distribution.
+		The \IS*{} differ in whether they rely on sentinel values.
+		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
+		The speed-ups are with respect to the \IS{} relying on sentinel values.
 	}
 	\label{fig:speed-up_over_is}
 \end{figure}
 
-\paragraph{InsertionSort}
+\paragraph{\IS{}}
 This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
-Even though in both the average case and the worst case, InsertionSort has a runtime of \(\bigomicron{n^2}\)\todo{Beleg?}, it displays quite some advantages:
+Even though in both the average case and the worst case, \IS{} has a runtime of \(\bigoh{n^2}\)\todo{Beleg?}, it features quite some advantages:
 \begin{enumerate*}
 	\item
-	It works in-place, needing only \(\bigomicron{1}\) additional space.
+	It works in-place, needing only \(\bigoh{1}\) additional space.
 
 	\item
 	It is inherently adaptive:
-	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigomicron{n}\).
+	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigoh{n}\).
 
 	\item
 	Its program code is short, lending itself to inlining.
@@ -47,39 +55,40 @@ Even though in both the average case and the worst case, InsertionSort has a run
 	\item
 	The overhead is small.
 \end{enumerate*}
-Especially the last two points make InsertionSort a good base algorithm for asymptotically better sorting algorithms to use on very small subarrays.
+Especially the last two points make \IS{} a good base algorithm for asymptotically better sorting algorithms to use on very small subarrays.
 
 When moving an element to the left, two checks are needed:
-Does the left neighbour exist and is it smaller than the element?
+Does the left neighbour exist and is it smaller than the element to move?
 The first check can be omitted through the use of \emph{sentinel values}:
 If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
-Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\% (\cref{fig:speed-up_over_is}).
+Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\% in the relevant input range (\cref{fig:speed-up_over_is}).%
+\todo{ex- und implizite Wächterwerte benennen}
+\todo[inline]{auf Compilersperenzchen eingehen?}
 
-
-Other known simple sorting algorithm with similar runtimes are SelectionSort and BubbleSort.
-The asymptoticity, however, hides much higher constant factors such that even for as little as three elements InsertionSort is superior (\cref{fig:speed-up_over_is}).
+Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
+The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:speed-up_over_is}) and should always be used.
 
 
 
 \begin{figure}
-	\begin{tikzpicture}%[trim axis group left, trim axis group right]
+	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			width=0.4358\linewidth,
 			group/group size=2 by 1,
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
 			minor xtick=data,
-			legend columns=-1,
 			legend entries={\(1\), \(...\), \(9\)},
+			legend columns=-1,
 			legend to name={leg:shell_sort},
-			]
+		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80]
 			\pgfplotsinvokeforeach{1,...,9}{
 				\plotpernn{#1}{\tablesmallsorts}
 			}
 			%
-			\nextgroupplot[ylabel=Speed-Up, ymin=0.6, ymax=1.2]
-			\plotspeedup[no markers, draw=none]{1}{1}{\tablesmallsorts}  % invisible but needed to *properly* skip over first colour (even in the legend!)
+			\nextgroupplot[ylabel=Speed-up, ymin=0.6, ymax=1.2]
+			\plotonlyforticks{0}{\tablesmallsorts}  % Hacky: Invisible but needed to *properly* skip over first colour (even in the legend!)
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup{#1}{1}{\tablesmallsorts}
 			}
@@ -87,10 +96,13 @@ The asymptoticity, however, hides much higher constant factors such that even fo
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:shell_sort}\hfil
-
 	\caption{
-		The runtime of InsertionSort and various ShellSorts as well as the speed-ups of the ShellSorts over InsertionSort with uniform input distribution.
-		Each ShellSort does one InsertionSort pass with a step size between 2 and 9.
-		Speed-ups below \(1\) indicate slow-downs.
+		Comparison of \IS{} and various \ShS*{} on a uniform input distribution.
+		Each \ShS{} does one \IS{} pass with a step size between 2 and 9 before doing a pass of regular \IS{}.
+		The speed-ups are with respect to the \IS{}.
 	}
 \end{figure}
+
+\paragraph{\ShS{}}
+\IS{} suffers from small elements at the end of the input array, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
+\ShS{}, proposed by Donald L. Shell in 1959 \cite{Shell1959AHS},
