@@ -1,3 +1,4 @@
+\pgfplotstableread{data/shell/no_third_step.txt}{\tableshellnothirdstep}
 \pgfplotstableread{data/shell/h1=7.txt}{\tableshellvii}
 \pgfplotstableread{data/shell/h1=8.txt}{\tableshellviii}
 \pgfplotstableread{data/shell/h1=9.txt}{\tableshellix}
@@ -13,14 +14,7 @@
 \pgfplotstableread{data/shell/quick.txt}{\tableshellquick}
 
 \NewDocumentCommand{\shellscatter}{m m}{
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y=σ_#2] {\tableshellx};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxi};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxii};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiii};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiv};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxv};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxvi};
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxvii};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot, thick, draw=black] table [x=µ_#2, y=σ_#2] {\tableshellnothirdstep};
 	\ifnumless{#2}{7}{
 		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellvii};
 	}{}
@@ -30,6 +24,14 @@
 	\ifnumless{#2}{9}{
 		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellix};
 	}{}
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellx};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxi};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxii};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiii};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiv};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxv};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxvi};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y=σ_#2] {\tableshellxvii};
 }
 
 \begin{figure}[p]
@@ -41,55 +43,129 @@
 			groupplot ylabel={Standard Deviation [Cycles]},
 			scaled x ticks=base 10:-4,
 			xtick scale label code/.code={},  % removes exponent underneath the axis
+			/tikz/only marks,
 			legend columns=-1,
 		]
 			\nextgroupplot[title={Input Length \(n = 24\)}]
-
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{0}{#1}
 			}
+			\pgfplotsset{cycle list shift=1}
 			\addplot+ plot [select coords between index={0}{0}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			%
 			\nextgroupplot[title={Input Length \(n = 32\)}]
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{1}{#1}
 			}
+			\addplot+ plot [select coords between index={1}{1}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
 			\addplot+ plot [select coords between index={1}{1}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			%
 			\nextgroupplot[title={Input Length \(n = 48\)}]
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{2}{#1}
 			}
+			\addplot+ plot [select coords between index={2}{2}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
 			\addplot+ plot [select coords between index={2}{2}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			%
 			\nextgroupplot[title={Input Length \(n = 64\)}]
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{3}{#1}
 			}
+			\addplot+ plot [select coords between index={3}{3}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
 			\addplot+ plot [select coords between index={3}{3}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			%
 			\nextgroupplot[title={Input Length \(n = 96\)}]
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{4}{#1}
 			}
+			\addplot+ plot [select coords between index={4}{4}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
 			\addplot+ plot [select coords between index={4}{4}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			%
 			\nextgroupplot[title={Input Length \(n = 128\)}, legend to name=leg:shell_vs_quick]
-			\legend{\(h_2 = 3\), \(h_2 = 4\), \(h_2 = 5\), \(h_2 = 6\), \(h_2 = 7\), \(h_2 = 8\), \(h_2 = 9\), Quick, Ciura}
+			\legend{\(h_2 = 3\), \(h_2 = 4\), \(h_2 = 5\), \(h_2 = 6\), \(h_2 = 7\), \(h_2 = 8\), \(h_2 = 9\), Ciura, Quick}
 			\pgfplotsinvokeforeach{3,...,9}{
 				\shellscatter{5}{#1}
 			}
-			\addplot+ plot [select coords between index={5}{5}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 			\addplot+ plot [select coords between index={5}{5}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
+			\addplot+ plot [select coords between index={5}{5}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:shell_vs_quick}\hfil
 	\caption{
-		Comparison of sorting algorithms with \(\bigoh{n^2}\) runtime on a uniform input distribution.
-		The \IS*{} differ in whether they rely on sentinel values.
-		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
-		The speed-ups are with respect to the \IS{} relying on sentinel values.
+	}
+\end{figure}
+
+\NewDocumentCommand{\shellscattern}{m m}{
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={6}] {\tableshellnothirdstep};
+	\ifnumless{#2}{7}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={7}] {\tableshellvii};
+	}{}
+	\ifnumless{#2}{8}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={8}] {\tableshellviii};
+	}{}
+	\ifnumless{#2}{9}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={9}] {\tableshellix};
+	}{}
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={10}, forget plot] {\tableshellx};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={11}, forget plot] {\tableshellxi};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={12}, forget plot] {\tableshellxii};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={13}, forget plot] {\tableshellxiii};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={14}, forget plot] {\tableshellxiv};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={15}, forget plot] {\tableshellxv};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={16}, forget plot] {\tableshellxvi};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={17}] {\tableshellxvii};
+}
+
+\begin{figure}[p]
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 3,
+			groupplot xlabel={Mean [\(10^4\) Cycles]},
+			groupplot ylabel={\(h_1\)},
+			scaled x ticks=base 10:-4,
+			xtick scale label code/.code={},  % removes exponent underneath the axis
+			ytick={6, 7, 9, ..., 17},
+			yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
+			/tikz/only marks,
+			legend columns=-1,
+		]
+			\nextgroupplot[title={Input Length \(n = 24\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{0}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 32\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{1}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 48\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{2}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 64\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{3}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 96\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{4}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 128\)}, legend to name=leg:shell_three_rounds]
+			\legend{\(h_2 = 3\), \(h_2 = 4\), \(h_2 = 5\), \(h_2 = 6\), \(h_2 = 7\), \(h_2 = 8\), \(h_2 = 9\)}
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscattern{5}{#1}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell_three_rounds}\hfil
+	\caption{
 	}
 \end{figure}
 
