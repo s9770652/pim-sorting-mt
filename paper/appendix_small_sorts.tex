@@ -1,3 +1,99 @@
+\pgfplotstableread{data/shell/h1=7.txt}{\tableshellvii}
+\pgfplotstableread{data/shell/h1=8.txt}{\tableshellviii}
+\pgfplotstableread{data/shell/h1=9.txt}{\tableshellix}
+\pgfplotstableread{data/shell/h1=10.txt}{\tableshellx}
+\pgfplotstableread{data/shell/h1=11.txt}{\tableshellxi}
+\pgfplotstableread{data/shell/h1=12.txt}{\tableshellxii}
+\pgfplotstableread{data/shell/h1=13.txt}{\tableshellxiii}
+\pgfplotstableread{data/shell/h1=14.txt}{\tableshellxiv}
+\pgfplotstableread{data/shell/h1=15.txt}{\tableshellxv}
+\pgfplotstableread{data/shell/h1=16.txt}{\tableshellxvi}
+\pgfplotstableread{data/shell/h1=17.txt}{\tableshellxvii}
+\pgfplotstableread{data/shell/h1=23,h2=10,h3=4.txt}{\tableshellciura}
+\pgfplotstableread{data/shell/quick.txt}{\tableshellquick}
+
+\NewDocumentCommand{\shellscatter}{m m}{
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y=σ_#2] {\tableshellx};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxi};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxii};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiii};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxiv};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxv};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxvi};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellxvii};
+	\ifnumless{#2}{7}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellvii};
+	}{}
+	\ifnumless{#2}{8}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellviii};
+	}{}
+	\ifnumless{#2}{9}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellix};
+	}{}
+}
+
+\begin{figure}[p]
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 3,
+			groupplot xlabel={Mean [\(10^4\) Cycles]},
+			groupplot ylabel={Standard Deviation [Cycles]},
+			scaled x ticks=base 10:-4,
+			xtick scale label code/.code={},  % removes exponent underneath the axis
+			legend columns=-1,
+		]
+			\nextgroupplot[title={Input Length \(n = 24\)}]
+
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{0}{#1}
+			}
+			\addplot+ plot [select coords between index={0}{0}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			%
+			\nextgroupplot[title={Input Length \(n = 32\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{1}{#1}
+			}
+			\addplot+ plot [select coords between index={1}{1}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			%
+			\nextgroupplot[title={Input Length \(n = 48\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{2}{#1}
+			}
+			\addplot+ plot [select coords between index={2}{2}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			%
+			\nextgroupplot[title={Input Length \(n = 64\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{3}{#1}
+			}
+			\addplot+ plot [select coords between index={3}{3}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			%
+			\nextgroupplot[title={Input Length \(n = 96\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{4}{#1}
+			}
+			\addplot+ plot [select coords between index={4}{4}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			%
+			\nextgroupplot[title={Input Length \(n = 128\)}, legend to name=leg:shell_vs_quick]
+			\legend{\(h_2 = 3\), \(h_2 = 4\), \(h_2 = 5\), \(h_2 = 6\), \(h_2 = 7\), \(h_2 = 8\), \(h_2 = 9\), Quick, Ciura}
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{5}{#1}
+			}
+			\addplot+ plot [select coords between index={5}{5}] table [x=µ_QuickRec, y=σ_QuickRec] {\tableshellquick};
+			\addplot+ plot [select coords between index={5}{5}] table [x=µ_Ciura, y=σ_Ciura] {\tableshellciura};
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell_vs_quick}\hfil
+	\caption{
+		Comparison of sorting algorithms with \(\bigoh{n^2}\) runtime on a uniform input distribution.
+		The \IS*{} differ in whether they rely on sentinel values.
+		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
+		The speed-ups are with respect to the \IS{} relying on sentinel values.
+	}
+\end{figure}
+
+
 \begin{description}
 	\item[r0] start
 	\item[r1] end

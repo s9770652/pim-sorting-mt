@@ -1,0 +1,8 @@
+# reps=1000, upper bound=0, TYPE=UINT32, BLOCK_SIZE=2048, SEQREAD_CACHE_SIZE=1024, NR_TASKLETS=1
+n       µ_Ciura σ_Ciura
+24        9917   424
+32       13966   519
+48       22770   716
+64       32177   957
+96       52441  1343
+128      74252  1864

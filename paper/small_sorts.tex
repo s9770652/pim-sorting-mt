@@ -10,7 +10,7 @@
 			minor xtick=data,
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80, legend to name={leg:speed-up_over_is}]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80, legend to name=leg:insertion_sort]
 			\legend{Insertion, Insertion (no sentinel), Bubble, Bubble(adaptive), Selection}
 			\plotpernn{1}{\tablesmallsorts}
 			\plotpernn{1NoSentinel}{\tablesmallsorts}
@@ -27,14 +27,14 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:speed-up_over_is}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion_sort}\hfil
 	\caption{
 		Comparison of sorting algorithms with \(\bigoh{n^2}\) runtime on a uniform input distribution.
 		The \IS*{} differ in whether they rely on sentinel values.
 		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
 		The speed-ups are with respect to the \IS{} relying on sentinel values.
 	}
-	\label{fig:speed-up_over_is}
+	\label{fig:insertion_sort}
 \end{figure}
 
 \paragraph{\IS{}}
@@ -60,12 +60,12 @@ When moving an element to the left, two checks are needed:
 Does the left neighbour exist and is it smaller than the element to move?
 The first check can be omitted through the use of \emph{sentinel values}:
 If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
-Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\% in the relevant input range (\cref{fig:speed-up_over_is}).%
+Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\%\todo{auf Kompilat eingehen?} in the relevant input range (\cref{fig:insertion_sort}).%
 \todo{ex- und implizite Wächterwerte benennen}
 \todo[inline]{auf Compilersperenzchen eingehen?}
 
 Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
-The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:speed-up_over_is}) and should always be used.
+The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion_sort}) and should always be used.
 
 
 
@@ -79,7 +79,7 @@ The asymptoticity, however, hides much higher constant factors such that even fo
 			minor xtick=data,
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80, legend to name={leg:shell_sort}]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=80, legend to name=leg:shell_sort]
 			\legend{\(1\), \(...\), \(9\)}
 			\pgfplotsinvokeforeach{1,...,9}{
 				\plotpernn{#1}{\tablesmallsorts}
@@ -95,12 +95,23 @@ The asymptoticity, however, hides much higher constant factors such that even fo
 
 	\hfil\pgfplotslegendfromname{leg:shell_sort}\hfil
 	\caption{
-		Comparison of \IS{} and various \ShS*{} on a uniform input distribution.
+		Comparison of \IS{} (1) and various \ShS*{} (2--9) on a uniform input distribution.
 		Each \ShS{} does one \IS{} pass with a step size between 2 and 9 before doing a pass of regular \IS{}.
 		The speed-ups are with respect to the \IS{}.
 	}
+	\label{fig:shell_sort}
 \end{figure}
 
 \paragraph{\ShS{}}
 \IS{} suffers from small elements at the end of the input array, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
-\ShS{}, proposed by Donald L. Shell in 1959 \cite{Shell1959AHS},
+\ShS{}, proposed by Donald L. Shell in 1959 \cite{Shell1959AHS}, remedies this by doing multiple passes of \IS{} with different step sizes:
+In round \(i\) with step size \(h_i\), the input array is divided into the subarrays of indices \((0, h_i, 2 h_i, \dots)\), \((1, h_i + 1, 2 h_i +1, \dots)\), \((2, h_i + 2, 2 h_i + 2, \dots)\) and so on which then get sorted individually via \IS{}.
+The step size decreases with each round, with the final step size being \(1\) such that a regular \IS{} is performed.
+The individual \IS*{} should be fast since elements which need to travel long distances already did big jumps.
+
+Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research\todo{Belege} and depends on the cost of the operations (comparing, swapping, looping)\todo{Unikosten für DPU analysierend einbauen?}.
+Let us first take a quick look on \ShS{} for small input arrays where surely only two rounds with step sizes \(h_1\) and \(1\) suffice.
+The previous results on \IS{} suggest that \ShS{} should make use of \(h_1\) sentinel values.
+\Cref{fig:shell_sort} shows that the additional rounds starts to pay off at 19 elements for \(h_1 \ge 5\), at 20 elements for \(h_1 \ge 3\), and at 25 elements for \(h_1 = 2\).
+Bear in mind that these measurements were conducted on a uniform input distribution;
+if \ShS{} is used by another algorithm on a subarray, these thresholds may be even higher or even non-existent due to some degree of presorting.
