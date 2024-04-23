@@ -35,7 +35,7 @@
 }
 \pgfplotsset{
 	height=4cm,
-	cycle list name=exotic,  % automatic colouring of plots
+	cycle multiindex list={exotic \nextlist mark list*},  % automatic colouring of plots
 	scale only axis,  % height and width apply only to the axes, not the labels
 	enlargelimits={abs=3mm, auto},  % for axes without specified limits, the limits are a bit bigger than neeeded (→ padding)
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …

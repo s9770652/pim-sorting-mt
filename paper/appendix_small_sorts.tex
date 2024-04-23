@@ -14,7 +14,7 @@
 \pgfplotstableread{data/shell/quick.txt}{\tableshellquick}
 
 \NewDocumentCommand{\shellscatter}{m m}{
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot, thick, draw=black] table [x=µ_#2, y=σ_#2] {\tableshellnothirdstep};
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot, very thick, draw=black] table [x=µ_#2, y=σ_#2] {\tableshellnothirdstep};
 	\ifnumless{#2}{7}{
 		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y=σ_#2] {\tableshellvii};
 	}{}
