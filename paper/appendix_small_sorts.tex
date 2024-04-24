@@ -12,6 +12,7 @@
 \pgfplotstableread{data/shell/h1=17.txt}{\tableshellxvii}
 \pgfplotstableread{data/shell/h1=23,h2=10,h3=4.txt}{\tableshellciura}
 \pgfplotstableread{data/shell/quick.txt}{\tableshellquick}
+\pgfplotstableread{data/shell/custom.txt}{\tableshellcustom}
 
 \NewDocumentCommand{\shellscatter}{m m}{
 	\addplot+ plot [select coords between index={#1}{#1}, forget plot, very thick, draw=black] table [x=µ_#2, y=σ_#2] {\tableshellnothirdstep};
@@ -167,6 +168,49 @@
 	\hfil\pgfplotslegendfromname{leg:shell_three_rounds}\hfil
 	\caption{
 	}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=\linewidth,
+			groupplot xlabel={Input Length \(n\)},
+			ylabel={Speed-up},
+			xtick={24, 32, ..., 128},
+			minor xtick=data,
+			ymin=0.2,
+			legend columns=-1,
+		]
+			\nextgroupplot
+			\plotspeedup{InsertSent}{QuickRec}{\tableshellcustom}
+			\plotspeedup{ShellCustom}{QuickRec}{\tableshellcustom}
+		\end{groupplot}
+	\end{tikzpicture}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xtick distance=16,
+			minor xtick=data,
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \(n \lb n\), ymin=0, legend to name=leg:quick_vs_insert_vs_shell]
+			\legend{Insertion, Shell, Quick}
+			\plotpernlogn{InsertSent}{\tableshellcustom}
+			\plotpernlogn{ShellCustom}{\tableshellcustom}
+			\plotpernlogn{QuickRec}{\tableshellcustom}
+			%
+			\nextgroupplot[ylabel=Speed-up]
+			\plotspeedup{InsertSent}{QuickRec}{\tableshellcustom}
+			\plotspeedup{ShellCustom}{QuickRec}{\tableshellcustom}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick_vs_insert_vs_shell}\hfil
 \end{figure}
 
 
