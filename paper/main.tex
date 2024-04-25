@@ -1,6 +1,5 @@
 \documentclass[draft, british]{../garticle}
 
-\RequirePackage{mfirstuc}  % used for capitalising names of sorting algorithms
 \input{../macros.sty}
 
 \titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
@@ -79,6 +78,8 @@
 }
 \makeatother
 
+\DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred's red
+
 
 \begin{document}
 	\pagenumbering{gobble}  % turn off pagenumbering
@@ -103,9 +104,9 @@
 
 	\include{singletasklet}
 
-	\include{appendix_small_sorts}
-
 %	\clearpage
 
 	\mybibliography
+
+	\include{appendix_small_sorts}
 \end{document}

@@ -1,5 +1,19 @@
 \subsection{\ShS{}}
 
+\pgfplotstableread{data/shell/no_third_step.txt}{\tableshellnothirdstep}
+\pgfplotstableread{data/shell/h1=7.txt}{\tableshellvii}
+\pgfplotstableread{data/shell/h1=8.txt}{\tableshellviii}
+\pgfplotstableread{data/shell/h1=9.txt}{\tableshellix}
+\pgfplotstableread{data/shell/h1=10.txt}{\tableshellx}
+\pgfplotstableread{data/shell/h1=11.txt}{\tableshellxi}
+\pgfplotstableread{data/shell/h1=12.txt}{\tableshellxii}
+\pgfplotstableread{data/shell/h1=13.txt}{\tableshellxiii}
+\pgfplotstableread{data/shell/h1=14.txt}{\tableshellxiv}
+\pgfplotstableread{data/shell/h1=15.txt}{\tableshellxv}
+\pgfplotstableread{data/shell/h1=16.txt}{\tableshellxvi}
+\pgfplotstableread{data/shell/h1=17.txt}{\tableshellxvii}
+\pgfplotstableread{data/shell/custom.txt}{\tableshellcustom}
+
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -35,13 +49,143 @@
 
 \IS{} suffers from small elements at the end of the input array, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
 \ShS{}, proposed by Donald L. Shell in 1959 \cite{Shell1959AHS}, remedies this by doing multiple passes of \IS{} with different step sizes:
-In round \(i\) with step size \(h_i\), the input array is divided into the subarrays of indices \((0, h_i, 2 h_i, \dots)\), \((1, h_i + 1, 2 h_i +1, \dots)\), \((2, h_i + 2, 2 h_i + 2, \dots)\) and so on which then get sorted individually via \IS{}.
-The step size decreases with each round, with the final step size being \(1\) such that a regular \IS{} is performed.
-The individual \IS*{} should be fast since elements which need to travel long distances already did big jumps.
+In round \(r\) with step size \(h_r\), the input array is divided into the subarrays of indices \((i, h_r + i, 2 h_r + i, \dots)\) for \(i = 0, \dots, h_r - 1\) which then get sorted individually through \IS{}.
+The step size get smaller each round, with the final step size being \(1\) such that a regular \IS{} is performed.
+Intuitively, the individual \IS*{} are fast since elements which need to travel long distances already did big jumps.
+Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research \cite{skean2023optimization, 10.1007/3-540-44669-9_12} and depends on the cost of the operations (comparing, swapping, looping).
 
-Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research\todo{Belege} and depends on the cost of the operations (comparing, swapping, looping)\todo{Unikosten für DPU analysierend einbauen?}.
-Let us first take a quick look on \ShS{} for small input arrays where surely only two rounds with step sizes \(h_1\) and \(1\) suffice.
-The previous results on \IS{} suggest that \ShS{} should make use of \(h_1\) sentinel values.
-\Cref{fig:shell_sort} shows that the additional rounds starts to pay off at 19 elements for \(h_1 \ge 5\), at 20 elements for \(h_1 \ge 3\), and at 25 elements for \(h_1 = 2\).
+Let us first focus on small input arrays where only two rounds with step sizes~\(h_1\) and \(1\) suffice.
+The previous results on \IS{} suggest that \ShS{} should make use of~\(h_1\) sentinel values lest bounds checking eats any gain up.
+\Cref{fig:shell_sort} shows that the additional rounds starts to pay off at around 20 elements for \(h_1 \ge 3\).
 Bear in mind that these measurements were conducted on a uniform input distribution;
-if \ShS{} is used by another algorithm on a subarray, these thresholds may be even higher or even non-existent due to some degree of presorting.
+if \ShS{} is used by another algorithm on a subarray, these thresholds may be higher or even non-existent due to some degree of presorting.
+
+\NewDocumentCommand{\shellscatter}{m m}{
+	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={6}] {\tableshellnothirdstep};
+	\ifnumless{#2}{7}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={7}] {\tableshellvii};
+	}{}
+	\ifnumless{#2}{8}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={8}] {\tableshellviii};
+	}{}
+	\ifnumless{#2}{9}{
+		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={9}] {\tableshellix};
+	}{}
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={10}, forget plot] {\tableshellx};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={11}, forget plot] {\tableshellxi};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={12}, forget plot] {\tableshellxii};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={13}, forget plot] {\tableshellxiii};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={14}, forget plot] {\tableshellxiv};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={15}, forget plot] {\tableshellxv};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={16}, forget plot] {\tableshellxvi};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={17}] {\tableshellxvii};
+}
+
+\begin{figure}[p]
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 3,
+			groupplot xlabel={Mean [\(10^4\) Cycles]},
+			groupplot ylabel={\(h_1\)},
+			scaled x ticks=base 10:-4,
+			xtick scale label code/.code={},  % removes exponent underneath the axis
+			ytick={6, 7, 9, ..., 17},
+			yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
+			/tikz/only marks,
+			cycle list shift=2,  % for sharing colours with the previous figure
+			legend columns=-1,
+		]
+			\nextgroupplot[title={Input Length \(n = 24\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{0}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 32\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{1}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 48\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{2}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 64\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{3}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 96\)}]
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{4}{#1}
+			}
+			%
+			\nextgroupplot[title={Input Length \(n = 128\)}, legend to name=leg:shell_three_rounds]
+			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+			\pgfplotsinvokeforeach{3,...,9}{
+				\shellscatter{5}{#1}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell_three_rounds}\hfil
+	\caption{
+		Runtimes of \ShS*{} with two rounds (/) and three rounds (7--17) on a uniform input distribution.
+		The coloured symbols encode the step size \(h_1\) for two-round \ShS*{} and the step size~\(h_2\) for three-round \ShS*{}.
+		For the latter, the step size \(h_1\) is noted on the y-axes.
+	}
+	\label{fig:shell_three_rounds}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xtick distance=16,
+			minor xtick=data,
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \(n \lb n\), ymin=0, legend to name=leg:quick_vs_insert_vs_shell]
+			\legend{Insertion, Shell, Quick}
+			\plotpernlogn{InsertSent}{\tableshellcustom}
+			\plotpernlogn{ShellCiura}{\tableshellcustom}
+			\plotpernlogn{QuickRec}{\tableshellcustom}
+			%
+			\nextgroupplot[ylabel=Speed-up]
+			\plotspeedup{InsertSent}{QuickRec}{\tableshellcustom}
+			\plotspeedup{ShellCiura}{QuickRec}{\tableshellcustom}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick_vs_insert_vs_shell}\hfil
+	\caption{
+		Comparison of \IS{}, \ShS{} and an optimised \QS{} on a uniform input distribution.
+		The \ShS{} uses the steps sizes \(h = (6, 1)\) for \(n \le 64\) and \(h = (17, 4, 1)\) elsewise.
+		The speed-ups are with respect to the \QS{}.
+		\todo[inline]{\QS{} mit Zufallspivot auch noch einbauen}
+		\todo[inline]{verschiedene Verteilungen}
+	}
+	\label{fig:quick_vs_insert_vs_shell}
+\end{figure}
+
+When moving to greater input lengths, the differences in performance between the two-round \ShS*{} become more pronounced \cref{fig:shell_three_rounds};
+especially the ones with \(h_1 = 3\) and \(h_1 = 4\) fall off whereas the one with \(h_1 = 6\) holds its ground quite well.
+With more than 64 elements, three round get worthwhile to consider.
+Interestingly, many \ShS*{} with \(h_2 = 4\) take the lead whilst the ones with \(h_2 = 6\) are mid-table.
+This is in accordance with \citeauthor{10.1007/3-540-44669-9_12} \cite{10.1007/3-540-44669-9_12} who noted~\(h = (17, 4, 1)\) to be the optimal triplet for 128 elements.
+It is noteworthy, though, that he measured the quadruplet~\(h = (38, 9, 4, 1)\) to be about 5\% faster in the MIX machine model.
+On a DPU, this sequence leads to a runtime of near exactly 74.000 cycles, placing it in the middle of the triplets.
+Without access to Ciura's original code, giving a satisfactory explanation for the discrepancy is hard, however.
+
+But would pushing the limits of \ShS{} even be rewarding?
+Two issues come up.
+Firstly, greater input lengths require greater steps and those in turn require more sentinel values.
+But the more sentinel values are stored, the less space is available for the actual input array, leading to smaller runs and thus hurting the overall sorting algorithm.
+Explorative testing suggests that falling back to bounds checking for big steps is too punishing.
+Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
+\Cref{fig:quick_vs_insert_vs_shell} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash seeming to achieve a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash, \QS{} beats \ShS{} for 28 elements onwards.
+This makes \ShS{} the fastest sorting algorithm only for the tiny range from 20 to 27 elements.
+Consequently, \ShS{} will not be improved upon in this Thesis.

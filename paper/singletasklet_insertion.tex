@@ -63,7 +63,10 @@ The first check can be omitted through the use of \emph{sentinel values}:
 If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
 Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\%\todo{auf Kompilat eingehen?} in the relevant input range (\cref{fig:insertion_sort}).%
 \todo{ex- und implizite Wächterwerte benennen}
+Thence, \enquote{\IS{}} refers to the version relying on sentinel values henceforth.
 \todo[inline]{auf Compilersperenzchen eingehen?}
 
-Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
-The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion_sort}) and should always be used.
+\begin{note}
+	Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
+	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion_sort}) and should always be preferred.
+\end{note}
