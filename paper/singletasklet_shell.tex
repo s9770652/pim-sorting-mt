@@ -52,7 +52,7 @@
 In round \(r\) with step size \(h_r\), the input array is divided into the subarrays of indices \((i, h_r + i, 2 h_r + i, \dots)\) for \(i = 0, \dots, h_r - 1\) which then get sorted individually through \IS{}.
 The step size get smaller each round, with the final step size being \(1\) such that a regular \IS{} is performed.
 Intuitively, the individual \IS*{} are fast since elements which need to travel long distances already did big jumps.
-Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research \cite{skean2023optimization, 10.1007/3-540-44669-9_12} and depends on the cost of the operations (comparing, swapping, looping).
+Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research to this day \cite{skean2023optimization, lee2021empirically} and depends on the cost of the operations (comparing, swapping, looping).
 
 Let us first focus on small input arrays where only two rounds with step sizes~\(h_1\) and \(1\) suffice.
 The previous results on \IS{} suggest that \ShS{} should make use of~\(h_1\) sentinel values lest bounds checking eats any gain up.
@@ -171,21 +171,21 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\label{fig:quick_vs_insert_vs_shell}
 \end{figure}
 
-When moving to greater input lengths, the differences in performance between the two-round \ShS*{} become more pronounced \cref{fig:shell_three_rounds};
+When moving to greater input lengths (\cref{fig:shell_three_rounds}), the differences in performance between the two-round \ShS*{} become more pronounced;
 especially the ones with \(h_1 = 3\) and \(h_1 = 4\) fall off whereas the one with \(h_1 = 6\) holds its ground quite well.
 With more than 64 elements, three round get worthwhile to consider.
 Interestingly, many \ShS*{} with \(h_2 = 4\) take the lead whilst the ones with \(h_2 = 6\) are mid-table.
 This is in accordance with \citeauthor{10.1007/3-540-44669-9_12} \cite{10.1007/3-540-44669-9_12} who noted~\(h = (17, 4, 1)\) to be the optimal triplet for 128 elements.
 It is noteworthy, though, that he measured the quadruplet~\(h = (38, 9, 4, 1)\) to be about 5\% faster in the MIX machine model.
-On a DPU, this sequence leads to a runtime of near exactly 74.000 cycles, placing it in the middle of the triplets.
+On a DPU, this sequence leads to a runtime of nearly exactly 74.000 cycles, placing it only mid-table.
 Without access to Ciura's original code, giving a satisfactory explanation for the discrepancy is hard, however.
 
 But would pushing the limits of \ShS{} even be rewarding?
 Two issues come up.
-Firstly, greater input lengths require greater steps and those in turn require more sentinel values.
+Firstly, greater input lengths require greater steps \Dash well into the three digits for \(n \approx 1000\) \cite{skean2023optimization, 10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
 But the more sentinel values are stored, the less space is available for the actual input array, leading to smaller runs and thus hurting the overall sorting algorithm.
 Explorative testing suggests that falling back to bounds checking for big steps is too punishing.
 Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
-\Cref{fig:quick_vs_insert_vs_shell} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash seeming to achieve a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash, \QS{} beats \ShS{} for 28 elements onwards.
-This makes \ShS{} the fastest sorting algorithm only for the tiny range from 20 to 27 elements.
-Consequently, \ShS{} will not be improved upon in this Thesis.
+\Cref{fig:quick_vs_insert_vs_shell} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash apparently achieving a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash\negthinspace, \QS{} beats both from 20 elements onwards.
+Even \QS{}'s standard deviation of 2237 cycles is superior to \ShS{}'s 2670 cycles (for 128 elements).
+Consequently, \ShS{} will not be improved upon in this thesis.
