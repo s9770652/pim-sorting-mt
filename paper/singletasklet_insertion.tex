@@ -10,29 +10,28 @@
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
 			minor xtick=data,
-			legend columns=-1,
+			legend columns=3,
 		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:insertion_sort]
-			\legend{Insertion, Insertion (no sentinel), Bubble, Bubble(adaptive), Selection}
+			\legend{Insertion (sentinel), Insertion (no sentinel), Selection, Bubble (adaptive), Bubble (not adaptive)}
 			\plotpernn{1}{\tablesmallsorts}
 			\plotpernn{1NoSentinel}{\tablesmallsorts}
-			\plotpernn{BubbleNonAdapt}{\tablesmallsorts}
-			\plotpernn{BubbleAdapt}{\tablesmallsorts}
 			\plotpernn{Selection}{\tablesmallsorts}
+			\plotpernn{BubbleAdapt}{\tablesmallsorts}
+			\plotpernn{BubbleNonAdapt}{\tablesmallsorts}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
 			\pgfplotsset{cycle list shift=1}
 			\plotspeedup{1NoSentinel}{1}{\tablesmallsorts}
-			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
-			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
 			\plotspeedup{Selection}{1}{\tablesmallsorts}
+			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
+			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:insertion_sort}\hfil
 	\caption{
-		Comparison of sorting algorithms with \(\bigoh{n^2}\) runtime.
-		The \IS*{} differ in whether they rely on sentinel values.
+		Comparison of sorting algorithms with a runtime in \(\bigoh{n^2}\).
 		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
 		The speed-ups are with respect to the \IS{} relying on sentinel values.
 	}
