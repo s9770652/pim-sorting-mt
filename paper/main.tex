@@ -39,6 +39,7 @@
 	enlargelimits={abs=3mm, auto},  % for axes without specified limits, the limits are a bit bigger than neeeded (→ padding)
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
 	ymajorgrids,  % grey, horizontal background lines at each y-tick
+	set layers,  % needed as otherwise extra ticks are drawn above the border
 	legend style={  % adds padding to legends with multiple columns
 		cells={anchor=west},  % left aligned labels
 		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},

@@ -1,3 +1,62 @@
+\pgfplotstableread{data/quick/fallback.txt}{\tablequickfallback}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 2,
+			group style={horizontal sep=5em, vertical sep=3em},  % For some reason, `group/vertical sep` does not work.
+			groupplot xlabel={Input Length \(n\)},
+			xmode=log,
+			xtick={20, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, legend to name=leg:quick_fallback]
+			\legend{None, \(10\), \(11\), \(...\), \(16\)}
+			\plotpernlogn{None}{\tablequickfallback}
+			\pgfplotsinvokeforeach{10,...,16}{
+				\plotpernlogn{#1}{\tablequickfallback}
+			}
+			%
+			\nextgroupplot[ylabel=Speed-up]
+			\plotspeedup{None}{13}{\tablequickfallback}
+			\pgfplotsinvokeforeach{10,...,16}{
+				\ifnumequal{#1}{13}{
+					\pgfplotsset{cycle list shift=1}
+				}{
+					\plotspeedup{#1}{13}{\tablequickfallback}
+				}
+			}
+			%
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\)]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{10,...,16}{
+				\plotpernlogn{#1}{\tablequickfallback}
+			}
+			%
+			\nextgroupplot[ylabel=Speed-up, /pgf/number format/.cd, precision=3, fixed zerofill=true]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{10,...,16}{
+				\ifnumequal{#1}{13}{
+					\pgfplotsset{cycle list shift=2}
+				}{
+					\plotspeedup{#1}{13}{\tablequickfallback}
+				}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick_fallback}\hfil
+	\caption{
+		Comparison of \QS{} without fallback algorithm and \QS*{} using \IS{} if only a few elements in a partition remain.
+		The bottom row is zoomed in on the latter.
+		The speed-up are with respect to the \QS{} without fallback algorithm.
+	}
+	\label{fig:quick_fallback}
+\end{figure}
+
 \begin{description}
 	\item[r0] start
 	\item[r1] end
