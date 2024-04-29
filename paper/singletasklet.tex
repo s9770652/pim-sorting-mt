@@ -1,5 +1,20 @@
 \section{Sorting with One Tasklet}
 
+This section covers the very first phase where each tasklet sorts on its own, \ie{} sequentially.
+Unless specified otherwise, every measurement in this section was conducted on a uniform input distribution with each 32-bit integer drawn independently from the range \([0, 2^{32} - 1]\), and the default configurations of the sorting algorithms were as follows:
+\begin{description}
+	\item[\IS{}]
+	using one sentinel value
+
+	\item[\ShS{}]
+	using \(h_1\) sentinel values
+
+	\item[\QS{}]
+	recursive implementation;
+	switching to \IS{} whenever 13 elements or less remain in a partition;
+	median of three as pivot
+\end{description}
+
 \input{singletasklet_insertion}
 \input{singletasklet_shell}
 \input{singletasklet_quick}
