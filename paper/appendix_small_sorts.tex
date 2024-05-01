@@ -1,3 +1,6 @@
+\subsection{\QS{}}
+\label{subsec:appendix:quick}
+
 \pgfplotstableread{data/quick/fallback.txt}{\tablequickfallback}
 
 \begin{figure}
@@ -56,6 +59,57 @@
 	}
 	\label{fig:quick_fallback}
 \end{figure}
+
+Two base cases exist:
+\begin{enumerate*}
+	\item
+	If there are less than two elements left, terminate.
+
+	\item
+	If there are less than 14 elements left, call \IS{}.
+\end{enumerate*}
+The first base case is not strictly necessary as the second one covers it.
+The following implementation takes 623\,000 cycles on average for 1024 elements:
+\begin{itemize}
+	\item
+	If the partition has a length of 1 or less, terminate.
+	If not and if the threshold is undercut, sort with \IS{}.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+\end{itemize}
+In comparison, the following implementations take between 715\,000 and 725\,000 cycles, which is 15\% more:
+\begin{itemize}
+	\item
+	If the threshold is undercut, sort with \IS{}.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+
+	\item
+	If the threshold is undercut, check whether the partition has a length of 1 or less and either terminate or sort with \IS{}.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+
+	\item
+	If the threshold is undercut, sort with an \IS{} which terminates if the given array has a length of 1 or less.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+
+	\item
+	If the threshold is undercut, sort with \IS{}.
+	If not, terminate if the partition has a length of 1 or less.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+
+	\item
+	Sort with \QS{}.
+	Check if the partitions undercut the threshold and either call \IS{}, \QS{}, or nothing on them.
+
+	\item
+	Sort with \QS{}.
+	Check if the partitions have a length of 1 or less or at least undercut the threshold and either call \IS{}, \QS{}, or nothing on them.
+\end{itemize}
+Even this implementation is a bit slower at 625\,000 cycles:
+\begin{itemize}
+	\item
+	If the threshold is undercut, sort with \IS{}.
+	Otherwise, sort with \QS{}.
+	Check if the partitions have a length of 1 or less and call \QS{} on them if not.
+\end{itemize}
 
 \begin{description}
 	\item[r0] start

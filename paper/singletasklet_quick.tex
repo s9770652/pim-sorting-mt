@@ -2,4 +2,14 @@
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements bigger or smaller than the pivot are moved to the right or left of the pivot element, respectively.
-Finally, \QS{} is called on the left and right subarrays.
+Finally, \QS{} is called on the left and right partitions.
+
+\paragraph{Base Cases}
+When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as alternative.
+As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of between a quarter and a half compared to a \QS{} without fallback algorithm.
+This low threshold also means that even a simple two-round \ShS{} is not worth considering.
+
+Besides falling back to \IS{}, another base case is imaginable, namely terminating when the partition has a length of 1, 0, or even --1 elements.
+Realistically speaking, this should not be necessary, because even though the extra check is done with just one additional instruction, it is a rare occurrence and the \IS{} would terminate after a few instructions anyway.
+Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases.
+Since these are likely caused by the compiler, they are laid out in \cref{subsec:appendix:quick}.
