@@ -1,49 +1,44 @@
-\subsection{\QS{}}
+\subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:appendix:quick}
 
 \pgfplotstableread{data/quick/fallback.txt}{\tablequickfallback}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tablequickrecnssuniend}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tablequickrecnssunimiddle}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tablequickrecnssunimedian}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/end.txt}{\tablequickrecssuniend}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/middle.txt}{\tablequickrecssunimiddle}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/median_of_three.txt}{\tablequickrecssunimedian}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/end.txt}{\tablequickitnssuniend}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/middle.txt}{\tablequickitnssunimiddle}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{\tablequickitnssunimedian}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/end.txt}{\tablequickitssuniend}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/middle.txt}{\tablequickitssunimiddle}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tablequickitssunimedian}
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			width=0.4358\linewidth,
-			group/group size=2 by 2,
+			group/group size=2 by 1,
 			group style={horizontal sep=5em, vertical sep=3em},  % For some reason, `group/vertical sep` does not work.
 			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Speed-up},
 			xmode=log,
 			xtick={20, 32, 64, 128, 256, 512, 1024},
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
+%			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, legend to name=leg:quick_fallback]
-			\legend{None, \(10\), \(11\), \(...\), \(16\)}
-			\plotpernlogn{None}{\tablequickfallback}
+			\nextgroupplot[title={Over No Fallback}, legend to name=leg:quick_fallback]
+			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
-				\plotpernlogn{#1}{\tablequickfallback}
+				\plotspeedup{#1}{None}{\tablequickfallback}
 			}
 			%
-			\nextgroupplot[ylabel=Speed-up]
-			\plotspeedup{None}{13}{\tablequickfallback}
+			\nextgroupplot[title={Over a Threshold of 13}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
 			\pgfplotsinvokeforeach{10,...,16}{
 				\ifnumequal{#1}{13}{
 					\pgfplotsset{cycle list shift=1}
-				}{
-					\plotspeedup{#1}{13}{\tablequickfallback}
-				}
-			}
-			%
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\)]
-			\pgfplotsset{cycle list shift=1}
-			\pgfplotsinvokeforeach{10,...,16}{
-				\plotpernlogn{#1}{\tablequickfallback}
-			}
-			%
-			\nextgroupplot[ylabel=Speed-up, /pgf/number format/.cd, precision=3, fixed zerofill=true]
-			\pgfplotsset{cycle list shift=1}
-			\pgfplotsinvokeforeach{10,...,16}{
-				\ifnumequal{#1}{13}{
-					\pgfplotsset{cycle list shift=2}
 				}{
 					\plotspeedup{#1}{13}{\tablequickfallback}
 				}
@@ -53,9 +48,7 @@
 
 	\hfil\pgfplotslegendfromname{leg:quick_fallback}\hfil
 	\caption{
-		Comparison of \QS{} without fallback algorithm (None) and \QS*{} using \IS{} if only a few elements remain in a partition (10--16).
-		The bottom row is zoomed in on the latter.
-		The speed-ups are with respect to the \QS{} without fallback algorithm.
+		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
 	}
 	\label{fig:quick_fallback}
 \end{figure}
@@ -69,102 +62,154 @@ Two base cases exist:
 	If there are less than 14 elements left, call \IS{}.
 \end{enumerate*}
 The first base case is not strictly necessary as the second one covers it.
-The following implementation takes 623\,000 cycles on average for 1024 elements:
-\begin{itemize}
-	\item
+The fastest implementation with 622\,750 cycles on average for 1024 elements is as follows:
+\begin{enumerate}
+	\item\label[implementation]{imp:normal}
 	If the partition has a length of 1 or less, terminate.
 	If not and if the threshold is undercut, sort with \IS{}.
 	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-\end{itemize}
-In comparison, the following implementations take between 715\,000 and 725\,000 cycles, which is 15\% more:
-\begin{itemize}
-	\item
+	\textcolor{red}{[Normal]}
+\end{enumerate}
+The following implementation, which avoids some function calls by reordering the checks, is ever so slightly slower at 625\,150 cycles:
+\begin{enumerate}[resume]
+	\item\label[implementation]{imp:triviality_before_call}
+	If the threshold is undercut, sort with \IS{}.
+	Otherwise, sort with \QS{}.
+	Then check if the partitions have a length of 1 or less and call \QS{} on them if not.
+	\textcolor{red}{[TrivialBC]}
+\end{enumerate}
+A look at the compilation reveals that only some jumps at the start and at the end of the function have changed.
+It appears that the changed program flow causes one additional operation per call, since \QS{} gets called roughly 230 times and 230 × 11 cycles = 2530 cycles, which is the measured difference.
+This one operation is already too much as partitions hardly have such short lengths and function calls are cheap.
+
+But what if one were to get rid of all recursive calls on partitions below the threshold?
+After all, they come up roughly 350 times.
+Or what if one tried any other handling of the base cases?
+All of the following implementations take between 710\,000 and 725\,000 cycles:
+\begin{enumerate}[resume]
+	\item\label[implementation]{imp:one_insertion}
+	If the threshold is undercut, terminate.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+	After all \QS*{} are done, sort the whole input array with \IS{}.
+	\textcolor{red}{[OneInsertion]}
+
+	\item\label[implementation]{imp:no_triviality}
 	If the threshold is undercut, sort with \IS{}.
 	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+	\textcolor{red}{[NoTrivial]}
 
-	\item
-	If the threshold is undercut, check whether the partition has a length of 1 or less and either terminate or sort with \IS{}.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-
-	\item
-	If the threshold is undercut, sort with an \IS{} which terminates if the given array has a length of 1 or less.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-
-	\item
+	\item\label[implementation]{imp:threshold_then_triviality}
 	If the threshold is undercut, sort with \IS{}.
 	If not, terminate if the partition has a length of 1 or less.
 	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+	\textcolor{red}{[ThreshThenTriv]}
 
-	\item
+	\item\label[implementation]{imp:threshold_before_call}
 	Sort with \QS{}.
-	Check if the partitions undercut the threshold and either call \IS{}, \QS{}, or nothing on them.
+	Check if the partitions undercut the threshold and either call \IS{} or \QS{} on them.
+	\textcolor{red}{[ThreshBC]}
 
-	\item
+	\item\label[implementation]{imp:threshold_and_triviality_before_call}
 	Sort with \QS{}.
-	Check if the partitions have a length of 1 or less or at least undercut the threshold and either call \IS{}, \QS{}, or nothing on them.
-\end{itemize}
-Even this implementation is a bit slower at 625\,000 cycles:
-\begin{itemize}
-	\item
-	If the threshold is undercut, sort with \IS{}.
-	Otherwise, sort with \QS{}.
-	Check if the partitions have a length of 1 or less and call \QS{} on them if not.
-\end{itemize}
+	Check if the partitions have a length of 1 or less or at least undercut the threshold and either call \IS{}, \QS{} or nothing on them.
+	\textcolor{red}{[ThreshTrivBC]}
 
-\begin{description}
-	\item[r0] start
-	\item[r1] end
-	\item[r23] return address
-\end{description}
-\begin{verbatim}
-insertion_sort_nosentinel:
-    jleu r0, r1, .LBB2_1  // Continue if array of positive length …
-.LBB2_8:
-    jump r23  // … else leave the function.
-.LBB2_1:
-    move r2, r0, true, .LBB2_2  // i ← start; Jump to beginning of outer loop.
-.LBB2_5:
-    move r4, r5  // ?
-.LBB2_7:
-    add r2, r2, 4  // i++
-    sw r4, 0, r3  // *curr ← to_sort
-    jgtu r2, r1, .LBB2_8  // If i > end, terminate.
-.LBB2_2:  // Beginning of outer loop.
-    lw r3, r2, 0  // to_sort ← *i;
-    add r5, r2, -4  // prev ← i - 1
-    move r4, r2  // curr ← i
-    jltu r5, r0, .LBB2_7  // If prev < start, skip to the next iteration of the outer loop.
-    move r5, r2  // (prev + 1) ← i
-.LBB2_4:
-    lw r6, r5, -4  // *prev
-    jleu r6, r3, .LBB2_5  // If *prev > to_sort, terminate inner loop.
-    add r4, r5, -4  // Store prev.
-    add r7, r5, -8  // Store prev--.
-    sw r5, 0, r6  // *curr ← *prev
-    move r5, r4  // curr ← prev
-    jgeu r7, r0, .LBB2_4  // If prev >= start, continue with the next iteration of the inner loop.
-    jump .LBB2_7  // Continue with the next iteration of the outer loop.
-\end{verbatim}
+	\item\label[implementation]{imp:triviality_within_threshold}
+	If the threshold is undercut, check whether the partition has a length of 1 or less and either terminate or sort with \IS{}.
+	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
+	\textcolor{red}{[TrivInThresh]}
+\end{enumerate}
+In each of them, the compiler makes poorer use of the registers with the biggest impact on the loop which finds the next element to move to the right, increasing the length of an iteration from three instructions to four.
 
-\begin{verbatim}
-insertion_sort_sentinel:
-    jleu r0, r1, .LBB3_1  // Continue if array of positive length …
-.LBB3_5:
-    jump r23  // … else leave the function.
-.LBB3_4:
-    add r0, r0, 4  // i++
-    sw r3, 0, r2  // *curr ← to_sort
-    jgtu r0, r1, .LBB3_5  // If i > end, leave the function.
-.LBB3_1:
-    lw r2, r0, 0  // to_sort ← *i
-    lw r4, r0, -4  // *prev
-    move r3, r0  // curr ← i
-    jleu r4, r2, .LBB3_4  // If *prev > to_sort, terminate inner loop.
-    move r3, r0  // ???
-.LBB3_3:
-    sw r3, 0, r4  // *curr ← *prev
-    lw r4, r3, -8  // *(prev - 1)
-    add r3, r3, -4  // curr ← prev
-    jgtu r4, r2, .LBB3_3  // If *(prev - 1) > to_sort, continue with the next iteration of the inner loop.
-    jump .LBB3_4  // Leave inner loop.
-\end{verbatim}
+The phenomenon gets more complicated when one considers the iterative implementation.
+In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{imp:triviality_before_call} coming in close second and all other implementations deteriorating to the similarly bad runtimes.
+
+\todo[inline]{Verweis auf Begründung in Rek.\ gg.\ Iter.?}
+\todo[inline]{Extra-Code ist teilweise verbuggt!}
+
+\begin{figure}[p]
+	\begin{tikzpicture}[plot]
+		\def\algos{Normal,TrivialBC,NoTrivial,OneInsertion,ThreshBC,ThreshTrivBC,ThreshThenTriv,TrivInThresh}
+		\begin{groupplot}[
+			width=0.2863\linewidth,
+			height=3.5cm,
+			group/group size=3 by 4,
+			group style={horizontal sep=2.75em, vertical sep=4.5em},  % For some reason, `group/vertical sep` does not work.
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \((n \lb n)\)},
+			xmode=log,
+			xtick={20, 64, 256, 1024},
+			xticklabels={\(20\), \(64\), \(256\), \(1024\)},
+			minor xtick={32, 128, 512},
+			legend columns=-1,
+		]
+			% Recursive
+			\nextgroupplot[title={Recursive | Last | Left to Right}, legend to name=leg:quick_implementations]
+			\legend{\ref{imp:normal}, \ref{imp:triviality_before_call}, \ref{imp:no_triviality}, \ref{imp:one_insertion}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_within_threshold}}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecnssuniend}
+			}
+			%
+			\nextgroupplot[title={Recursive | Middle | Left to Right}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecnssunimiddle}
+			}
+			%
+			\nextgroupplot[title={Recursive | Median of Three | Left to Right}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecnssunimedian}
+			}
+			%
+			\nextgroupplot[title={Recursive | Last | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecssuniend}
+			}
+			%
+			\nextgroupplot[title={Recursive | Middle | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecssunimiddle}
+			}
+			%
+			\nextgroupplot[title={Recursive | Median of Three | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickrecssunimedian}
+			}
+			% Iterative
+			\nextgroupplot[title={Iterative | Last | Left to Right}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitnssuniend}
+			}
+			%
+			\nextgroupplot[title={Iterative | Middle | Left to Right}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitnssunimiddle}
+			}
+			%
+			\nextgroupplot[title={Iterative | Median of Three | Left to Right}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitnssunimedian}
+			}
+			%
+			\nextgroupplot[title={Iterative | Last | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitssuniend}
+			}
+			%
+			\nextgroupplot[title={Iterative | Middle | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitssunimiddle}
+			}
+			%
+			\nextgroupplot[title={Iterative | Median of Three | Right to Left}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{\tablequickitssunimedian}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick_implementations}\hfil
+	\caption{
+		Comparison of \QS*{} with different handling of the base cases.
+	}
+	\label{fig:quick_implementations}
+\end{figure}

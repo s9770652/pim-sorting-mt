@@ -1,0 +1,279 @@
+quick_sort:                             // @quick_sort
+.Lfunc_begin1:
+	.loc	3 51 0                          // benchmark/quick_sorts.c:51:0
+	.cfi_startproc
+// %bb.0:
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: quick_sort:end <- $r1
+	.cfi_def_cfa_offset -16
+	.cfi_offset 23, -8
+	.cfi_offset 22, -4
+	sd r22, 8, d22
+	add r22, r22, 16
+	.cfi_offset 15, -16
+	.cfi_offset 14, -12
+	sd r22, -16, d14
+	move r14, r1
+.Ltmp13:
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	.loc	3 53 9 prologue_end             // benchmark/quick_sorts.c:53:9
+	jgtu r14, r0, .LBB1_1
+.Ltmp14:
+.LBB1_16:
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	.loc	3 72 1                          // benchmark/quick_sorts.c:72:1
+	ld d14, r22, -16
+.Ltmp15:
+	ld d22, r22, -8
+	jump r23
+.LBB1_15:                               //   in Loop: Header=BB1_1 Depth=1
+.Ltmp16:
+	//DEBUG_VALUE: swap:a <- $r15
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: swap:b <- $r14
+	//DEBUG_VALUE: swap:temp <- $r3
+	.file	7 "/home/vboxuser/Dokumente/pim/pim-sorting" "benchmark/tester.h"
+	.loc	7 46 8                          // benchmark/tester.h:46:8
+	sw r15, 0, r1
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r14, 0, r3
+.Ltmp17:
+	.loc	3 70 5                          // benchmark/quick_sorts.c:70:5
+	add r1, r15, -4
+	call r23, quick_sort
+.Ltmp18:
+	.loc	3 53 13                         // benchmark/quick_sorts.c:53:13
+	add r0, r15, 4
+.Ltmp19:
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:start <- [DW_OP_plus_uconst 8, DW_OP_stack_value] undef
+	.loc	3 53 9 is_stmt 0                // benchmark/quick_sorts.c:53:9
+	jgeu r0, r14, .LBB1_16
+.Ltmp20:
+.LBB1_1:                                // =>This Loop Header: Depth=1
+                                        //     Child Loop BB1_11 Depth 2
+                                        //       Child Loop BB1_12 Depth 3
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	.loc	3 54 13 is_stmt 1               // benchmark/quick_sorts.c:54:13
+	sub r1, r14, r0
+.Ltmp21:
+	.loc	3 54 9 is_stmt 0                // benchmark/quick_sorts.c:54:9
+	jles r1, 51, .LBB1_2
+.Ltmp22:
+// %bb.6:                               //   in Loop: Header=BB1_1 Depth=1
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: get_pivot:start <- $r0
+	//DEBUG_VALUE: get_pivot:end <- $r14
+	.loc	7 73 41 is_stmt 1               // benchmark/tester.h:73:41
+	add r1, r0, r14
+	.loc	7 73 59 is_stmt 0               // benchmark/tester.h:73:59
+	lsr r1, r1, 1
+	.loc	7 73 63                         // benchmark/tester.h:73:63
+	and r1, r1, 2147483644
+.Ltmp23:
+	//DEBUG_VALUE: get_pivot:middle <- $r1
+	.loc	7 74 10 is_stmt 1               // benchmark/tester.h:74:10
+	lw r3, r0, 0
+	.loc	7 74 19 is_stmt 0               // benchmark/tester.h:74:19
+	lw r5, r1, 0
+	.loc	7 74 40                         // benchmark/tester.h:74:40
+	lw r2, r14, 0
+	.loc	7 74 17                         // benchmark/tester.h:74:17
+	sub r4, r3, r5, gtu
+.Ltmp24:
+	.loc	7 74 9                          // benchmark/tester.h:74:9
+	sub r5, r2, r5, gtu
+	jneq r4, r5, .LBB1_8
+.Ltmp25:
+// %bb.7:                               //   in Loop: Header=BB1_1 Depth=1
+	//DEBUG_VALUE: get_pivot:end <- $r14
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: get_pivot:middle <- $r1
+	//DEBUG_VALUE: get_pivot:start <- $r0
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	move r1, r14
+.Ltmp26:
+.LBB1_8:                                //   in Loop: Header=BB1_1 Depth=1
+	//DEBUG_VALUE: get_pivot:end <- $r14
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: get_pivot:start <- $r0
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	.loc	7 0 0                           // benchmark/tester.h:0:0
+	sub r3, r3, r2, gtu
+	xor r3, r4, r3
+	.loc	7 74 9                          // benchmark/tester.h:74:9
+	and r4, r3, 1
+	move r3, r0
+	jnz r4, .LBB1_10
+.Ltmp27:
+// %bb.9:                               //   in Loop: Header=BB1_1 Depth=1
+	//DEBUG_VALUE: get_pivot:end <- $r14
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: get_pivot:start <- $r0
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	move r3, r1
+.Ltmp28:
+.LBB1_10:                               //   in Loop: Header=BB1_1 Depth=1
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: quick_sort:pivot <- $r3
+	//DEBUG_VALUE: swap:a <- $r3
+	//DEBUG_VALUE: swap:b <- $r14
+	.loc	7 45 20 is_stmt 1               // benchmark/tester.h:45:20
+	lw r1, r3, 0
+.Ltmp29:
+	//DEBUG_VALUE: swap:temp <- $r1
+	.loc	7 46 8                          // benchmark/tester.h:46:8
+	sw r3, 0, r2
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r14, 0, r1
+.Ltmp30:
+	.loc	3 61 18                         // benchmark/quick_sorts.c:61:18
+	add r15, r0, -4
+.Ltmp31:
+	//DEBUG_VALUE: quick_sort:j <- $r14
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	move r2, r14
+	//DEBUG_VALUE: quick_sort:i <- $r15
+.Ltmp32:
+	//DEBUG_VALUE: quick_sort:j <- $r2
+.LBB1_11:                               //   Parent Loop BB1_1 Depth=1
+                                        // =>  This Loop Header: Depth=2
+                                        //       Child Loop BB1_12 Depth 3
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	.loc	3 63 16 is_stmt 1               // benchmark/quick_sorts.c:63:16
+	lw r3, r15, 4
+	.loc	3 63 17 is_stmt 0               // benchmark/quick_sorts.c:63:17
+	add r15, r15, 4
+.Ltmp33:
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	.loc	3 63 9                          // benchmark/quick_sorts.c:63:9
+	jltu r3, r1, .LBB1_11
+.Ltmp34:
+.LBB1_12:                               //   Parent Loop BB1_1 Depth=1
+                                        //     Parent Loop BB1_11 Depth=2
+                                        // =>    This Inner Loop Header: Depth=3
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	.loc	3 64 16 is_stmt 1               // benchmark/quick_sorts.c:64:16
+	lw r4, r2, -4
+	.loc	3 64 17 is_stmt 0               // benchmark/quick_sorts.c:64:17
+	add r2, r2, -4
+.Ltmp35:
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	.loc	3 64 9                          // benchmark/quick_sorts.c:64:9
+	jgtu r4, r1, .LBB1_12
+.Ltmp36:
+// %bb.13:                              //   in Loop: Header=BB1_11 Depth=2
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: swap:a <- $r15
+	//DEBUG_VALUE: swap:a <- $r15
+	.loc	3 65 13 is_stmt 1               // benchmark/quick_sorts.c:65:13
+	jgeu r15, r2, .LBB1_15
+.Ltmp37:
+// %bb.14:                              //   in Loop: Header=BB1_11 Depth=2
+	//DEBUG_VALUE: swap:a <- $r15
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	//DEBUG_VALUE: quick_sort:start <- $r0
+	//DEBUG_VALUE: swap:b <- $r2
+	//DEBUG_VALUE: swap:temp <- $r3
+	.loc	7 46 8                          // benchmark/tester.h:46:8
+	sw r15, 0, r4
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r2, 0, r3
+	lw r1, r14, 0
+	//DEBUG_VALUE: quick_sort:i <- $r15
+	//DEBUG_VALUE: quick_sort:j <- $r2
+	jump .LBB1_11
+.Ltmp38:
+.LBB1_5:                                //   in Loop: Header=BB1_2 Depth=1
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: to_sort <- $r1
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r0
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	add r0, r0, 4
+.Ltmp39:
+	.loc	3 41 15 is_stmt 1               // benchmark/quick_sorts.c:41:15
+	sw r2, 0, r1
+.Ltmp40:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r0
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- [DW_OP_plus_uconst 4, DW_OP_stack_value] $r0
+	.loc	3 34 5                          // benchmark/quick_sorts.c:34:5
+	jgtu r0, r14, .LBB1_16
+.Ltmp41:
+.LBB1_2:                                // =>This Loop Header: Depth=1
+                                        //     Child Loop BB1_4 Depth 2
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r0
+	//DEBUG_VALUE: prev <- [DW_OP_constu 4, DW_OP_minus, DW_OP_stack_value] $r0
+	.loc	3 36 27                         // benchmark/quick_sorts.c:36:27
+	lw r1, r0, 0
+.Ltmp42:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r0
+	//DEBUG_VALUE: to_sort <- $r1
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r0
+	.loc	3 37 16                         // benchmark/quick_sorts.c:37:16
+	lw r3, r0, -4
+.Ltmp43:
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	move r2, r0
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r0
+	//DEBUG_VALUE: to_sort <- $r1
+.Ltmp44:
+	.loc	3 37 9                          // benchmark/quick_sorts.c:37:9
+	jleu r3, r1, .LBB1_5
+.Ltmp45:
+// %bb.3:                               //   in Loop: Header=BB1_2 Depth=1
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: to_sort <- $r1
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r0
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r0
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r0
+	.loc	3 0 9                           // benchmark/quick_sorts.c:0:9
+	move r2, r0
+.Ltmp46:
+.LBB1_4:                                //   Parent Loop BB1_2 Depth=1
+                                        // =>  This Inner Loop Header: Depth=2
+	//DEBUG_VALUE: quick_sort:end <- $r14
+	//DEBUG_VALUE: to_sort <- $r1
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r0
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- undef
+	.loc	3 38 19 is_stmt 1               // benchmark/quick_sorts.c:38:19
+	sw r2, 0, r3
+.Ltmp47:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- undef
+	//DEBUG_VALUE: prev <- [DW_OP_constu 4, DW_OP_minus, DW_OP_stack_value] undef
+	.loc	3 37 16                         // benchmark/quick_sorts.c:37:16
+	lw r3, r2, -8
+	.loc	3 37 9 is_stmt 0                // benchmark/quick_sorts.c:37:9
+	add r2, r2, -4
+	jgtu r3, r1, .LBB1_4
+	jump .LBB1_5
+.Ltmp48:
+.Lfunc_end1:
+	.size	quick_sort, .Lfunc_end1-quick_sort
+	.cfi_endproc
+	.section	.stack_sizes,"o",@progbits,.text.quick_sort
+	.long	.Lfunc_begin1
+	.byte	16
+	.section	.text.quick_sort,"ax",@progbits
+                                        // -- End function

@@ -1,11 +1,13 @@
-\subsection{\QS{}}
+\subsection{\texorpdfstring{\QS{}}{QuickSort}}
+
+\pgfplotstableread{data/quick/rec_vs_it.txt}{\tablequickrecvsit}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements bigger or smaller than the pivot are moved to the right or left of the pivot element, respectively.
 Finally, \QS{} is called on the left and right partitions.
 
 \paragraph{Base Cases}
-When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as alternative.
+When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
 As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of between a quarter and a half compared to a \QS{} without fallback algorithm.
 This low threshold also means that even a simple two-round \ShS{} is not worth considering.
 
@@ -13,3 +15,64 @@ Besides falling back to \IS{}, another base case is imaginable, namely terminati
 Realistically speaking, this should not be necessary, because even though the extra check is done with just one additional instruction, it is a rare occurrence and the \IS{} would terminate after a few instructions anyway.
 Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases.
 Since these are likely caused by the compiler, they are laid out in \cref{subsec:appendix:quick}.
+
+\paragraph{Recursion vs. Iteration}
+
+%\begin{figure}
+%	\begin{tikzpicture}[plot]
+%		\begin{groupplot}[
+%			width=0.4358\linewidth,
+%			group/group size=2 by 1,
+%			groupplot xlabel={Input Length \(n\)},
+%			xmode=log,
+%			xtick={20, 32, 64, 128, 256, 512, 1024},
+%			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+%%			minor xtick=data,
+%			legend columns=-1,
+%		]
+%			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), legend to name=leg:rec_vs_it]
+%			\legend{Iterative, Recursive}
+%			\plotpernlogn{It}{\tablequickrecvsit}
+%			\plotpernlogn{Rec}{\tablequickrecvsit}
+%			%
+%			\nextgroupplot[ylabel=Speed-up]
+%			\plotspeedup{It}{Rec}{\tablequickrecvsit}
+%		\end{groupplot}
+%	\end{tikzpicture}
+%
+%	\hfil\pgfplotslegendfromname{leg:rec_vs_it}\hfil
+%	\caption{
+%		Comparison of the recursive and the iterative variant of a \QS{} using \cref{imp:normal} and prioritising the left partition over the right one.
+%		The actual algorithm is compiled the very same in both cases, so that time differences are only due to the way \QS{} is applied to the partitions.
+%	}
+%	\label{fig:rec_vs_it}
+%\end{figure}
+
+In theory, the question of whether an algorithm should be implemented recursively or iteratively comes down to convenience.
+Due to the uniform cost of instructions, putting arguments automatically on the call stack or manually in an array essentially costs the same, as does jumping to the start of a loop and to the start of a function.
+Furthermore, in case of \QS{}, the compiler turns tail-recursive calls into jumps back to the function start, so that one partition is sorted recursively and the other iteratively.
+All this would suggest a recursive implementation with less code complexity.
+
+In practice, it comes down to the compilation.
+Selcouthly, even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
+The fastest implementation overall is indeed an iterative one, though this rather caused by better register usage and less instructions used for the actual \QS{} algorithm.
+
+\paragraph{Pivot}
+Another parameter to tune is the way in which the pivot is chosen.
+The following were implemented and tested:
+\begin{description}
+	\item[Last Element]
+	This is the fastest way, requiring zero instructions.
+
+	\item[Middle Element]
+	This way is slower than the first one, requiring a calculation of the middle element's address and swapping it with the last element, so that it can act as sentinel value during partitioning.
+	The upside is that it is more suited for sorted and nearly sorted inputs.
+
+	\item[Median of Three]
+	Taking the median of the first, middle, and last element is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
+\end{description}
+
+\begin{itemize}
+	\item
+	\enquote{end} ist unbrauchbar für fast sortierte Eingabe, da der Stapelspeicher nicht ausreicht.
+\end{itemize}

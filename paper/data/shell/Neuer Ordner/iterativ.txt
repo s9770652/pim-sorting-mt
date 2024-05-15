@@ -1,0 +1,326 @@
+quick_sort_iterative:                   // @quick_sort_iterative
+.Lfunc_begin9:
+	.loc	3 300 0 is_stmt 1               // benchmark/quick_sorts.c:300:0
+	.cfi_startproc
+// %bb.0:
+	//DEBUG_VALUE: quick_sort_iterative:start <- $r0
+	//DEBUG_VALUE: quick_sort_iterative:end <- $r1
+	.cfi_def_cfa_offset 0
+	.loc	3 303 31 prologue_end           // benchmark/quick_sorts.c:303:31
+	lw r2, zero, call_stack
+.Ltmp329:
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: quick_sort_iterative:end <- $r1
+	//DEBUG_VALUE: quick_sort_iterative:start <- $r0
+	.loc	3 304 16                        // benchmark/quick_sorts.c:304:16
+	add r3, r2, 4
+	sw zero, call_stack, r3
+	.loc	3 304 19 is_stmt 0              // benchmark/quick_sorts.c:304:19
+	sw r2, 0, r0
+	.loc	3 305 16 is_stmt 1              // benchmark/quick_sorts.c:305:16
+	add r0, r2, 8
+.Ltmp330:
+	.loc	3 305 19 is_stmt 0              // benchmark/quick_sorts.c:305:19
+	sw r2, 4, r1
+	jump .LBB9_1
+.Ltmp331:
+.LBB9_16:                               //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: j <- $r6
+	//DEBUG_VALUE: swap:a <- $r4
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: swap:b <- $r1
+	//DEBUG_VALUE: swap:temp <- $r7
+	.loc	7 46 8 is_stmt 1                // benchmark/tester.h:46:8
+	sw r4, 0, r5
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r1, 0, r7
+.Ltmp332:
+	.loc	3 326 23                        // benchmark/quick_sorts.c:326:23
+	add r5, r4, 4
+	sw r0, -8, r5
+	.loc	3 327 23                        // benchmark/quick_sorts.c:327:23
+	sw r0, -4, r1
+	.loc	3 329 23                        // benchmark/quick_sorts.c:329:23
+	sw r0, 0, r3
+	.loc	3 330 20                        // benchmark/quick_sorts.c:330:20
+	add r1, r0, 8
+.Ltmp333:
+	.loc	3 330 23 is_stmt 0              // benchmark/quick_sorts.c:330:23
+	add r3, r4, -4
+.Ltmp334:
+	sw r0, 4, r3
+	move r0, r1
+.Ltmp335:
+.LBB9_17:                               //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	.loc	3 331 5 is_stmt 1               // benchmark/quick_sorts.c:331:5
+	jeq r0, r2, .LBB9_18
+.Ltmp336:
+.LBB9_1:                                // =>This Loop Header: Depth=1
+                                        //     Child Loop BB9_12 Depth 2
+                                        //       Child Loop BB9_13 Depth 3
+                                        //     Child Loop BB9_3 Depth 2
+                                        //       Child Loop BB9_5 Depth 3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	.loc	3 307 20                        // benchmark/quick_sorts.c:307:20
+	lw r1, r0, -4
+.Ltmp337:
+	//DEBUG_VALUE: right <- $r1
+	.loc	3 307 43 is_stmt 0              // benchmark/quick_sorts.c:307:43
+	lw r3, r0, -8
+.Ltmp338:
+	//DEBUG_VALUE: left <- $r3
+	.loc	3 309 19 is_stmt 1              // benchmark/quick_sorts.c:309:19
+	sub r4, r1, r3
+.Ltmp339:
+	.loc	3 309 13 is_stmt 0              // benchmark/quick_sorts.c:309:13
+	jgts r4, 51, .LBB9_7
+.Ltmp340:
+// %bb.2:                               //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	.loc	3 0 0                           // benchmark/quick_sorts.c:0:0
+	add r0, r0, -8
+.Ltmp341:
+	.loc	3 310 17 is_stmt 1              // benchmark/quick_sorts.c:310:17
+	jgtu r1, r3, .LBB9_3
+	jump .LBB9_17
+.Ltmp342:
+.LBB9_6:                                //   in Loop: Header=BB9_3 Depth=2
+	//DEBUG_VALUE: to_sort <- $r4
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	add r3, r3, 4
+.Ltmp343:
+	.loc	3 41 15 is_stmt 1               // benchmark/quick_sorts.c:41:15
+	sw r5, 0, r4
+.Ltmp344:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r3
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- [DW_OP_plus_uconst 4, DW_OP_stack_value] $r3
+	.loc	3 34 5                          // benchmark/quick_sorts.c:34:5
+	jgtu r3, r1, .LBB9_17
+.Ltmp345:
+.LBB9_3:                                //   Parent Loop BB9_1 Depth=1
+                                        // =>  This Loop Header: Depth=2
+                                        //       Child Loop BB9_5 Depth 3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r3
+	//DEBUG_VALUE: prev <- [DW_OP_constu 4, DW_OP_minus, DW_OP_stack_value] $r3
+	.loc	3 36 27                         // benchmark/quick_sorts.c:36:27
+	lw r4, r3, 0
+.Ltmp346:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r3
+	//DEBUG_VALUE: to_sort <- $r4
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r3
+	.loc	3 37 16                         // benchmark/quick_sorts.c:37:16
+	lw r6, r3, -4
+.Ltmp347:
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	move r5, r3
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r3
+	//DEBUG_VALUE: to_sort <- $r4
+.Ltmp348:
+	.loc	3 37 9                          // benchmark/quick_sorts.c:37:9
+	jleu r6, r4, .LBB9_6
+.Ltmp349:
+// %bb.4:                               //   in Loop: Header=BB9_3 Depth=2
+	//DEBUG_VALUE: to_sort <- $r4
+	//DEBUG_VALUE: prev <- [DW_OP_plus_uconst 4294967292, DW_OP_stack_value] $r3
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- $r3
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	.loc	3 0 9                           // benchmark/quick_sorts.c:0:9
+	move r5, r3
+.Ltmp350:
+.LBB9_5:                                //   Parent Loop BB9_1 Depth=1
+                                        //     Parent Loop BB9_3 Depth=2
+                                        // =>    This Inner Loop Header: Depth=3
+	//DEBUG_VALUE: to_sort <- $r4
+	//DEBUG_VALUE: insertion_sort_sentinel:i <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- undef
+	.loc	3 38 19 is_stmt 1               // benchmark/quick_sorts.c:38:19
+	sw r5, 0, r6
+.Ltmp351:
+	//DEBUG_VALUE: insertion_sort_sentinel:curr <- undef
+	//DEBUG_VALUE: prev <- [DW_OP_constu 4, DW_OP_minus, DW_OP_stack_value] undef
+	.loc	3 37 16                         // benchmark/quick_sorts.c:37:16
+	lw r6, r5, -8
+	.loc	3 37 9 is_stmt 0                // benchmark/quick_sorts.c:37:9
+	add r5, r5, -4
+	jgtu r6, r4, .LBB9_5
+	jump .LBB9_6
+.Ltmp352:
+.LBB9_7:                                //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: get_pivot:start <- $r3
+	//DEBUG_VALUE: get_pivot:end <- $r1
+	.loc	7 73 41 is_stmt 1               // benchmark/tester.h:73:41
+	add r4, r3, r1
+	.loc	7 73 59 is_stmt 0               // benchmark/tester.h:73:59
+	lsr r4, r4, 1
+	.loc	7 73 63                         // benchmark/tester.h:73:63
+	and r5, r4, 2147483644
+.Ltmp353:
+	//DEBUG_VALUE: get_pivot:middle <- $r5
+	.loc	7 74 10 is_stmt 1               // benchmark/tester.h:74:10
+	lw r6, r3, 0
+	.loc	7 74 19 is_stmt 0               // benchmark/tester.h:74:19
+	lw r8, r5, 0
+	.loc	7 74 40                         // benchmark/tester.h:74:40
+	lw r4, r1, 0
+	.loc	7 74 17                         // benchmark/tester.h:74:17
+	sub r7, r6, r8, gtu
+.Ltmp354:
+	.loc	7 74 9                          // benchmark/tester.h:74:9
+	sub r8, r4, r8, gtu
+	jneq r7, r8, .LBB9_9
+.Ltmp355:
+// %bb.8:                               //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: get_pivot:middle <- $r5
+	//DEBUG_VALUE: get_pivot:start <- $r3
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: get_pivot:end <- $r1
+	//DEBUG_VALUE: right <- $r1
+	move r5, r1
+.Ltmp356:
+.LBB9_9:                                //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: get_pivot:start <- $r3
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: get_pivot:end <- $r1
+	//DEBUG_VALUE: right <- $r1
+	.loc	7 0 0                           // benchmark/tester.h:0:0
+	sub r6, r6, r4, gtu
+	xor r6, r7, r6
+	.loc	7 74 9                          // benchmark/tester.h:74:9
+	and r7, r6, 1
+	move r6, r3
+	jnz r7, .LBB9_11
+.Ltmp357:
+// %bb.10:                              //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: get_pivot:start <- $r3
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: get_pivot:end <- $r1
+	//DEBUG_VALUE: right <- $r1
+	move r6, r5
+.Ltmp358:
+.LBB9_11:                               //   in Loop: Header=BB9_1 Depth=1
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: pivot <- $r6
+	//DEBUG_VALUE: swap:a <- $r6
+	//DEBUG_VALUE: swap:b <- $r1
+	.loc	7 45 20 is_stmt 1               // benchmark/tester.h:45:20
+	lw r5, r6, 0
+.Ltmp359:
+	//DEBUG_VALUE: swap:temp <- $r5
+	.loc	7 46 8                          // benchmark/tester.h:46:8
+	sw r6, 0, r4
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r1, 0, r5
+.Ltmp360:
+	.loc	3 317 21                        // benchmark/quick_sorts.c:317:21
+	add r4, r3, -4
+.Ltmp361:
+	//DEBUG_VALUE: j <- $r1
+	//DEBUG_VALUE: i <- $r4
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	move r6, r1
+.Ltmp362:
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: j <- $r6
+.LBB9_12:                               //   Parent Loop BB9_1 Depth=1
+                                        // =>  This Loop Header: Depth=2
+                                        //       Child Loop BB9_13 Depth 3
+	//DEBUG_VALUE: j <- $r6
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: i <- $r4
+	.loc	3 319 20 is_stmt 1              // benchmark/quick_sorts.c:319:20
+	lw r7, r4, 4
+	.loc	3 319 21 is_stmt 0              // benchmark/quick_sorts.c:319:21
+	add r4, r4, 4
+.Ltmp363:
+	//DEBUG_VALUE: i <- $r4
+	.loc	3 319 13                        // benchmark/quick_sorts.c:319:13
+	jltu r7, r5, .LBB9_12
+.Ltmp364:
+.LBB9_13:                               //   Parent Loop BB9_1 Depth=1
+                                        //     Parent Loop BB9_12 Depth=2
+                                        // =>    This Inner Loop Header: Depth=3
+	//DEBUG_VALUE: j <- $r6
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: j <- $r6
+	.loc	3 320 20 is_stmt 1              // benchmark/quick_sorts.c:320:20
+	lw r8, r6, -4
+	.loc	3 320 21 is_stmt 0              // benchmark/quick_sorts.c:320:21
+	add r6, r6, -4
+.Ltmp365:
+	//DEBUG_VALUE: j <- $r6
+	.loc	3 320 13                        // benchmark/quick_sorts.c:320:13
+	jgtu r8, r5, .LBB9_13
+.Ltmp366:
+// %bb.14:                              //   in Loop: Header=BB9_12 Depth=2
+	//DEBUG_VALUE: j <- $r6
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: swap:a <- $r4
+	//DEBUG_VALUE: swap:a <- $r4
+	.loc	3 321 17 is_stmt 1              // benchmark/quick_sorts.c:321:17
+	jgeu r4, r6, .LBB9_16
+.Ltmp367:
+// %bb.15:                              //   in Loop: Header=BB9_12 Depth=2
+	//DEBUG_VALUE: j <- $r6
+	//DEBUG_VALUE: swap:a <- $r4
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: left <- $r3
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	//DEBUG_VALUE: right <- $r1
+	//DEBUG_VALUE: swap:b <- $r6
+	//DEBUG_VALUE: swap:temp <- $r7
+	.loc	7 46 8                          // benchmark/tester.h:46:8
+	sw r4, 0, r8
+	.loc	7 47 8                          // benchmark/tester.h:47:8
+	sw r6, 0, r7
+	lw r5, r1, 0
+	//DEBUG_VALUE: i <- $r4
+	//DEBUG_VALUE: j <- $r6
+	jump .LBB9_12
+.Ltmp368:
+.LBB9_18:
+	//DEBUG_VALUE: quick_sort_iterative:start_of_call_stack <- $r2
+	.loc	3 0 0 is_stmt 0                 // benchmark/quick_sorts.c:0:0
+	sw zero, call_stack, r2
+	.loc	3 332 1 is_stmt 1               // benchmark/quick_sorts.c:332:1
+	jump r23
+.Ltmp369:
+.Lfunc_end9:
+	.size	quick_sort_iterative, .Lfunc_end9-quick_sort_iterative
+	.cfi_endproc
+	.section	.stack_sizes,"o",@progbits,.text.quick_sort_iterative
+	.long	.Lfunc_begin9
+	.byte	0
+	.section	.text.quick_sort_iterative,"ax",@progbits
+                                        // -- End function

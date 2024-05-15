@@ -60,3 +60,14 @@
 \NewDocumentCommand{\QS}{s}{Quick\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\SelS}{s}{Selection\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\ShS}{s}{Shell\-Sort\IfBooleanT{#1}{s}}
+
+\makeatletter
+\@ifpackagewith{cleveref}{capitalize}{
+	\crefname{implementation}{Impl.}{Impl.}
+	\Crefname{implementation}{Implementation}{Implementations}
+}{
+	\crefname{implementation}{impl.}{impl.}
+	\Crefname{implementation}{Implementation}{Implementations}
+}
+
+\makeatother
