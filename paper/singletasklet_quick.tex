@@ -55,24 +55,27 @@ All this would suggest a recursive implementation with less code complexity.
 
 In practice, it comes down to the compilation.
 Selcouthly, even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
-The fastest implementation overall is indeed an iterative one, though this rather caused by better register usage and less instructions used for the actual \QS{} algorithm.
+Overall though, iterative implementations tend to be compiled better with superior register usage and less instructions used for the actual \QS{} algorithm.
+The fastest implementation is indeed an iterative one, even if it beats the fastest recursive implementations by just 4\%.
 
 \paragraph{Pivot}
 Another parameter to tune is the way in which the pivot is chosen.
 The following were implemented and tested:
-\begin{description}
-	\item[Last Element]
-	This is the fastest way, requiring zero instructions.
-
-	\item[Middle Element]
-	This way is slower than the first one, requiring a calculation of the middle element's address and swapping it with the last element, so that it can act as sentinel value during partitioning.
-	The upside is that it is more suited for sorted and nearly sorted inputs.
-
-	\item[Median of Three]
-	Taking the median of the first, middle, and last element is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
-\end{description}
-
 \begin{itemize}
 	\item
-	\enquote{end} ist unbrauchbar für fast sortierte Eingabe, da der Stapelspeicher nicht ausreicht.
+	Using the \emph{last element} is the fastest way, requiring zero instructions.
+
+	\item
+	Choosing the \emph{middle element} is slower than the last one, requiring a calculation of its address and swapping it with the last element, so that it can act as sentinel value during partitioning.
+	The upside is that it is more suited for sorted and nearly sorted inputs.
+
+	\item
+	Taking the \emph{median of three elements}, namely the first, middle, and last one, is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
+
+	\item
+	A \emph{random element} is most efficiently drawn using a xorshift random number generator and rejection sampling\todo{LG-Quelle}.
 \end{itemize}
+Luckily, the pivot choice does not affect the overall compilation most of the time, making a comparison easier.
+Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage usually, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
+The random pivot is about 10\% worse than choosing the median of three elements.
+Since drawing the random index is thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times.

@@ -5,15 +5,19 @@
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tablequickrecnssuniend}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tablequickrecnssunimiddle}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tablequickrecnssunimedian}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/random.txt}{\tablequickrecnssunirandom}
 \pgfplotstableread{data/quick/recursive/switched sides/uniform/end.txt}{\tablequickrecssuniend}
 \pgfplotstableread{data/quick/recursive/switched sides/uniform/middle.txt}{\tablequickrecssunimiddle}
 \pgfplotstableread{data/quick/recursive/switched sides/uniform/median_of_three.txt}{\tablequickrecssunimedian}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/random.txt}{\tablequickrecssunirandom}
 \pgfplotstableread{data/quick/iterative/no switched sides/uniform/end.txt}{\tablequickitnssuniend}
 \pgfplotstableread{data/quick/iterative/no switched sides/uniform/middle.txt}{\tablequickitnssunimiddle}
 \pgfplotstableread{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{\tablequickitnssunimedian}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/random.txt}{\tablequickitnssunirandom}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/end.txt}{\tablequickitssuniend}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/middle.txt}{\tablequickitssunimiddle}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tablequickitssunimedian}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tablequickitssunirandom}
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
@@ -29,13 +33,13 @@
 %			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
 			legend columns=-1,
 		]
-			\nextgroupplot[title={Over No Fallback}, legend to name=leg:quick_fallback]
+			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
 			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
 				\plotspeedup{#1}{None}{\tablequickfallback}
 			}
 			%
-			\nextgroupplot[title={Over a Threshold of 13}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
+			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
 			\pgfplotsinvokeforeach{10,...,16}{
 				\ifnumequal{#1}{13}{
 					\pgfplotsset{cycle list shift=1}
@@ -52,6 +56,7 @@
 	}
 	\label{fig:quick_fallback}
 \end{figure}
+
 
 Two base cases exist:
 \begin{enumerate*}
@@ -128,88 +133,128 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 \todo[inline]{Extra-Code ist teilweise verbuggt!}
 
 \begin{figure}[p]
-	\begin{tikzpicture}[plot]
-		\def\algos{Normal,TrivialBC,NoTrivial,OneInsertion,ThreshBC,ThreshTrivBC,ThreshThenTriv,TrivInThresh}
-		\begin{groupplot}[
-			width=0.2863\linewidth,
-			height=3.5cm,
-			group/group size=3 by 4,
-			group style={horizontal sep=2.75em, vertical sep=4.5em},  % For some reason, `group/vertical sep` does not work.
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \((n \lb n)\)},
-			xmode=log,
-			xtick={20, 64, 256, 1024},
-			xticklabels={\(20\), \(64\), \(256\), \(1024\)},
-			minor xtick={32, 128, 512},
-			legend columns=-1,
-		]
-			% Recursive
-			\nextgroupplot[title={Recursive | Last | Left to Right}, legend to name=leg:quick_implementations]
-			\legend{\ref{imp:normal}, \ref{imp:triviality_before_call}, \ref{imp:no_triviality}, \ref{imp:one_insertion}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_within_threshold}}
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecnssuniend}
-			}
-			%
-			\nextgroupplot[title={Recursive | Middle | Left to Right}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecnssunimiddle}
-			}
-			%
-			\nextgroupplot[title={Recursive | Median of Three | Left to Right}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecnssunimedian}
-			}
-			%
-			\nextgroupplot[title={Recursive | Last | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecssuniend}
-			}
-			%
-			\nextgroupplot[title={Recursive | Middle | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecssunimiddle}
-			}
-			%
-			\nextgroupplot[title={Recursive | Median of Three | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickrecssunimedian}
-			}
-			% Iterative
-			\nextgroupplot[title={Iterative | Last | Left to Right}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitnssuniend}
-			}
-			%
-			\nextgroupplot[title={Iterative | Middle | Left to Right}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitnssunimiddle}
-			}
-			%
-			\nextgroupplot[title={Iterative | Median of Three | Left to Right}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitnssunimedian}
-			}
-			%
-			\nextgroupplot[title={Iterative | Last | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitssuniend}
-			}
-			%
-			\nextgroupplot[title={Iterative | Middle | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitssunimiddle}
-			}
-			%
-			\nextgroupplot[title={Iterative | Median of Three | Right to Left}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernlogn{#1}{\tablequickitssunimedian}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
+	\def\algos{Normal,TrivialBC,NoTrivial,OneInsertion,ThreshBC,ThreshTrivBC,ThreshThenTriv,TrivInThresh}
+	\pgfplotsset{
+		width=0.2308\linewidth,
+		height=3.5cm,
+		group/group size=4 by 2,
+		group style={horizontal sep=1em, vertical sep=3.5em},  % For some reason, `group/horizontal sep` does not work.
+		groupplot xlabel={Input Length \(n\)},
+		groupplot ylabel={Cycles / \((n \lb n)\)},
+		xmode=log,
+		xtick={20, 64, 256, 1024},
+		xticklabels={\(20\), \(64\), \(256\), \(1024\)},
+		minor xtick={32, 128, 512},
+		ymin=55,
+		ymax=79,
+		ytick={55,59,...,79},
+		legend columns=-1,
+	}
+	\begin{subfigure}{\textwidth}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}
+				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick_implementations]
+				\legend{\ref{imp:normal}, \ref{imp:triviality_before_call}, \ref{imp:no_triviality}, \ref{imp:one_insertion}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_within_threshold}}
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecnssuniend}
+				}
+				%
+				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecnssunimiddle}
+				}
+				%
+				\nextgroupplot[title={Median | Left First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecnssunimedian}
+				}
+				%
+				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecnssunirandom}
+				}
+				%
+				\nextgroupplot[title={Last | Right First}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecssuniend}
+				}
+				%
+				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecssunimiddle}
+				}
+				%
+				\nextgroupplot[title={Median | Right First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecssunimedian}
+				}
+				%
+				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickrecssunirandom}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Recursive Implementation
+		}
+		\bigskip
+	\end{subfigure}
+	%
+	\begin{subfigure}{\textwidth}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}
+				\nextgroupplot[title={Last | Left First}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitnssuniend}
+				}
+				%
+				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitnssunimiddle}
+				}
+				%
+				\nextgroupplot[title={Median | Left First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitnssunimedian}
+				}
+				%
+				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitnssunirandom}
+				}
+				%
+				\nextgroupplot[title={Last | Right First}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitssuniend}
+				}
+				%
+				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitssunimiddle}
+				}
+				%
+				\nextgroupplot[title={Median | Right First}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitssunimedian}
+				}
+				%
+				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+					\plotpernlogn{#1}{\tablequickitssunirandom}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Iterative Implementation
+		}
+	\end{subfigure}
 
+	\bigskip
 	\hfil\pgfplotslegendfromname{leg:quick_implementations}\hfil
 	\caption{
-		Comparison of \QS*{} with different handling of the base cases.
+		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
+		In the first rows, the left partitions are sorted before the right ones, while it is the reverse in the second rows.
 	}
 	\label{fig:quick_implementations}
 \end{figure}
