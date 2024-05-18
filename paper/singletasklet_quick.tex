@@ -1,12 +1,13 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 
-\pgfplotstableread{data/quick/rec_vs_it.txt}{\tablequickrecvsit}
+\pgfplotstableread{data/quick/rec_vs_it.txt}{\tableQuickRecVsIter}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements bigger or smaller than the pivot are moved to the right or left of the pivot element, respectively.
 Finally, \QS{} is called on the left and right partitions.
 
 \paragraph{Base Cases}
+
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
 As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of between a quarter and a half compared to a \QS{} without fallback algorithm.
 This low threshold also means that even a simple two-round \ShS{} is not worth considering.
@@ -32,11 +33,11 @@ Since these are likely caused by the compiler, they are laid out in \cref{subsec
 %		]
 %			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), legend to name=leg:rec_vs_it]
 %			\legend{Iterative, Recursive}
-%			\plotpernlogn{It}{\tablequickrecvsit}
-%			\plotpernlogn{Rec}{\tablequickrecvsit}
+%			\plotpernlogn{It}{\tableQuickRecVsIter}
+%			\plotpernlogn{Rec}{\tableQuickRecVsIter}
 %			%
 %			\nextgroupplot[ylabel=Speed-up]
-%			\plotspeedup{It}{Rec}{\tablequickrecvsit}
+%			\plotspeedup{It}{Rec}{\tableQuickRecVsIter}
 %		\end{groupplot}
 %	\end{tikzpicture}
 %

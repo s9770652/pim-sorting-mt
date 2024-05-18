@@ -1,23 +1,23 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:appendix:quick}
 
-\pgfplotstableread{data/quick/fallback.txt}{\tablequickfallback}
-\pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tablequickrecnssuniend}
-\pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tablequickrecnssunimiddle}
-\pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tablequickrecnssunimedian}
-\pgfplotstableread{data/quick/recursive/no switched sides/uniform/random.txt}{\tablequickrecnssunirandom}
-\pgfplotstableread{data/quick/recursive/switched sides/uniform/end.txt}{\tablequickrecssuniend}
-\pgfplotstableread{data/quick/recursive/switched sides/uniform/middle.txt}{\tablequickrecssunimiddle}
-\pgfplotstableread{data/quick/recursive/switched sides/uniform/median_of_three.txt}{\tablequickrecssunimedian}
-\pgfplotstableread{data/quick/recursive/switched sides/uniform/random.txt}{\tablequickrecssunirandom}
-\pgfplotstableread{data/quick/iterative/no switched sides/uniform/end.txt}{\tablequickitnssuniend}
-\pgfplotstableread{data/quick/iterative/no switched sides/uniform/middle.txt}{\tablequickitnssunimiddle}
-\pgfplotstableread{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{\tablequickitnssunimedian}
-\pgfplotstableread{data/quick/iterative/no switched sides/uniform/random.txt}{\tablequickitnssunirandom}
-\pgfplotstableread{data/quick/iterative/switched sides/uniform/end.txt}{\tablequickitssuniend}
-\pgfplotstableread{data/quick/iterative/switched sides/uniform/middle.txt}{\tablequickitssunimiddle}
-\pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tablequickitssunimedian}
-\pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tablequickitssunirandom}
+\pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tableQuickRecNssUniEnd}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tableQuickRecNssUniMiddle}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tableQuickRecNssUniMedian}
+\pgfplotstableread{data/quick/recursive/no switched sides/uniform/random.txt}{\tableQuickRecNssUniRandom}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/end.txt}{\tableQuickRecSsUniEnd}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/middle.txt}{\tableQuickRecSsUniMiddle}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/median_of_three.txt}{\tableQuickRecSsUniMedian}
+\pgfplotstableread{data/quick/recursive/switched sides/uniform/random.txt}{\tableQuickRecSsUniRandom}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/end.txt}{\tableQuickIterNssUniEnd}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/middle.txt}{\tableQuickIterNssUniMiddle}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{\tableQuickIterNssUniMedian}
+\pgfplotstableread{data/quick/iterative/no switched sides/uniform/random.txt}{\tableQuickIterNssUniRandom}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/end.txt}{\tableQuickIterSsUniEnd}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/middle.txt}{\tableQuickIterSsUniMiddle}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tableQuickIterSsUniMedian}
+\pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tableQuickIterSsUniRandom}
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
@@ -36,7 +36,7 @@
 			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
 			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
-				\plotspeedup{#1}{None}{\tablequickfallback}
+				\plotspeedup{#1}{None}{\tableQuickFallback}
 			}
 			%
 			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
@@ -44,7 +44,7 @@
 				\ifnumequal{#1}{13}{
 					\pgfplotsset{cycle list shift=1}
 				}{
-					\plotspeedup{#1}{13}{\tablequickfallback}
+					\plotspeedup{#1}{13}{\tableQuickFallback}
 				}
 			}
 		\end{groupplot}
@@ -56,7 +56,6 @@
 	}
 	\label{fig:quick_fallback}
 \end{figure}
-
 
 Two base cases exist:
 \begin{enumerate*}
@@ -156,42 +155,42 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick_implementations]
 				\legend{\ref{imp:normal}, \ref{imp:triviality_before_call}, \ref{imp:no_triviality}, \ref{imp:one_insertion}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_within_threshold}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecnssuniend}
+					\plotpernlogn{#1}{\tableQuickRecNssUniEnd}
 				}
 				%
 				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecnssunimiddle}
+					\plotpernlogn{#1}{\tableQuickRecNssUniMiddle}
 				}
 				%
 				\nextgroupplot[title={Median | Left First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecnssunimedian}
+					\plotpernlogn{#1}{\tableQuickRecNssUniMedian}
 				}
 				%
 				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecnssunirandom}
+					\plotpernlogn{#1}{\tableQuickRecNssUniRandom}
 				}
 				%
 				\nextgroupplot[title={Last | Right First}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecssuniend}
+					\plotpernlogn{#1}{\tableQuickRecSsUniEnd}
 				}
 				%
 				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecssunimiddle}
+					\plotpernlogn{#1}{\tableQuickRecSsUniMiddle}
 				}
 				%
 				\nextgroupplot[title={Median | Right First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecssunimedian}
+					\plotpernlogn{#1}{\tableQuickRecSsUniMedian}
 				}
 				%
 				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickrecssunirandom}
+					\plotpernlogn{#1}{\tableQuickRecSsUniRandom}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -206,42 +205,42 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 			\begin{groupplot}
 				\nextgroupplot[title={Last | Left First}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitnssuniend}
+					\plotpernlogn{#1}{\tableQuickIterNssUniEnd}
 				}
 				%
 				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitnssunimiddle}
+					\plotpernlogn{#1}{\tableQuickIterNssUniMiddle}
 				}
 				%
 				\nextgroupplot[title={Median | Left First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitnssunimedian}
+					\plotpernlogn{#1}{\tableQuickIterNssUniMedian}
 				}
 				%
 				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitnssunirandom}
+					\plotpernlogn{#1}{\tableQuickIterNssUniRandom}
 				}
 				%
 				\nextgroupplot[title={Last | Right First}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitssuniend}
+					\plotpernlogn{#1}{\tableQuickIterSsUniEnd}
 				}
 				%
 				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitssunimiddle}
+					\plotpernlogn{#1}{\tableQuickIterSsUniMiddle}
 				}
 				%
 				\nextgroupplot[title={Median | Right First}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitssunimedian}
+					\plotpernlogn{#1}{\tableQuickIterSsUniMedian}
 				}
 				%
 				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{\tablequickitssunirandom}
+					\plotpernlogn{#1}{\tableQuickIterSsUniRandom}
 				}
 			\end{groupplot}
 		\end{tikzpicture}

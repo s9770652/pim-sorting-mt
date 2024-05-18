@@ -1,6 +1,6 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
 
-\pgfplotstableread{data/small_sorts.txt}{\tablesmallsorts}
+\pgfplotstableread{data/small_sorts.txt}{\tableSmallSorts}
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
@@ -14,18 +14,18 @@
 		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:insertion_sort]
 			\legend{Insertion (sentinel), Insertion (no sentinel), Selection, Bubble (adaptive), Bubble (not adaptive)}
-			\plotpernn{1}{\tablesmallsorts}
-			\plotpernn{1NoSentinel}{\tablesmallsorts}
-			\plotpernn{Selection}{\tablesmallsorts}
-			\plotpernn{BubbleAdapt}{\tablesmallsorts}
-			\plotpernn{BubbleNonAdapt}{\tablesmallsorts}
+			\plotpernn{1}{\tableSmallSorts}
+			\plotpernn{1NoSentinel}{\tableSmallSorts}
+			\plotpernn{Selection}{\tableSmallSorts}
+			\plotpernn{BubbleAdapt}{\tableSmallSorts}
+			\plotpernn{BubbleNonAdapt}{\tableSmallSorts}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
 			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{1NoSentinel}{1}{\tablesmallsorts}
-			\plotspeedup{Selection}{1}{\tablesmallsorts}
-			\plotspeedup{BubbleAdapt}{1}{\tablesmallsorts}
-			\plotspeedup{BubbleNonAdapt}{1}{\tablesmallsorts}
+			\plotspeedup{1NoSentinel}{1}{\tableSmallSorts}
+			\plotspeedup{Selection}{1}{\tableSmallSorts}
+			\plotspeedup{BubbleAdapt}{1}{\tableSmallSorts}
+			\plotspeedup{BubbleNonAdapt}{1}{\tableSmallSorts}
 		\end{groupplot}
 	\end{tikzpicture}
 
