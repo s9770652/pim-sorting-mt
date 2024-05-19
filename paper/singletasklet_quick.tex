@@ -1,4 +1,5 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
+\label{subsec:tasklet:quick}
 
 \pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
 \pgfplotstableread{data/quick/rec_vs_it.txt}{\tableQuickRecVsIter}
@@ -119,3 +120,7 @@ Luckily, the pivot choice does not affect the overall compilation most of the ti
 Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage usually, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
 The random pivot is about 10\% worse than choosing the median of three elements.
 Since drawing the random index is thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times.
+
+
+
+\input{singletasklet_quick_compiler}
