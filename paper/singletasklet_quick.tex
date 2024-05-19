@@ -74,7 +74,7 @@ The following were implemented and tested:
 	Taking the \emph{median of three elements}, namely the first, middle, and last one, is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
 
 	\item
-	A \emph{random element} is most efficiently drawn using a xorshift random number generator and rejection sampling\todo{LG-Quelle}.
+	A \emph{random element} is most efficiently drawn using a xorshift random number generator and rejection sampling \cite{lukas_geis}.
 \end{itemize}
 Luckily, the pivot choice does not affect the overall compilation most of the time, making a comparison easier.
 Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage usually, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
