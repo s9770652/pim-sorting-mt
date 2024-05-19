@@ -1,5 +1,6 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 
+\pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
 \pgfplotstableread{data/quick/rec_vs_it.txt}{\tableQuickRecVsIter}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
@@ -7,6 +8,44 @@ A pivot element is chosen from the input array, then the input array gets scanne
 Finally, \QS{} is called on the left and right partitions.
 
 \paragraph{Base Cases}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4358\linewidth,
+			group/group size=2 by 1,
+			group style={horizontal sep=5em, vertical sep=3em},  % For some reason, `group/vertical sep` does not work.
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Speed-up},
+			xmode=log,
+			xtick={20, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			%			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
+			legend columns=-1,
+			]
+			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
+			\legend{\(10\), \(11\), \(...\), \(16\)}
+			\pgfplotsinvokeforeach{10,...,16}{
+				\plotspeedup{#1}{None}{\tableQuickFallback}
+			}
+			%
+			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
+			\pgfplotsinvokeforeach{10,...,16}{
+				\ifnumequal{#1}{13}{
+					\pgfplotsset{cycle list shift=1}
+				}{
+					\plotspeedup{#1}{13}{\tableQuickFallback}
+				}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick_fallback}\hfil
+	\caption{
+		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
+	}
+	\label{fig:quick_fallback}
+\end{figure}
 
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
 As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of between a quarter and a half compared to a \QS{} without fallback algorithm.

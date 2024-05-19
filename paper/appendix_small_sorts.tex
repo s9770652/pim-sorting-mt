@@ -1,7 +1,6 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:appendix:quick}
 
-\pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tableQuickRecNssUniEnd}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tableQuickRecNssUniMiddle}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tableQuickRecNssUniMedian}
@@ -18,44 +17,6 @@
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/middle.txt}{\tableQuickIterSsUniMiddle}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tableQuickIterSsUniMedian}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tableQuickIterSsUniRandom}
-
-\begin{figure}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			width=0.4358\linewidth,
-			group/group size=2 by 1,
-			group style={horizontal sep=5em, vertical sep=3em},  % For some reason, `group/vertical sep` does not work.
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Speed-up},
-			xmode=log,
-			xtick={20, 32, 64, 128, 256, 512, 1024},
-			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-%			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
-			legend columns=-1,
-		]
-			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
-			\legend{\(10\), \(11\), \(...\), \(16\)}
-			\pgfplotsinvokeforeach{10,...,16}{
-				\plotspeedup{#1}{None}{\tableQuickFallback}
-			}
-			%
-			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
-			\pgfplotsinvokeforeach{10,...,16}{
-				\ifnumequal{#1}{13}{
-					\pgfplotsset{cycle list shift=1}
-				}{
-					\plotspeedup{#1}{13}{\tableQuickFallback}
-				}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:quick_fallback}\hfil
-	\caption{
-		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
-	}
-	\label{fig:quick_fallback}
-\end{figure}
 
 Two base cases exist:
 \begin{enumerate*}
