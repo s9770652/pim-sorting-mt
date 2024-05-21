@@ -1,6 +1,7 @@
-\subsection{\texorpdfstring{\QS{}}{QuickSort}}
-\label{subsec:appendix:quick}
+\subsubsection{Investigating the Compilation}
+\label{subsubsec:tasklet:quick:compiler}
 
+\pgfplotstableread{data/quick/rec_vs_it.txt}{\tableQuickRecVsIter}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/end.txt}{\tableQuickRecNssUniEnd}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/middle.txt}{\tableQuickRecNssUniMiddle}
 \pgfplotstableread{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{\tableQuickRecNssUniMedian}
@@ -18,15 +19,10 @@
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tableQuickIterSsUniMedian}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tableQuickIterSsUniRandom}
 
-Two base cases exist:
-\begin{enumerate*}
-	\item
-	If there are less than two elements left, terminate.
-
-	\item
-	If there are less than 14 elements left, call \IS{}.
-\end{enumerate*}
-The first base case is not strictly necessary as the second one covers it.
+In fact, two base cases exist.
+Besides falling back to \IS{} if 13 elements remain, a full termination could occur if 1, 0, or --1 elements remain.
+This second base case is not strictly needed as the first one covers it.
+Also, it should not be needed because even though the extra check is doable with just one additional instruction, such small partitions are rare and the \IS{} would terminate after a few instructions anyway.
 The fastest implementation with 622\,750 cycles on average for 1024 elements is as follows:
 \begin{enumerate}
 	\item\label[implementation]{imp:normal}
@@ -95,10 +91,10 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 \begin{figure}[p]
 	\def\algos{Normal,TrivialBC,NoTrivial,OneInsertion,ThreshBC,ThreshTrivBC,ThreshThenTriv,TrivInThresh}
 	\pgfplotsset{
-		width=0.2308\linewidth,
+		width=\dimexpr(\linewidth-9mm)/4,  % 9mm = 3 × group/horizontal sep
 		height=3.5cm,
 		group/group size=4 by 2,
-		group style={horizontal sep=1em, vertical sep=3.5em},  % For some reason, `group/horizontal sep` does not work.
+		group/horizontal sep=3mm,
 		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		xmode=log,
@@ -106,8 +102,8 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 		xticklabels={\(20\), \(64\), \(256\), \(1024\)},
 		minor xtick={32, 128, 512},
 		ymin=55,
-		ymax=79,
-		ytick={55,59,...,79},
+		ymax=80,
+		ytick distance=5,
 		legend columns=-1,
 	}
 	\begin{subfigure}{\textwidth}
@@ -215,6 +211,37 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 	\caption{
 		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
 		In the first rows, the left partitions are sorted before the right ones, while it is the reverse in the second rows.
+		\todo{Reihenfolge}
 	}
 	\label{fig:quick_implementations}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4401\linewidth,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xmode=log,
+			xtick={20, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), legend to name=leg:rec_vs_it]
+			\legend{Iterative, Recursive}
+			\plotpernlogn{It}{\tableQuickRecVsIter}
+			\plotpernlogn{Rec}{\tableQuickRecVsIter}
+			%
+			\nextgroupplot[ylabel=Speed-up, /pgf/number format/.cd, precision=2, fixed zerofill=true]
+			\plotspeedup{It}{Rec}{\tableQuickRecVsIter}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:rec_vs_it}\hfil
+	\caption{
+		Comparison of the fastest recursive and iterative \QS*{} (cf. \cref{subsubsec:tasklet:quick:compiler}).
+		The actual algorithm is compiled the very same in both cases, so that time differences are only due to the way \QS{} is applied to the partitions.
+		\todo{nicht mehr wegen des Pivots!}
+	}
+	\label{fig:rec_vs_it}
 \end{figure}

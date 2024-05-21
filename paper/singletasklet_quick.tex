@@ -2,18 +2,22 @@
 \label{subsec:tasklet:quick}
 
 \pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
-\pgfplotstableread{data/quick/rec_vs_it.txt}{\tableQuickRecVsIter}
+\pgfplotstableread{data/quick/pivot.txt}{\tableQuickPivot}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements bigger or smaller than the pivot are moved to the right or left of the pivot element, respectively.
-Finally, \QS{} is called on the left and right partitions.
+Finally, \QS{} is used on the left and right partitions.
+
 
 \paragraph{Base Cases}
+When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
+As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of 30\% and more over a \QS{} without fallback algorithm.
+This low threshold also means that even a simple two-round \ShS{} is not worth considering.
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=0.4358\linewidth,
+			width=0.4359\linewidth,
 			group/group size=2 by 1,
 			group style={horizontal sep=5em, vertical sep=3em},  % For some reason, `group/vertical sep` does not work.
 			groupplot xlabel={Input Length \(n\)},
@@ -21,9 +25,8 @@ Finally, \QS{} is called on the left and right partitions.
 			xmode=log,
 			xtick={20, 32, 64, 128, 256, 512, 1024},
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			%			minor xtick={24, 48, 96, 192, 384, 768, 1536},  % For some reason, `data` does not work.
 			legend columns=-1,
-			]
+		]
 			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
 			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
@@ -48,47 +51,14 @@ Finally, \QS{} is called on the left and right partitions.
 	\label{fig:quick_fallback}
 \end{figure}
 
-When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
-As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of between a quarter and a half compared to a \QS{} without fallback algorithm.
-This low threshold also means that even a simple two-round \ShS{} is not worth considering.
-
 Besides falling back to \IS{}, another base case is imaginable, namely terminating when the partition has a length of 1, 0, or even --1 elements.
 Realistically speaking, this should not be necessary, because even though the extra check is done with just one additional instruction, it is a rare occurrence and the \IS{} would terminate after a few instructions anyway.
 Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases.
 Since these are likely caused by the compiler, they are laid out in \cref{subsec:appendix:quick}.
+\todo{zurückkehren nach Unterunterabschnitt}
+
 
 \paragraph{Recursion vs. Iteration}
-
-%\begin{figure}
-%	\begin{tikzpicture}[plot]
-%		\begin{groupplot}[
-%			width=0.4358\linewidth,
-%			group/group size=2 by 1,
-%			groupplot xlabel={Input Length \(n\)},
-%			xmode=log,
-%			xtick={20, 32, 64, 128, 256, 512, 1024},
-%			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-%%			minor xtick=data,
-%			legend columns=-1,
-%		]
-%			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), legend to name=leg:rec_vs_it]
-%			\legend{Iterative, Recursive}
-%			\plotpernlogn{It}{\tableQuickRecVsIter}
-%			\plotpernlogn{Rec}{\tableQuickRecVsIter}
-%			%
-%			\nextgroupplot[ylabel=Speed-up]
-%			\plotspeedup{It}{Rec}{\tableQuickRecVsIter}
-%		\end{groupplot}
-%	\end{tikzpicture}
-%
-%	\hfil\pgfplotslegendfromname{leg:rec_vs_it}\hfil
-%	\caption{
-%		Comparison of the recursive and the iterative variant of a \QS{} using \cref{imp:normal} and prioritising the left partition over the right one.
-%		The actual algorithm is compiled the very same in both cases, so that time differences are only due to the way \QS{} is applied to the partitions.
-%	}
-%	\label{fig:rec_vs_it}
-%\end{figure}
-
 In theory, the question of whether an algorithm should be implemented recursively or iteratively comes down to convenience.
 Due to the uniform cost of instructions, putting arguments automatically on the call stack or manually in an array essentially costs the same, as does jumping to the start of a loop and to the start of a function.
 Furthermore, in case of \QS{}, the compiler turns tail-recursive calls into jumps back to the function start, so that one partition is sorted recursively and the other iteratively.
@@ -97,7 +67,9 @@ All this would suggest a recursive implementation with less code complexity.
 In practice, it comes down to the compilation.
 Selcouthly, even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
 Overall though, iterative implementations tend to be compiled better with superior register usage and less instructions used for the actual \QS{} algorithm.
-The fastest implementation is indeed an iterative one, even if it beats the fastest recursive implementations by just 4\%.
+The fastest implementation is indeed an iterative one, even if it beats the fastest recursive implementations \Dash outliers, admittedly \Dash by less than 4\%.
+More details are given in \cref{subsubsec:tasklet:quick:compiler}.
+
 
 \paragraph{Pivot}
 Another parameter to tune is the way in which the pivot is chosen.
@@ -107,19 +79,61 @@ The following were implemented and tested:
 	Using the \emph{last element} is the fastest way, requiring zero instructions.
 
 	\item
-	Choosing the \emph{middle element} is slower than the last one, requiring a calculation of its address and swapping it with the last element, so that it can act as sentinel value during partitioning.
+	Choosing the \emph{middle element} is slower than choosing the last one, requiring a calculation of its address and swapping it with the last element so that it can act as sentinel value during partitioning.
 	The upside is that it is more suited for sorted and nearly sorted inputs.
 
 	\item
 	Taking the \emph{median of three elements}, namely the first, middle, and last one, is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
 
 	\item
-	A \emph{random element} is most efficiently drawn using a xorshift random number generator and rejection sampling \cite{lukas_geis}.
+	A \emph{random element} is most efficiently drawn using an xorshift random number generator and rejection sampling \cite{lukas_geis}.
 \end{itemize}
-Luckily, the pivot choice does not affect the overall compilation most of the time, making a comparison easier.
-Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage usually, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
-The random pivot is about 10\% worse than choosing the median of three elements.
-Since drawing the random index is thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times.
+Luckily, the pivot choice seldom has bearing on the overall compilation, making a comparison easier.
+The results are shown in \cref{fig:pivot}.
+Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
+At 1024 elements, the runtime with a random pivot is 10\% worse than with the median of three elements.
+Since drawing the random index is more than thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times, should one need randomisation.
+Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4401\linewidth,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xmode=log,
+			xtick={20, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:pivot]
+			\legend{Last, Middle, Median of Three, Random}
+			\plotpernlogn{End}{\tableQuickPivot}
+			\plotpernlogn{Middle}{\tableQuickPivot}
+			\plotpernlogn{MedianOfThree}{\tableQuickPivot}
+			\plotpernlogn{Random}{\tableQuickPivot}
+			%
+			\nextgroupplot[ylabel=Speed-up, ymin=0.9, ymax=1.01, extra y ticks={1.01}, /pgf/number format/.cd, precision=2, fixed zerofill=true]
+			\plotspeedup{End}{MedianOfThree}{\tableQuickPivot}
+			\plotspeedup{Middle}{MedianOfThree}{\tableQuickPivot}
+			\pgfplotsset{cycle list shift=1}
+			\plotspeedup{Random}{MedianOfThree}{\tableQuickPivot}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:pivot}\hfil
+	\caption{
+		Comparison of \QS{} with different pivot choices.
+		The speed-ups are with respect to the \QS{} with the median of three as pivot choice.
+	}
+	\label{fig:pivot}
+\end{figure}
+
+
+\paragraph{Prioritisation of Partitions}
+After partitioning, in order to minimise the call stack, \QS{} should be used on the smaller of the two partitions first.
+For code simplicity and to reduce the overhead, no such mechanism was implemented.
+As shown in \cref{subsubsec:tasklet:quick:compiler}, the choice between always sorting the left-hand partition or the right-hand partition first can have tremendous effects nevertheless.
 
 
 
