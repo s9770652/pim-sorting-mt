@@ -19,77 +19,89 @@
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/median_of_three.txt}{\tableQuickIterSsUniMedian}
 \pgfplotstableread{data/quick/iterative/switched sides/uniform/random.txt}{\tableQuickIterSsUniRandom}
 
-In fact, two base cases exist.
-Besides falling back to \IS{} if 13 elements remain, a full termination could occur if 1, 0, or --1 elements remain.
-This second base case is not strictly needed as the first one covers it.
-Also, it should not be needed because even though the extra check is doable with just one additional instruction, such small partitions are rare and the \IS{} would terminate after a few instructions anyway.
-The fastest implementation with 622\,750 cycles on average for 1024 elements is as follows:
+The quality of the compilation and thus the real performance of \QS{} is erratic to such an extent that one implementation variant may see a speed-up of 25\% over another one even with the same pivot choice although virtually none would be expected.
+As hinted in the preceding paragraphs, this raises the need for a benchmark suite with the following parameters:
+base case handling, recursion/iteration, pivot choice, and partition prioritisation.
+Before the results are discussed, the first parameter shall be explained in more depth.
+
+Besides falling back to \IS{} if 13 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a full termination if 1, 0, or --1 elements remain (\enquote{trivial length}).
+Theoretically, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such small partitions are rare and the \IS{} would terminate after a few instructions anyway.
+Nonetheless, its inclusion or exclusion can have significant impacts.
+The following Implementations were tested:
 \begin{enumerate}
 	\item\label[implementation]{imp:normal}
-	If the partition has a length of 1 or less, terminate.
+	If the length is trivial, terminate.
 	If not and if the threshold is undercut, sort with \IS{}.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-	\textcolor{red}{[Normal]}
-\end{enumerate}
-The following implementation, which avoids some function calls by reordering the checks, is ever so slightly slower at 625\,150 cycles:
-\begin{enumerate}[resume]
-	\item\label[implementation]{imp:triviality_before_call}
-	If the threshold is undercut, sort with \IS{}.
-	Otherwise, sort with \QS{}.
-	Then check if the partitions have a length of 1 or less and call \QS{} on them if not.
-	\textcolor{red}{[TrivialBC]}
-\end{enumerate}
-A look at the compilation reveals that only some jumps at the start and at the end of the function have changed.
-It appears that the changed program flow causes one additional operation per call, since \QS{} gets called roughly 230 times and 230 × 11 cycles = 2530 cycles, which is the measured difference.
-This one operation is already too much as partitions hardly have such short lengths and function calls are cheap.
+	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+%	\textcolor{red}{[Normal]}
 
-But what if one were to get rid of all recursive calls on partitions below the threshold?
-After all, they come up roughly 350 times.
-Or what if one tried any other handling of the base cases?
-All of the following implementations take between 710\,000 and 725\,000 cycles:
-\begin{enumerate}[resume]
-	\item\label[implementation]{imp:one_insertion}
-	If the threshold is undercut, terminate.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-	After all \QS*{} are done, sort the whole input array with \IS{}.
-	\textcolor{red}{[OneInsertion]}
+	\item\label[implementation]{imp:triviality_within_threshold}
+	If the threshold is undercut, check if the length is trivial and terminate or sort with \IS{}, respectively.
+	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+%	\textcolor{red}{[TrivInThresh]}
+	\begin{itemize}
+		\item
+		This Implementation significantly reduces the number of checks for trivial length.
+	\end{itemize}
 
 	\item\label[implementation]{imp:no_triviality}
 	If the threshold is undercut, sort with \IS{}.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-	\textcolor{red}{[NoTrivial]}
+	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+%	\textcolor{red}{[NoTrivial]}
+	\begin{itemize}
+		\item
+		This Implementation forgoes the check for a trivial length completely, at the cost of unneeded \IS*{}.
+	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_then_triviality}
 	If the threshold is undercut, sort with \IS{}.
-	If not, terminate if the partition has a length of 1 or less.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-	\textcolor{red}{[ThreshThenTriv]}
+	If not and if the length is trivial, terminate.
+	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+%	\textcolor{red}{[ThreshThenTriv]}
+	\begin{itemize}
+		\item
+		This Implementation, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
+	\end{itemize}
+
+	\item\label[implementation]{imp:triviality_before_call}
+	If the threshold is undercut, sort with \IS{}.
+	Otherwise, sort with \QS{}.
+	Then check for either partition if its length is trivial and use \QS{} if not.
+%	\textcolor{red}{[TrivialBC]}
+	\begin{itemize}
+		\item
+		This Implementation, as well as the next two, gets rid of some unneeded uses of \QS{}.
+		In the recursive case, these Implementations lose the property of being tail-recursive.
+	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
 	Sort with \QS{}.
-	Check if the partitions undercut the threshold and either call \IS{} or \QS{} on them.
-	\textcolor{red}{[ThreshBC]}
+	Check for either partition if the threshold is undercut and use \IS{} or \QS{}, respectively.
+%	\textcolor{red}{[ThreshBC]}
 
 	\item\label[implementation]{imp:threshold_and_triviality_before_call}
 	Sort with \QS{}.
-	Check if the partitions have a length of 1 or less or at least undercut the threshold and either call \IS{}, \QS{} or nothing on them.
-	\textcolor{red}{[ThreshTrivBC]}
+	Check for either partition if its length is trivial or if the threshold is undercut and use \IS{}, \QS{}, or nothing, respectively.
+%	\textcolor{red}{[ThreshTrivBC]}
 
-	\item\label[implementation]{imp:triviality_within_threshold}
-	If the threshold is undercut, check whether the partition has a length of 1 or less and either terminate or sort with \IS{}.
-	Otherwise, sort with \QS{} and call \QS{} on both the left and right partition.
-	\textcolor{red}{[TrivInThresh]}
+	\item\label[implementation]{imp:one_insertion}
+	If the threshold is undercut, terminate.
+	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	After all \QS*{} are done, sort the whole input array with \IS{}.
+%	\textcolor{red}{[OneInsertion]}
+	\begin{itemize}
+		\item
+		This Implementation always does one pass of \IS{}.
+		For example, the other Implementations do roughly 90 at 1024 elements.
+	\end{itemize}
 \end{enumerate}
-In each of them, the compiler makes poorer use of the registers with the biggest impact on the loop which finds the next element to move to the right, increasing the length of an iteration from three instructions to four.
 
-The phenomenon gets more complicated when one considers the iterative implementation.
-In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{imp:triviality_before_call} coming in close second and all other implementations deteriorating to the similarly bad runtimes.
-
-\todo[inline]{Verweis auf Begründung in Rek.\ gg.\ Iter.?}
-\todo[inline]{Extra-Code ist teilweise verbuggt!}
+All results are shown in \cref{fig:quick_implementations}.
+When using recursion, \cref{imp:normal,imp:triviality_before_call} perform the best, especially for large inputs.
+Their compilations are fundamentally the same, including the conversion of the second recursive call into a jump back to the function start \Dash even though \cref{imp:triviality_before_call} is not tail-recursive.
 
 \begin{figure}[p]
-	\def\algos{Normal,TrivialBC,NoTrivial,OneInsertion,ThreshBC,ThreshTrivBC,ThreshThenTriv,TrivInThresh}
+	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 	\pgfplotsset{
 		width=\dimexpr(\linewidth-9mm)/4,  % 9mm = 3 × group/horizontal sep
 		height=3.5cm,
@@ -110,7 +122,7 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}
 				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick_implementations]
-				\legend{\ref{imp:normal}, \ref{imp:triviality_before_call}, \ref{imp:no_triviality}, \ref{imp:one_insertion}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_within_threshold}}
+				\legend{\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 					\plotpernlogn{#1}{\tableQuickRecNssUniEnd}
 				}
@@ -152,7 +164,7 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			Recursive Implementation
+			Recursive Approach
 		}
 		\bigskip
 	\end{subfigure}
@@ -202,7 +214,7 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			Iterative Implementation
+			Iterative approach
 		}
 	\end{subfigure}
 
@@ -211,7 +223,6 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 	\caption{
 		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
 		In the first rows, the left partitions are sorted before the right ones, while it is the reverse in the second rows.
-		\todo{Reihenfolge}
 	}
 	\label{fig:quick_implementations}
 \end{figure}
@@ -227,12 +238,12 @@ In that case, \cref{imp:triviality_within_threshold} is the fastest with \cref{i
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), legend to name=leg:rec_vs_it]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=65, extra y ticks={55, 65}, legend to name=leg:rec_vs_it]
 			\legend{Iterative, Recursive}
 			\plotpernlogn{It}{\tableQuickRecVsIter}
 			\plotpernlogn{Rec}{\tableQuickRecVsIter}
 			%
-			\nextgroupplot[ylabel=Speed-up, /pgf/number format/.cd, precision=2, fixed zerofill=true]
+			\nextgroupplot[ylabel=Speed-up, ymin=0.96, ymax=1.04, /pgf/number format/.cd, precision=2, fixed zerofill=true]
 			\plotspeedup{It}{Rec}{\tableQuickRecVsIter}
 		\end{groupplot}
 	\end{tikzpicture}
