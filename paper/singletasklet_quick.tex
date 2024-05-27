@@ -88,6 +88,7 @@ The following were implemented and tested:
 	A \emph{random element} is most efficiently drawn using an xorshift random number generator and rejection sampling \cite{lukas_geis}.
 \end{itemize}
 Luckily, the pivot choice seldom has bearing on the overall compilation, making a comparison easier.
+\todo{Stimmt nicht!}
 The results are shown in \cref{fig:pivot}.
 Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
 At 1024 elements, the runtime with a random pivot is 10\% worse than with the median of three elements.

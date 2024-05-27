@@ -103,18 +103,22 @@ All other \nameCrefs{imp:normal} fare vastly worse.
 Common occurrences are \dots{}
 \begin{itemize}
 	\item
-	\dots{} a lengthening of the loop finding the next element to move to the right of the pivot from three instructions to four, \dots{}
+	\dots{} one more instruction in the loop finding the next element to move to the right, \dots{}
 
 	\item
-	\dots{} an additional instruction after such an element to move has been found, \dots{}
+	\dots{} one more instruction after such an element has been found, \dots{}
 
 	\item
-	\dots{} an additional instruction when swapping elements, and \dots{}
-
-	\item
-	\dots{} more stores and loads
+	\dots{} more stores and loads when entering and leaving the function.
 \end{itemize}
 
+\todo[inline]{%
+	Ich kann mir leider nicht alles erklären.
+	Als Beispiel habe ich die Kompilate von \cref{imp:normal} / Recursive / Last für Left First und Right First hochgeladen (die verkürzten Varianten besitzen nur noch Befehle und Sprungmarken).
+	Ersteres ist ja die schnellste rekursive Variante, während letzteres deutlich schlechter abschneidet.
+	Dennoch sehe ich bei der langsameren Variante keinen fundamental anderen Algorithmus.
+	Je Funktionsaufruf kommen ≈3 Extra-Aufrufe hinzu (bei insgesamt ≈104 rekursiven und ≈104 \enquote{Endaufrufen} bei 1024 Elementen), was fast 70\,000 Takte Unterschied nicht erklären kann.
+}
 
 \begin{figure}[p]
 	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
