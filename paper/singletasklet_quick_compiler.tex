@@ -27,7 +27,7 @@ Before the results are discussed, the first parameter shall be explained in more
 Besides falling back to \IS{} if 13 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a full termination if 1, 0, or --1 elements remain (\enquote{trivial length}).
 Theoretically, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such small partitions are rare and the \IS{} would terminate after a few instructions anyway.
 Nonetheless, its inclusion or exclusion can have significant impacts.
-The following Implementations were tested:
+The following \nameCrefs{imp:normal} were tested:
 \begin{enumerate}
 	\item\label[implementation]{imp:normal}
 	If the length is trivial, terminate.
@@ -41,7 +41,7 @@ The following Implementations were tested:
 %	\textcolor{red}{[TrivInThresh]}
 	\begin{itemize}
 		\item
-		This Implementation significantly reduces the number of checks for trivial length.
+		This \nameCref{imp:triviality_within_threshold} significantly reduces the number of checks for trivial length.
 	\end{itemize}
 
 	\item\label[implementation]{imp:no_triviality}
@@ -50,7 +50,7 @@ The following Implementations were tested:
 %	\textcolor{red}{[NoTrivial]}
 	\begin{itemize}
 		\item
-		This Implementation forgoes the check for a trivial length completely, at the cost of unneeded \IS*{}.
+		This \nameCref{imp:no_triviality} forgoes the check for a trivial length completely, at the cost of unneeded \IS*{}.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_then_triviality}
@@ -60,7 +60,7 @@ The following Implementations were tested:
 %	\textcolor{red}{[ThreshThenTriv]}
 	\begin{itemize}
 		\item
-		This Implementation, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
+		This \nameCref{imp:threshold_then_triviality}, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
@@ -70,8 +70,8 @@ The following Implementations were tested:
 %	\textcolor{red}{[TrivialBC]}
 	\begin{itemize}
 		\item
-		This Implementation, as well as the next two, gets rid of some unneeded uses of \QS{}.
-		In the recursive case, these Implementations lose the property of being tail-recursive.
+		This \nameCref{imp:triviality_before_call}, as well as the next two, gets rid of some unneeded uses of \QS{}.
+		In the recursive case, these \nameCrefs{imp:triviality_before_call} lose the property of being tail-recursive.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
@@ -91,14 +91,30 @@ The following Implementations were tested:
 %	\textcolor{red}{[OneInsertion]}
 	\begin{itemize}
 		\item
-		This Implementation always does one pass of \IS{}.
-		For example, the other Implementations do roughly 90 at 1024 elements.
+		This \nameCref{imp:one_insertion} always does one pass of \IS{}.
+		For example, the other \nameCrefs{imp:normal} do roughly 90 at 1024 elements.
 	\end{itemize}
 \end{enumerate}
 
 All results are shown in \cref{fig:quick_implementations}.
 When using recursion, \cref{imp:normal,imp:triviality_before_call} perform the best, especially for large inputs.
-Their compilations are fundamentally the same, including the conversion of the second recursive call into a jump back to the function start \Dash even though \cref{imp:triviality_before_call} is not tail-recursive.
+Their compilations are fundamentally the same, including the conversion of the second recursive call into a jump back to the function start.
+All other \nameCrefs{imp:normal} fare vastly worse.
+Common occurrences are \dots{}
+\begin{itemize}
+	\item
+	\dots{} a lengthening of the loop finding the next element to move to the right of the pivot from three instructions to four, \dots{}
+
+	\item
+	\dots{} an additional instruction after such an element to move has been found, \dots{}
+
+	\item
+	\dots{} an additional instruction when swapping elements, and \dots{}
+
+	\item
+	\dots{} more stores and loads
+\end{itemize}
+
 
 \begin{figure}[p]
 	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}

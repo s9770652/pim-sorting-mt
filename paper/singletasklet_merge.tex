@@ -1,0 +1,36 @@
+\subsection{\texorpdfstring{\MS{}}{MergeSort}}
+
+\pgfplotstableread{data/wram_sorts.txt}{\tableWramSorts}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=0.4401\linewidth,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xmode=log,
+			xtick={20, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			legend columns=-1,
+		]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=200, legend to name=leg:wram_sorts]
+			\legend{\MS{} (no write-back), \MS{} (write-back), \HS{}, \QS{}}
+			\plotpernlogn{Merge}{\tableWramSorts}
+			\plotpernlogn{MergeWriteBack}{\tableWramSorts}
+			\plotpernlogn{Heap}{\tableWramSorts}
+			\plotpernlogn{Quick}{\tableWramSorts}
+			%
+			\nextgroupplot[ylabel=Speed-up, ymin=0.3, ymax=0.8, extra y ticks={0.3}]
+			\plotspeedup{Merge}{Quick}{\tableWramSorts}
+			\plotspeedup{MergeWriteBack}{Quick}{\tableWramSorts}
+			\plotspeedup{Heap}{Quick}{\tableWramSorts}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:wram_sorts}\hfil
+	\caption{
+		Comparison of \MS{}, \HS{} and \QS{}.
+		The speed-ups are with respect to the \QS{}.
+	}
+	\label{fig:wram_sorts}
+\end{figure}
