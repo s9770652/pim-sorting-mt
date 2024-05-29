@@ -11,17 +11,20 @@
 			xmode=log,
 			xtick={20, 32, 64, 128, 256, 512, 1024},
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			legend columns=-1,
+			legend columns=3,
 		]
 			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=200, legend to name=leg:wram_sorts]
-			\legend{\MS{} (no write-back), \MS{} (write-back), \HS{}, \QS{}}
+			\legend{\MS{} (no write-back), \QS{}, \ShS, \MS{} (write-back), \HS{}}
 			\plotpernlogn{Merge}{\tableWramSorts}
+			\plotpernlogn{Quick}{\tableWramSorts}
+			\plotpernlogn{Shell}{\tableWramSorts}
 			\plotpernlogn{MergeWriteBack}{\tableWramSorts}
 			\plotpernlogn{Heap}{\tableWramSorts}
-			\plotpernlogn{Quick}{\tableWramSorts}
 			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.3, ymax=0.8, extra y ticks={0.3}]
+			\nextgroupplot[ylabel=Speed-up, ymin=0.3, ymax=1, extra y ticks={0.3}]
 			\plotspeedup{Merge}{Quick}{\tableWramSorts}
+			\pgfplotsset{cycle list shift=1}
+			\plotspeedup{Shell}{Quick}{\tableWramSorts}
 			\plotspeedup{MergeWriteBack}{Quick}{\tableWramSorts}
 			\plotspeedup{Heap}{Quick}{\tableWramSorts}
 		\end{groupplot}
@@ -29,8 +32,24 @@
 
 	\hfil\pgfplotslegendfromname{leg:wram_sorts}\hfil
 	\caption{
-		Comparison of \MS{}, \HS{} and \QS{}.
+		Comparison of \MS{}, \HS{}, \ShS{}, and \QS{}.
+		Due to \MS{}'s increased space requirements, its runtime was measured only for up to 768 elements.
+		The \ShS{} uses the step sizes from \cref{fig:quick_vs_insert_vs_shell}, which are unoptimised for large input sizes.
 		The speed-ups are with respect to the \QS{}.
 	}
 	\label{fig:wram_sorts}
 \end{figure}
+
+\MS{} repeatedly compares two sorted subarrays and merges them into a bigger sorted array in time \(\bigtheta{n \log n}\).
+Unlike \QS{}, this runtime is guaranteed.
+Furthermore, the sorting is stable naturally.
+A naïve but fast implementation of \MS{} uses space for \(n\) additional elements since at the end of a round of merging, all elements have been copied to an output array.
+
+Compilation is worsened by:
+\begin{itemize}
+	\item
+	return, falls nur ein Start-Run
+
+	\item
+	kein Wächterwechsel beim ersten run
+\end{itemize}
