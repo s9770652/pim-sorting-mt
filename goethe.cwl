@@ -54,13 +54,31 @@
 
 \hairspace
 
-\RemoveSpaces{text}#n
-
 # environments
+\begin{acknowledgment}%\\end{acknowledgment}#n
+\end{acknowledgment}#n
+\begin{annotation}%\\end{annotation}#n
+\end{annotation}#n
+\begin{case}%\\end{case}#n
+\end{case}#n
 \begin{caseintext}{%|number%text}{condition%text}%\\end{caseintext}#n
 \end{caseintext}#n
+\begin{claim}%\\end{claim}#n
+\end{claim}#n
+\begin{conclusion}%\\end{conclusion}#n
+\end{conclusion}#n
+\begin{condition}%\\end{condition}#n
+\end{condition}#n
+\begin{conjecture}%\\end{conjecture}#n
+\end{conjecture}#n
+\begin{note}%\\end{note}#n
+\end{note}#n
+\begin{observation}%\\end{observation}#n
+\end{observation}#n
 \begin{proposition}%\\end{proposition}#n
 \end{proposition}#n
+\begin{remark}%\\end{remark}#n
+\end{remark}#n
 
 # abbreviations
 \eg#n
