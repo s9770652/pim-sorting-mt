@@ -43,7 +43,15 @@
 \MS{} repeatedly compares two sorted subarrays and merges them into a bigger sorted array in time \(\bigtheta{n \log n}\).
 Unlike \QS{}, this runtime is guaranteed.
 Furthermore, the sorting is stable naturally.
-A naïve but fast implementation of \MS{} uses space for \(n\) additional elements since at the end of a round of merging, all elements have been copied to an output array.
+
+The fastest implementation of \MS{} writes all merged runs to an output array, raising the need for additional space for \(n\) elements.
+Since in this implementation, the arrays from which it is read and to which it is written switch each round, the final sorted array may not be saved where the input array was.
+Thus, a final round with a write-back to the original position is sometimes needed.
+
+A slightly more sophisticated implementation needs additional space for only \(\sfrac{n}{2}\) elements:
+When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
+Then, the copy and the second run are merged to the position of the first run.
+As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged since the last elements of the other run are already in place, that is, flushes will only be performed on at most half of the runs.
 
 Compilation is worsened by:
 \begin{itemize}
