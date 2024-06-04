@@ -1,6 +1,11 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
 
 \pgfplotstableread{data/wram_sorts.txt}{\tableWramSorts}
+\pgfplotstableread{data/merge/MERGE_TO_INSERTION=8.txt}{\tableMergeStartVIII}
+\pgfplotstableread{data/merge/MERGE_TO_INSERTION=12.txt}{\tableMergeStartXII}
+\pgfplotstableread{data/merge/MERGE_TO_INSERTION=16.txt}{\tableMergeStartXVI}
+\pgfplotstableread{data/merge/MERGE_TO_INSERTION=24.txt}{\tableMergeStartXXIV}
+\pgfplotstableread{data/merge/MERGE_TO_INSERTION=32.txt}{\tableMergeStartXXXII}
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
@@ -14,12 +19,13 @@
 			legend columns=3,
 		]
 			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=200, legend to name=leg:wram_sorts]
-			\legend{\MS{} (no write-back), \QS{}, \ShS, \MS{} (write-back), \HS{}}
+			\legend{\MS{} (no write-back), \QS{}, \ShS, \MS{} (write-back), \HS{}, \MS{} (half space)}
 			\plotpernlogn{Merge}{\tableWramSorts}
 			\plotpernlogn{Quick}{\tableWramSorts}
 			\plotpernlogn{Shell}{\tableWramSorts}
 			\plotpernlogn{MergeWriteBack}{\tableWramSorts}
 			\plotpernlogn{Heap}{\tableWramSorts}
+			\plotpernlogn{MergeHalfSpace}{\tableWramSorts}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.3, ymax=1, extra y ticks={0.3}]
 			\plotspeedup{Merge}{Quick}{\tableWramSorts}
@@ -27,6 +33,7 @@
 			\plotspeedup{Shell}{Quick}{\tableWramSorts}
 			\plotspeedup{MergeWriteBack}{Quick}{\tableWramSorts}
 			\plotspeedup{Heap}{Quick}{\tableWramSorts}
+			\plotspeedup{MergeHalfSpace}{Quick}{\tableWramSorts}
 		\end{groupplot}
 	\end{tikzpicture}
 
@@ -44,14 +51,66 @@
 Unlike \QS{}, this runtime is guaranteed.
 Furthermore, the sorting is stable naturally.
 
-The fastest implementation of \MS{} writes all merged runs to an output array, raising the need for additional space for \(n\) elements.
+A simple but fast implementation of \MS{} writes all merged runs to an output array, raising the need for additional space for \(n\) elements.
 Since in this implementation, the arrays from which it is read and to which it is written switch each round, the final sorted array may not be saved where the input array was.
 Thus, a final round with a write-back to the original position is sometimes needed.
 
 A slightly more sophisticated implementation needs additional space for only \(\sfrac{n}{2}\) elements:
 When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
 Then, the copy and the second run are merged to the position of the first run.
-As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged since the last elements of the other run are already in place, that is, flushes will only be performed on at most half of the runs.
+As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged since the last elements of the other run are already in place.
+As a consequence, flushes will only be performed on at most half of the runs.
+
+Instead of starting by merging runs of length 1, it is once again beneficial to employ \IS{}.
+The optimal size for the starting runs depends on the size of the whole array, since it governs the number of rounds of merging, but a size of 16 poses a good compromise, as suggested by \cref{fig:merge_startingruns}.
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=\dimexpr(\linewidth-6mm)/3,  % 9mm = 3 × group/horizontal sep
+			group/group size=3 by 1,
+			group/horizontal sep=3mm,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \((n \lb n)\)},
+			xmode=log,
+			xtick={20, 64, 256, 768},
+			xticklabels={\(20\), \(64\), \(256\), \(768\)},
+			minor xtick={32, 128, 512},
+			ymin=60,
+			ymax=120,
+			legend columns=-1,
+		]
+			\nextgroupplot[title={No Write-back}, legend to name=leg:merge_startingruns]
+			\legend{8, 12, 16, 24, 32}
+			\plotpernlogn{Merge}{\tableMergeStartVIII}
+			\plotpernlogn{Merge}{\tableMergeStartXII}
+			\plotpernlogn{Merge}{\tableMergeStartXVI}
+			\plotpernlogn{Merge}{\tableMergeStartXXIV}
+			\plotpernlogn{Merge}{\tableMergeStartXXXII}
+			%
+			\nextgroupplot[title={Write-back}, yticklabels={}]
+			\plotpernlogn{MergeWriteBack}{\tableMergeStartVIII}
+			\plotpernlogn{MergeWriteBack}{\tableMergeStartXII}
+			\plotpernlogn{MergeWriteBack}{\tableMergeStartXVI}
+			\plotpernlogn{MergeWriteBack}{\tableMergeStartXXIV}
+			\plotpernlogn{MergeWriteBack}{\tableMergeStartXXXII}
+			%
+			\nextgroupplot[title={Half Space}, yticklabels={}]
+			\plotpernlogn{MergeHalfSpace}{\tableMergeStartVIII}
+			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXII}
+			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXVI}
+			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXXIV}
+			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXXXII}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\bigskip
+	\hfil\pgfplotslegendfromname{leg:merge_startingruns}\hfil
+	\caption{
+		Comparison of \MS*{}, which need an auxiliary array of size either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(\sfrac{n}{2}\) (\enquote{Half Space}), for different sizes of the starting runs.
+	}
+	\label{fig:merge_startingruns}
+\end{figure}
 
 Compilation is worsened by:
 \begin{itemize}
