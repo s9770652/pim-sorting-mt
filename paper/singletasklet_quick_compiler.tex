@@ -96,7 +96,7 @@ The following \nameCrefs{imp:normal} were tested:
 	\end{itemize}
 \end{enumerate}
 
-All results are shown in \cref{fig:quick_implementations}.
+All results are shown in \cref{fig:quick:implementations}.
 When using recursion, \cref{imp:normal,imp:triviality_before_call} perform the best, especially for large inputs.
 Their compilations are fundamentally the same, including the conversion of the second recursive call into a jump back to the function start.
 All other \nameCrefs{imp:normal} fare vastly worse.
@@ -141,7 +141,7 @@ Common occurrences are \dots{}
 	\begin{subfigure}{\textwidth}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}
-				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick_implementations]
+				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick:implementations]
 				\legend{\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 					\plotpernlogn{#1}{\tableQuickRecNssUniEnd}
@@ -239,12 +239,12 @@ Common occurrences are \dots{}
 	\end{subfigure}
 
 	\bigskip
-	\hfil\pgfplotslegendfromname{leg:quick_implementations}\hfil
+	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
 	\caption{
 		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
-		In the first rows, the left partitions are sorted before the right ones, while it is the reverse in the second rows.
+		In the first rows, the left-hand partitions are sorted before the right-hand ones, while it is the reverse in the second rows.
 	}
-	\label{fig:quick_implementations}
+	\label{fig:quick:implementations}
 \end{figure}
 
 \begin{figure}

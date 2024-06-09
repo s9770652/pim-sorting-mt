@@ -12,7 +12,7 @@
 			minor xtick=data,
 			legend columns=3,
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:insertion_sort]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:insertion:against_others]
 			\legend{Insertion (sentinel), Insertion (no sentinel), Selection, Bubble (adaptive), Bubble (not adaptive)}
 			\plotpernn{1}{\tableSmallSorts}
 			\plotpernn{1NoSentinel}{\tableSmallSorts}
@@ -29,13 +29,13 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion_sort}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
 	\caption{
 		Comparison of sorting algorithms with a runtime in \(\bigoh{n^2}\).
 		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
 		The speed-ups are with respect to the \IS{} relying on sentinel values.
 	}
-	\label{fig:insertion_sort}
+	\label{fig:insertion:against_others}
 \end{figure}
 
 This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
@@ -60,12 +60,12 @@ When moving an element to the left, two checks are needed:
 Does the left neighbour exist and is it smaller than the element to move?
 The first check can be omitted through the use of \emph{sentinel values}:
 If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
-Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\%\todo{auf Kompilat eingehen?} in the relevant input range (\cref{fig:insertion_sort}).%
+Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\%\todo{auf Kompilat eingehen?} in the relevant input range (\cref{fig:insertion:against_others}).%
 \todo{ex- und implizite Wächterwerte benennen}
 Thence, \enquote{\IS{}} refers to the version relying on sentinel values henceforth.
 \todo[inline]{auf Compilersperenzchen eingehen?}
 
 \begin{note}
 	Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
-	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion_sort}) and should always be preferred.
+	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion:against_others}) and should always be preferred.
 \end{note}

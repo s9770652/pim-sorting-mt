@@ -11,7 +11,7 @@ Finally, \QS{} is used on the left and right partitions.
 
 \paragraph{Base Cases}
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
-As \cref{fig:quick_fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of 30\% and more over a \QS{} without fallback algorithm.
+As \cref{fig:quick:fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of 30\% and more over a \QS{} without fallback algorithm.
 This low threshold also means that even a simple two-round \ShS{} is not worth considering.
 
 \begin{figure}
@@ -26,7 +26,7 @@ This low threshold also means that even a simple two-round \ShS{} is not worth c
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
 			legend columns=-1,
 		]
-			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick_fallback]
+			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick:fallback]
 			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
 				\plotspeedup{#1}{None}{\tableQuickFallback}
@@ -43,11 +43,11 @@ This low threshold also means that even a simple two-round \ShS{} is not worth c
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:quick_fallback}\hfil
+	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
 	\caption{
 		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
 	}
-	\label{fig:quick_fallback}
+	\label{fig:quick:fallback}
 \end{figure}
 
 Besides falling back to \IS{}, another base case is imaginable, namely terminating when the partition has a length of 1, 0, or even --1 elements.
@@ -89,7 +89,7 @@ The following were implemented and tested:
 \end{itemize}
 Luckily, the pivot choice seldom has bearing on the overall compilation, making a comparison easier.
 \todo{Stimmt nicht!}
-The results are shown in \cref{fig:pivot}.
+The results are shown in \cref{fig:quick:pivot}.
 Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
 At 1024 elements, the runtime with a random pivot is 10\% worse than with the median of three elements.
 Since drawing the random index is more than thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times, should one need randomisation.
@@ -106,7 +106,7 @@ Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
 			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:pivot]
+			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:quick:pivot]
 			\legend{Last, Middle, Median of Three, Random}
 			\plotpernlogn{End}{\tableQuickPivot}
 			\plotpernlogn{Middle}{\tableQuickPivot}
@@ -121,12 +121,12 @@ Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:pivot}\hfil
+	\hfil\pgfplotslegendfromname{leg:quick:pivot}\hfil
 	\caption{
 		Comparison of \QS{} with different pivot choices.
 		The speed-ups are with respect to the \QS{} with the median of three as pivot choice.
 	}
-	\label{fig:pivot}
+	\label{fig:quick:pivot}
 \end{figure}
 
 
