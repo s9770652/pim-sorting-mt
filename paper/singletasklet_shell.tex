@@ -49,14 +49,14 @@
 
 \IS{} suffers from small elements at the end of the input, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
 \ShS{}, proposed by Donald L. Shell in 1959~\cite{Shell1959AHS}, remedies this by doing multiple passes of \IS{} with different step sizes:
-In round~\(r\) with step size \(h_r\), the input array is divided into the subarrays of indices \((i, h_r + i, 2 h_r + i, \dots)\) for \(i = 0, \dots, h_r - 1\) which then get sorted individually through \IS{}.
+In round~\(r\) with step size \(\stepsizes_r\), the input array is divided into the subarrays of indices \((i, \stepsizes_r + i, 2 \stepsizes_r + i, \dots)\) for \(i = 0, \dots, \stepsizes_r - 1\) which then get sorted individually through \IS{}.
 The step size get smaller each round, with the final step size being \(1\) such that a regular \IS{} is performed.
 Intuitively, the individual \IS*{} are fast since elements which need to travel long distances already did big jumps.
 Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research to this day \cite{skean2023optimization, lee2021empirically} and depends on the cost of the operations (comparing, swapping, looping).
 
-Let us first focus on small input arrays where only two rounds with step sizes~\(h_1\) and \(1\) suffice.
-The previous results on \IS{} suggest that \ShS{} should make use of~\(h_1\) sentinel values lest bounds checking eats any gain up.
-\Cref{fig:shell:two_rounds} shows that the additional rounds starts to pay off at around 20 elements for \(h_1 \ge 3\).
+Let us first focus on small input arrays where only two rounds with step sizes~\(\stepsizes_1\) and \(1\) suffice.
+The previous results on \IS{} suggest that \ShS{} should make use of~\(\stepsizes_1\) sentinel values lest bounds checking eats any gain up.
+\Cref{fig:shell:two_rounds} shows that the additional rounds starts to pay off at around 20 elements for \(\stepsizes_1 \ge 3\).
 Bear in mind that these measurements were conducted on a uniform input distribution;
 if \ShS{} is used by another algorithm on a subarray, these thresholds may be higher or even non-existent due to some degree of presorting.
 
@@ -89,7 +89,7 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 			group/group size=2 by 3,
 			group/horizontal sep=12mm,
 			groupplot xlabel={Mean [\(10^4\) Cycles]},
-			groupplot ylabel={\(h_1\)},
+			groupplot ylabel={\(\stepsizes_1\)},
 			scaled x ticks=base 10:-4,
 			xtick scale label code/.code={},  % removes exponent underneath the axis
 			ytick={6, 7, 9, ..., 17},
@@ -134,8 +134,8 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\hfil\pgfplotslegendfromname{leg:shell:three_rounds}\hfil
 	\caption{
 		Runtimes of \ShS*{} with two rounds (/) and three rounds (7--17).
-		The coloured symbols encode the step size \(h_1\) for two-round \ShS*{} and the step size~\(h_2\) for three-round \ShS*{}.
-		For the latter, the step size \(h_1\) is noted on the y-axes.
+		The coloured symbols encode the step size \(\stepsizes_1\) for two-round \ShS*{} and the step size~\(\stepsizes_2\) for three-round \ShS*{}.
+		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
 	}
 	\label{fig:shell:three_rounds}
 \end{figure}
@@ -165,7 +165,7 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\hfil\pgfplotslegendfromname{leg:shell:against_others}\hfil
 	\caption{
 		Comparison of \IS{}, \ShS{} and \QS{}.
-		The \ShS{} uses the steps sizes \(h = (6, 1)\) for \(n \le 64\) and \(h = (17, 4, 1)\) elsewise.
+		The \ShS{} uses the steps sizes \(\stepsizes = (6, 1)\) for \(n \le 64\) and \(\stepsizes = (17, 4, 1)\) elsewise.
 		The speed-ups are with respect to the \QS{}.
 		\todo[inline]{\QS{} mit Zufallspivot auch noch einbauen?}
 		\todo[inline]{verschiedene Verteilungen?}
@@ -174,11 +174,11 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 \end{figure}
 
 When moving to greater input lengths (\cref{fig:shell:three_rounds}), the differences in performance between the two-round \ShS*{} become more pronounced;
-especially the ones with \(h_1 = 3\) and \(h_1 = 4\) fall off whereas the one with \(h_1 = 6\) holds its ground quite well.
+especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
 With more than 64 elements, three round get worthwhile to consider.
-Interestingly, many \ShS*{} with \(h_2 = 4\) take the lead whilst the ones with \(h_2 = 6\) are mid-table.
-This is in accordance with \citeauthor{10.1007/3-540-44669-9_12} \cite{10.1007/3-540-44669-9_12} who noted~\(h = (17, 4, 1)\) to be the optimal triplet for 128 elements.
-It is noteworthy, though, that he measured the quadruplet~\(h = (38, 9, 4, 1)\) to be about 5\% faster in the MIX machine model.
+Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.
+This is in accordance with \citeauthor{10.1007/3-540-44669-9_12} \cite{10.1007/3-540-44669-9_12} who noted~\(\stepsizes = (17, 4, 1)\) to be the optimal triplet for 128 elements.
+It is noteworthy, though, that he measured the quadruplet~\(\stepsizes = (38, 9, 4, 1)\) to be about 5\% faster in the MIX machine model.
 On a DPU, this sequence leads to a runtime of nearly exactly 74.000 cycles, placing it only mid-table.
 Without access to Ciura's original code, giving a satisfactory explanation for the discrepancy is hard, however.
 
