@@ -1,0 +1,129 @@
+\subsubsection*{Investigating the Compilation}
+\label{subsubsec:tasklet:insertion:compiler}
+
+At times, the quality of the compilation nosedives, and \IS{} shall serve as an example.
+When sorting an element, all previous elements must already be in sorted order;
+an implementation of this is shown in \cref{fig:insertion:impl:pred_first}.
+Obviously, the first element alone is already sorted, so \IS{} will not perform any changes and proceed to the second element.
+In order to get rid of some loop overhead, it would make sense to let \IS{} start at the second element, as in \cref{fig:insertion:impl:pred_sec}.
+Surprisingly, starting at the first element yields a runtime of 4166 cycles at 16 elements, whereas starting at the second yields a runtime of 4266 cycles.
+The same happens if, in \cref{fig:insertion:impl:pred_sec}, one keeps \lstinline|*i = start| and instead uses \lstinline|curr = ++i|.
+
+Looking at the compilation reveals the reason:
+In the faster case, the pointer \lstinline|pred| is optimised away and, in its stead, the pointer \lstinline|curr| and an offset of \lstinline|-4| is used.
+In the slower case, the pointer \lstinline|pred| is \emph{sometimes} used with an offset to get the true value of \lstinline|curr|.
+Two registers are used to store the addresses of \lstinline|curr| and \lstinline|pred| at different points in time, resulting in one additional instruction at the start of each round, nullifying any gain from starting with the second element.
+This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into the additionally used register.
+
+Multiple workarounds exist to circumvent this problem.
+One workaround is to take the faster code of \cref{fig:insertion:impl:pred_first} and add inline assembler to the start which increments the register holding the \lstinline|start| pointer.
+While this does work for the explicit \IS{}, the other two versions of \IS{} need to know the original starting address later on and, thus, actually set the address of \lstinline|i| rather late;
+adding inline assembler proves fare more difficult as a consequence.
+And as \IS{} is to be used as fallback algorithms by other functions, which might also need to keep the original value of \lstinline|start|, inline assembler is a bad choice even for the explicit \IS{}.
+
+Another workaround is the usage of a wrapper function calling \IS{} with the arguments \lstinline|start + 1| and \lstinline|end|.
+This works quite well:
+First, the register holding \lstinline|start| is incremented and, then, follows the inlined code from the actual \IS{}.
+Doing so makes the runtime drop from 4166 cycles down to 4101 cycles.
+
+Recall how in the faster version (\cref{fig:insertion:impl:pred_first}), the pointer \lstinline|pred| is always deduced from the pointer \lstinline|curr|.
+This is manually enforced in \cref{fig:insertion:impl:offset_first,fig:insertion:impl:offset_sec}, where \lstinline|pred| is replaced with \lstinline|curr - 1|.
+As a consequence, the code of \cref{fig:insertion:impl:offset_first} compiles the very same as the one of \cref{fig:insertion:impl:pred_first}, while \cref{fig:insertion:impl:offset_sec} yields the same compilation as the wrapper functions.
+This workaround is clearly the best of the three and, hence, the one used in the whole code base.
+
+Unluckily, the struggle with the compiler endeth not herewith.
+A deeper look into the compilation reveals the following three instructions:
+\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB1_4; move r3, r0|.
+Without delving further into their meaning \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it and, apparently, it does also not set any flags.
+Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime down to just 3961 cycles while still sorting correctly;
+the gain is even greater for input distributions other than the uniform one.
+New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.
+
+\begin{figure}
+	\begin{subfigure}{0.471\linewidth}
+		\begin{lstlisting}
+void insertion_sort(int *start, int *end) {
+	int *curr, *i = start;
+	while ((curr = i++) <= end) {
+		int to_sort = *curr;
+		int *pred = curr - 1;
+		while (*pred > to_sort) {
+			*curr = *pred;
+			curr = pred--;
+		}
+		*curr = to_sort;
+	}
+}
+		\end{lstlisting}
+		\caption{
+			Start at the first element and with predecessor pointer.
+		}
+		\label{fig:insertion:impl:pred_first}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.471\linewidth}
+		\begin{lstlisting}
+void insertion_sort(int *start, int *end) {
+	int *curr, *i = start + 1;
+	while ((curr = i++) <= end) {
+		int to_sort = *curr;
+		int *pred = curr - 1;
+		while (*pred > to_sort) {
+			*curr = *pred;
+			curr = pred--;
+		}
+		*curr = to_sort;
+	}
+}
+		\end{lstlisting}
+		\caption{
+			Start at the second element and with predecessor pointer.
+		}
+		\label{fig:insertion:impl:pred_sec}
+	\end{subfigure}
+
+	\begin{subfigure}{0.471\linewidth}
+		\begin{lstlisting}
+void insertion_sort(int *start, int *end) {
+	int *curr, *i = start;
+	while ((curr = i++) <= end) {
+		int to_sort = *curr;
+		while (*(curr-1) > to_sort) {
+			*curr = *(curr-1);
+			curr--;
+		}
+		*curr = to_sort;
+	}
+}
+		\end{lstlisting}
+		\caption{
+			Start at the first element and without predecessor pointer.
+		}
+		\label{fig:insertion:impl:offset_first}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.471\linewidth}
+		\begin{lstlisting}
+void insertion_sort(int *start, int *end) {
+	int *curr, *i = start + 1;
+	while ((curr = i++) <= end) {
+		int to_sort = *curr;
+		while (*(curr-1) > to_sort) {
+			*curr = *(curr-1);
+			curr--;
+		}
+		*curr = to_sort;
+	}
+}
+		\end{lstlisting}
+		\caption{
+			Start at the second element and without predecessor pointer.
+		}
+		\label{fig:insertion:impl:offset_sec}
+	\end{subfigure}
+	\caption{
+		Four different implementations of \IS{}.
+		\Cref{fig:insertion:impl:pred_first,fig:insertion:impl:offset_first} are compiled the same.
+		\Cref{fig:insertion:impl:pred_sec,fig:insertion:impl:offset_sec} are compiled differently.
+	}
+\end{figure}

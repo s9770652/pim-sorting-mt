@@ -1,52 +1,17 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
+\label{subsec:single:insertion}
 
-\pgfplotstableread{data/small_sorts.txt}{\tableSmallSorts}
+\pgfplotstableread{data/small sorts/uint32/uniform.txt}{\tableSmallSortsXxxiiUniform}
 
-\begin{figure}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			width=0.4401\linewidth,
-			group/group size=2 by 1,
-			groupplot xlabel={Input Length \(n\)},
-			xtick distance=3,
-			minor xtick=data,
-			legend columns=3,
-		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:insertion:against_others]
-			\legend{Insertion (sentinel), Insertion (no sentinel), Selection, Bubble (adaptive), Bubble (not adaptive)}
-			\plotpernn{1}{\tableSmallSorts}
-			\plotpernn{1NoSentinel}{\tableSmallSorts}
-			\plotpernn{Selection}{\tableSmallSorts}
-			\plotpernn{BubbleAdapt}{\tableSmallSorts}
-			\plotpernn{BubbleNonAdapt}{\tableSmallSorts}
-			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
-			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{1NoSentinel}{1}{\tableSmallSorts}
-			\plotspeedup{Selection}{1}{\tableSmallSorts}
-			\plotspeedup{BubbleAdapt}{1}{\tableSmallSorts}
-			\plotspeedup{BubbleNonAdapt}{1}{\tableSmallSorts}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
-	\caption{
-		Comparison of sorting algorithms with a runtime in \(\bigoh{n^2}\).
-		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
-		The speed-ups are with respect to the \IS{} relying on sentinel values.
-	}
-	\label{fig:insertion:against_others}
-\end{figure}
-
-This stable sorting algorithm works by moving the \(i\)th element to the left as long as its left neighbour is bigger, assuming that the elements \(0\) to \(i - 1\) are already sorted.
-Even though in both the average case and the worst case, \IS{} has a runtime of \(\bigoh{n^2}\)\todo{Beleg?}, it features quite some advantages:
+This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is bigger, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
+Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, where each of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
+Nonetheless, \IS{} does have some saving graces:
 \begin{enumerate*}
 	\item
-	It works in-place, needing only \(\bigoh{1}\) additional space.
+	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigoh{n}\).
 
 	\item
-	It is inherently adaptive:
-	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigoh{n}\).
+	It works in-place, needing only \(\bigoh{1}\) additional space.
 
 	\item
 	Its program code is short, lending itself to inlining.
@@ -54,18 +19,64 @@ Even though in both the average case and the worst case, \IS{} has a runtime of 
 	\item
 	The overhead is small.
 \end{enumerate*}
-Especially the last two points make \IS{} a good base algorithm for asymptotically better sorting algorithms to use on very small subarrays.
+Especially the last two points make \IS{} a good fall-back algorithm for asymptotically better sorting algorithms to use on small subarrays.
 
 When moving an element to the left, two checks are needed:
 Does the left neighbour exist and is it smaller than the element to move?
 The first check can be omitted through the use of \emph{sentinel values}:
 If the element at index \(-1\) is at least as small as any value in the input array, the leftwards motion stops there at the latest.
-Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies between 20\% and 40\%\todo{auf Kompilat eingehen?} in the relevant input range (\cref{fig:insertion:against_others}).%
-\todo{ex- und implizite Wächterwerte benennen}
-Thence, \enquote{\IS{}} refers to the version relying on sentinel values henceforth.
-\todo[inline]{auf Compilersperenzchen eingehen?}
+Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and lies at about 30\% for short inputs (\cref{fig:insertion:against_others}).
+
+Setting an \emph{explicit} sentinel value can be omitted by using \emph{implicit} sentinel values.
+At the start of each round, one can check if the element at index \(0\) is at least as small as the element at index~\(i\).
+If yes, the former is a sufficient sentinel value, and \IS{} can proceed as normal.
+If not, the latter must be the minimum of the first \(i + 1\) elements and, therefore, can be moved immediately to the front.
+Due to the uni-cost model, the implicit version is slower than the explicit version (\cref{fig:insertion:against_others}), effectively adding one instruction to each round:
+When moving the \(i\)th element to the front, checking whether the preceding element is smaller (explicit) and checking whether the preceding position is the start of the array (implicit) takes the same amount of time.
+Thence, a sole \enquote{\IS{}} refers to the version relying on explicit sentinel values henceforth.
+Implicit sentinel values will be of greater use for \ShS{} in \cref{subsec:single:shell}.
 
 \begin{note}
 	Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
-	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion:against_others}) and should always be preferred.
+	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion:against_others,fig:insertion:all_distributions_uint32,fig:insertion:all_distributions_uint64}) and should always be preferred.
 \end{note}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/2,
+			group/group size=2 by 1,
+			groupplot xlabel={Input Length \(n\)},
+			xtick distance=3,
+			minor xtick=data,
+			legend columns=3,
+		]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:insertion:against_others]
+			\legend{\IS{} (no sentinel), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
+			\plotpernn{1NoSentinel}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{1}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{1Implicit}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{BubbleNonAdapt}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{BubbleAdapt}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{Selection}{\tableSmallSortsXxxiiUniform}
+			%
+			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
+			\plotspeedup{1NoSentinel}{1}{\tableSmallSortsXxxiiUniform}
+			\pgfplotsset{cycle list shift=1}
+			\plotspeedup{1Implicit}{1}{\tableSmallSortsXxxiiUniform}
+			\plotspeedup{BubbleNonAdapt}{1}{\tableSmallSortsXxxiiUniform}
+			\plotspeedup{BubbleAdapt}{1}{\tableSmallSortsXxxiiUniform}
+			\plotspeedup{Selection}{1}{\tableSmallSortsXxxiiUniform}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
+	\caption{
+		Comparison of sorting algorithms with a runtime in \(\bigoh{n^2}\).
+		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
+		The speed-ups are with respect to the \IS{} relying on explicit sentinel values.
+	}
+	\label{fig:insertion:against_others}
+\end{figure}
+
+\input{singletasklet_insertion_compiler}

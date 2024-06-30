@@ -1,0 +1,125 @@
+\subsection{\texorpdfstring{\IS{}}{InsertionSort}}
+\label{subsec:app:single:insertion}
+
+\pgfplotstableread{data/small sorts/uint32/sorted.txt}{\tableSmallSortsXxxiiSorted}
+\pgfplotstableread{data/small sorts/uint32/reverse.txt}{\tableSmallSortsXxxiiReverse}
+\pgfplotstableread{data/small sorts/uint32/almost.txt}{\tableSmallSortsXxxiiAlmost}
+\pgfplotstableread{data/small sorts/uint32/zipf.txt}{\tableSmallSortsXxxiiZipf}
+\pgfplotstableread{data/small sorts/uint32/normal.txt}{\tableSmallSortsXxxiiNormal}
+\pgfplotstableread{data/small sorts/uint64/sorted.txt}{\tableSmallSortsLxivSorted}
+\pgfplotstableread{data/small sorts/uint64/reverse.txt}{\tableSmallSortsLxivReverse}
+\pgfplotstableread{data/small sorts/uint64/almost.txt}{\tableSmallSortsLxivAlmost}
+\pgfplotstableread{data/small sorts/uint64/uniform.txt}{\tableSmallSortsLxivUniform}
+\pgfplotstableread{data/small sorts/uint64/zipf.txt}{\tableSmallSortsLxivZipf}
+\pgfplotstableread{data/small sorts/uint64/normal.txt}{\tableSmallSortsLxivNormal}
+
+\begin{figure}[h]
+	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/2,
+			group/group size=2 by 3,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \(n^2\)},
+			xtick distance=3,
+			minor xtick=data,
+			ymin=0,
+			ymax=60,
+			legend columns=3,
+		]
+			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:all_distributions_uint32]
+			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiSorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiReverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiAlmost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiUniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiZipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsXxxiiNormal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:insertion:all_distributions_uint32}\hfil
+	\caption{
+		A continuation of \cref{fig:insertion:against_others} with more input distributions.
+		The data type is 32-bit integers.
+	}
+	\label{fig:insertion:all_distributions_uint32}
+\end{figure}
+
+\begin{figure}[h]
+	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/2,
+			group/group size=2 by 3,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \(n^2\)},
+			xtick distance=3,
+			minor xtick=data,
+			ymin=0,
+			ymax=70,
+			extra y ticks={70},
+			legend columns=3,
+		]
+			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:all_distributions_uint64]
+			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivSorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivReverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivAlmost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivUniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivZipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernn{#1}{\tableSmallSortsLxivNormal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:insertion:all_distributions_uint64}\hfil
+	\caption{
+		A continuation of \cref{fig:insertion:against_others} with more input distributions.
+		The data type is 64-bit integers.
+	}
+	\label{fig:insertion:all_distributions_uint64}
+\end{figure}

@@ -1,4 +1,5 @@
 \subsection{\texorpdfstring{\ShS{}}{ShellSort}}
+\label{subsec:single:shell}
 
 \pgfplotstableread{data/shell/no_third_step.txt}{\tableShellNoThirdStep}
 \pgfplotstableread{data/shell/h1=7.txt}{\tableShellVII}
@@ -8,7 +9,7 @@
 \pgfplotstableread{data/shell/h1=11.txt}{\tableShellXI}
 \pgfplotstableread{data/shell/h1=12.txt}{\tableShellXII}
 \pgfplotstableread{data/shell/h1=13.txt}{\tableShellXIII}
-\pgfplotstableread{data/shell/h1=14.txt}{\tableShellXIV}
+\pgfplotstableread{data/shell/h1=14.txt}{\tableShelLxiv}
 \pgfplotstableread{data/shell/h1=15.txt}{\tableShellXV}
 \pgfplotstableread{data/shell/h1=16.txt}{\tableShellXVI}
 \pgfplotstableread{data/shell/h1=17.txt}{\tableShellXVII}
@@ -24,16 +25,16 @@
 			minor xtick=data,
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=70, extra y ticks={70}, legend to name=leg:shell:two_rounds]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:shell:two_rounds]
 			\legend{\(1\), \(...\), \(9\)}
 			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSorts}
+				\plotpernn{#1}{\tableSmallSortsXxxiiUniform}
 			}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.6, ymax=1.2]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSorts}
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiUniform}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -75,7 +76,7 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={11}, forget plot] {\tableShellXI};
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={12}, forget plot] {\tableShellXII};
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={13}, forget plot] {\tableShellXIII};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={14}, forget plot] {\tableShellXIV};
+	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={14}, forget plot] {\tableShelLxiv};
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={15}, forget plot] {\tableShellXV};
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={16}, forget plot] {\tableShellXVI};
 	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={17}] {\tableShellXVII};
@@ -165,7 +166,7 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\hfil\pgfplotslegendfromname{leg:shell:against_others}\hfil
 	\caption{
 		Comparison of \IS{}, \ShS{} and \QS{}.
-		The \ShS{} uses the steps sizes \(\stepsizes = (6, 1)\) for \(n \le 64\) and \(\stepsizes = (17, 4, 1)\) elsewise.
+		The \ShS{} uses the step sizes \(\stepsizes = (6, 1)\) for \(n \le 64\) and \(\stepsizes = (17, 4, 1)\) elsewise.
 		The speed-ups are with respect to the \QS{}.
 		\todo[inline]{\QS{} mit Zufallspivot auch noch einbauen?}
 		\todo[inline]{verschiedene Verteilungen?}
