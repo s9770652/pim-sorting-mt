@@ -90,6 +90,17 @@
 }
 \makeatother
 
+% Lets the user specify the group plot size in the usual row-by-column format and expands the group plot adequately horizontally.
+% taken from: my brain
+\makeatletter
+\pgfplotsset{
+	adaptive group/.style args={#1 by #2}{  % #rows by #cols
+		group/group size=#2 by #1,  % #cols by #rows
+		width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/\pgfplots@group@columns,
+	}
+}
+\makeatother
+
 \DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred's red
 
 

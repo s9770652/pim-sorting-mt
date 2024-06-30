@@ -44,8 +44,7 @@ Implicit sentinel values will be of greater use for \ShS{} in \cref{subsec:singl
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/2,
-			group/group size=2 by 1,
+			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
 			minor xtick=data,

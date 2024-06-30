@@ -18,8 +18,7 @@
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=0.4401\linewidth,
-			group/group size=2 by 1,
+			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
 			minor xtick=data,
@@ -86,9 +85,8 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\begin{tikzpicture}[plot]
 		\newcommand{\setn}[1]{\textit{n} = #1}
 		\begin{groupplot}[
-			width=0.46\linewidth,
-			group/group size=2 by 3,
 			group/horizontal sep=12mm,
+			adaptive group=3 by 2,
 			groupplot xlabel={Mean [\(10^4\) Cycles]},
 			groupplot ylabel={\(\stepsizes_1\)},
 			scaled x ticks=base 10:-4,
@@ -144,8 +142,7 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=0.4401\linewidth,
-			group/group size=2 by 1,
+			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=16,
 			minor xtick=data,

@@ -17,8 +17,7 @@ This low threshold also means that even a simple two-round \ShS{} is not worth c
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=0.4401\linewidth,
-			group/group size=2 by 1,
+			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Speed-up},
 			xmode=log,
@@ -98,8 +97,7 @@ Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			width=0.4401\linewidth,
-			group/group size=2 by 1,
+			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xmode=log,
 			xtick={20, 32, 64, 128, 256, 512, 1024},
