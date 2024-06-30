@@ -1,8 +1,6 @@
 \RequirePackage{babel}  % Sprache
 \RequirePackage{csquotes}  % Anführungszeichen
 
-\RequirePackage{geometry}  % Seitenlayout (insbesondere Ränder)
-
 \RequirePackage{amssymb, amsthm}  % mathematische Grundlagen
 \RequirePackage[intlimits]{mathtools}  % stellt u. a. \DeclarePairedDelimiter zur Verfügung + weitere Verbesserungen für amsmath
 \RequirePackage[
