@@ -96,7 +96,7 @@
 \pgfplotsset{
 	adaptive group/.style args={#1 by #2}{  % #rows by #cols
 		group/group size=#2 by #1,  % #cols by #rows
-		width=\dimexpr(\linewidth-\pgfkeysvalueof{/pgfplots/group/horizontal sep})/\pgfplots@group@columns,
+		width=\dimexpr(\linewidth - \numexpr(\pgfplots@group@columns-1) * \pgfkeysvalueof{/pgfplots/group/horizontal sep}) / \pgfplots@group@columns,
 	}
 }
 \makeatother
