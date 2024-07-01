@@ -31,15 +31,16 @@ Setting an \emph{explicit} sentinel value can be omitted by using \emph{implicit
 At the start of each round, one can check if the element at index \(0\) is at least as small as the element at index~\(i\).
 If yes, the former is a sufficient sentinel value, and \IS{} can proceed as normal.
 If not, the latter must be the minimum of the first \(i + 1\) elements and, therefore, can be moved immediately to the front.
-Due to the uni-cost model, the implicit version is slower than the explicit version (\cref{fig:insertion:against_others}), effectively adding one instruction to each round:
-When moving the \(i\)th element to the front, checking whether the preceding element is smaller (explicit) and checking whether the preceding position is the start of the array (implicit) takes the same amount of time.
-Thence, a sole \enquote{\IS{}} refers to the version relying on explicit sentinel values henceforth.
-Implicit sentinel values will be of greater use for \ShS{} in \cref{subsec:single:shell}.
 
-\begin{note}
-	Other known simple sorting algorithm with similar runtime complexity are \SelS{} and \BS{}.
-	The asymptoticity, however, hides much higher constant factors such that even for as little as three elements \IS{} is superior (\cref{fig:insertion:against_others,fig:insertion:all_distributions_uint32,fig:insertion:all_distributions_uint64}) and should always be preferred.
-\end{note}
+The runtimes of the explicit and implicit \IS*{} can be compared in the \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
+For most input distributions, the implicit \IS{} is logically a bit slower, effectively adding one check instruction to each round.
+An outlier, however, are the reverse sorted inputs.
+For 32-bit numbers (\cref{fig:insertion:against_others_uint32}), the implicit version is up to 45\% slower than the explicit one.
+This comes at a surprise since both versions effectively execute the same loop body while shifting everything one index backwards, with only the loop condition being different.
+Due to the uni-cost model, a value check on whether the preceding element is smaller (explicit) and an address check on whether the preceding position is the start of the array (implicit) should take the same amount of time.
+Yet, even the \IS{} not relying on sentinel values surpasses the implicit \IS{}, although doing both value checks and address checks!
+For 64-bit numbers (\cref{fig:insertion:against_others_uint64}), the implicit \IS{} would be expected to perform better than the explicit one, considering that a value check now takes two instructions and an address check still only one.
+Nonetheless, the two \IS*{} tie.
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
@@ -79,3 +80,8 @@ Implicit sentinel values will be of greater use for \ShS{} in \cref{subsec:singl
 \end{figure}
 
 \input{singletasklet_insertion_compiler}
+
+\begin{note}
+	Other known simple sorting algorithm with a runtime complexity similar to \IS{} are \SelS{} and \BS{}.
+	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred (cf.\ \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}).
+\end{note}

@@ -1,5 +1,5 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
-\label{subsec:app:single:insertion}
+\label{subapp:single:insertion}
 
 \pgfplotstableread{data/small sorts/uint32/sorted.txt}{\tableSmallSortsXxxiiSorted}
 \pgfplotstableread{data/small sorts/uint32/reverse.txt}{\tableSmallSortsXxxiiReverse}
@@ -26,7 +26,7 @@
 			ymax=60,
 			legend columns=3,
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:all_distributions_uint32]
+			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint32]
 			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 				\plotpernn{#1}{\tableSmallSortsXxxiiSorted}
@@ -59,12 +59,12 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:all_distributions_uint32}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint32}\hfil
 	\caption{
 		A continuation of \cref{fig:insertion:against_others} with more input distributions.
-		The data type is 32-bit integers.
+		The data type is 32-bit unsigned integers.
 	}
-	\label{fig:insertion:all_distributions_uint32}
+	\label{fig:insertion:against_others_uint32}
 \end{figure}
 
 \begin{figure}[h]
@@ -81,7 +81,7 @@
 			extra y ticks={70},
 			legend columns=3,
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:all_distributions_uint64]
+			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint64]
 			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 				\plotpernn{#1}{\tableSmallSortsLxivSorted}
@@ -114,10 +114,10 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:all_distributions_uint64}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint64}\hfil
 	\caption{
 		A continuation of \cref{fig:insertion:against_others} with more input distributions.
-		The data type is 64-bit integers.
+		The data type is 64-bit unsigned integers.
 	}
-	\label{fig:insertion:all_distributions_uint64}
+	\label{fig:insertion:against_others_uint64}
 \end{figure}

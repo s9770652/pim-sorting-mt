@@ -1,9 +1,11 @@
 \subsubsection*{Investigating the Compilation}
 \label{subsubsec:tasklet:insertion:compiler}
 
-At times, the quality of the compilation nosedives, and \IS{} shall serve as an example.
+At times, the quality of the compilation nosedives, and \IS{} serves as great example.
+But before we focus on the poor performance of the implicit \IS{}, let us first look at something far more basic.
+
 When sorting an element, all previous elements must already be in sorted order;
-an implementation of this is shown in \cref{fig:insertion:impl:pred_first}.
+an exemplary implementation of this is shown in \cref{fig:insertion:impl:pred_first}.
 Obviously, the first element alone is already sorted, so \IS{} will not perform any changes and proceed to the second element.
 In order to get rid of some loop overhead, it would make sense to let \IS{} start at the second element, as in \cref{fig:insertion:impl:pred_sec}.
 Surprisingly, starting at the first element yields a runtime of 4166 cycles at 16 elements, whereas starting at the second yields a runtime of 4266 cycles.
@@ -15,7 +17,7 @@ In the slower case, the pointer \lstinline|pred| is \emph{sometimes} used with a
 Two registers are used to store the addresses of \lstinline|curr| and \lstinline|pred| at different points in time, resulting in one additional instruction at the start of each round, nullifying any gain from starting with the second element.
 This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into the additionally used register.
 
-Multiple workarounds exist to circumvent this problem.
+Multiple workarounds exist to sidestep this problem.
 One workaround is to take the faster code of \cref{fig:insertion:impl:pred_first} and add inline assembler to the start which increments the register holding the \lstinline|start| pointer.
 While this does work for the explicit \IS{}, the other two versions of \IS{} need to know the original starting address later on and, thus, actually set the address of \lstinline|i| rather late;
 adding inline assembler proves fare more difficult as a consequence.
@@ -30,14 +32,6 @@ Recall how in the faster version (\cref{fig:insertion:impl:pred_first}), the poi
 This is manually enforced in \cref{fig:insertion:impl:offset_first,fig:insertion:impl:offset_sec}, where \lstinline|pred| is replaced with \lstinline|curr - 1|.
 As a consequence, the code of \cref{fig:insertion:impl:offset_first} compiles the very same as the one of \cref{fig:insertion:impl:pred_first}, while \cref{fig:insertion:impl:offset_sec} yields the same compilation as the wrapper functions.
 This workaround is clearly the best of the three and, hence, the one used in the whole code base.
-
-Unluckily, the struggle with the compiler endeth not herewith.
-A deeper look into the compilation reveals the following three instructions:
-\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB1_4; move r3, r0|.
-Without delving further into their meaning \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it and, apparently, it does also not set any flags.
-Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime down to just 3961 cycles while still sorting correctly;
-the gain is even greater for input distributions other than the uniform one.
-New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.
 
 \begin{figure}
 	\def\iscodewidth{0.48\linewidth}
@@ -128,3 +122,16 @@ void insertion_sort(int *start, int *end) {
 		\Cref{fig:insertion:impl:pred_sec,fig:insertion:impl:offset_sec} are compiled differently.
 	}
 \end{figure}
+
+Alas, the struggle with the compiler endeth not herewith.
+A deeper look into the compilation reveals the following three instructions:
+\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB1_4; move r3, r0|.
+Without delving further into their meaning \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it and, apparently, it does also not set any flags.
+Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime down to just 3961 cycles while still sorting correctly;
+the gain is even greater for input distributions other than the uniform one.
+New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.
+
+At this point, it should have become apparent that the poor performance of the implicit \IS{} is also due to bad compilation.
+We refrain from going into details because we failed to find an easy fix and because the implicit \IS{} is not used in the rest of the code base.
+Thence, a sole \enquote{\IS{}} refers to the version relying on explicit sentinel values henceforth.
+Still, the idea of implicit sentinel values will be of use for \ShS{} in \cref{subsec:single:shell}.
