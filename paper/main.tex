@@ -41,6 +41,7 @@
 	},
 }
 \pgfplotsset{
+	filter discard warning=false,
 	height=4cm,
 	cycle multiindex list={exotic \nextlist mark list*},  % automatic colouring of plots
 	scale only axis,  % height and width apply only to the axes, not the labels
@@ -90,6 +91,26 @@
 }
 \makeatother
 
+% Allows to read a table in and save it with any name (e.g. \pgfplotstablereadnamed{int32.dat}{tableInt32}).
+% taken from: my brain
+\ExplSyntaxOn
+\NewDocumentCommand{\pgfplotstablereadnamed}{m m}{%
+	\use:e { \exp_not:n { \pgfplotstableread { #1 } } { \exp_not:c { #2 } } }
+}
+\ExplSyntaxOff
+
+% Allows to plot a table with a parametrised name (e.g.: \addplotnamedtable{table#1};).
+% taken from: https://tex.stackexchange.com/a/603677
+\ExplSyntaxOn
+\NewDocumentCommand{\addplotnamedtable}{oO{}m}{%
+	\IfNoValueTF{#1}{  % the call is like \addplot table[...}{...}
+	\use:e { \exp_not:n { \addplot+ table~[#2] } { \exp_not:c { #3 } } }
+}{  % the call is like \addplot [...] table [...] {...}
+	\use:e { \exp_not:n { \addplot+ [#1]~table~[#2] } { \exp_not:c { #3 } } }
+}
+}
+\ExplSyntaxOff
+
 % Lets the user specify the group plot size in the usual row-by-column format and expands the group plot adequately horizontally.
 % taken from: my brain
 \makeatletter
@@ -103,6 +124,8 @@
 
 \DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred's red
 
+\renewcommand{\topfraction}{.8}
+\renewcommand{\floatpagefraction}{.8}
 
 \begin{document}
 	\pagenumbering{gobble}  % turn off pagenumbering

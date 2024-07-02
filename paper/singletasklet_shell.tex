@@ -1,19 +1,20 @@
 \subsection{\texorpdfstring{\ShS{}}{ShellSort}}
 \label{subsec:single:shell}
 
-\pgfplotstableread{data/shell/no_third_step.txt}{\tableShellNoThirdStep}
-\pgfplotstableread{data/shell/h1=7.txt}{\tableShellVII}
-\pgfplotstableread{data/shell/h1=8.txt}{\tableShellVIII}
-\pgfplotstableread{data/shell/h1=9.txt}{\tableShellIX}
-\pgfplotstableread{data/shell/h1=10.txt}{\tableShellX}
-\pgfplotstableread{data/shell/h1=11.txt}{\tableShellXI}
-\pgfplotstableread{data/shell/h1=12.txt}{\tableShellXII}
-\pgfplotstableread{data/shell/h1=13.txt}{\tableShellXIII}
-\pgfplotstableread{data/shell/h1=14.txt}{\tableShelLxiv}
-\pgfplotstableread{data/shell/h1=15.txt}{\tableShellXV}
-\pgfplotstableread{data/shell/h1=16.txt}{\tableShellXVI}
-\pgfplotstableread{data/shell/h1=17.txt}{\tableShellXVII}
-\pgfplotstableread{data/shell/custom.txt}{\tableShellCustom}
+\pgfplotsinvokeforeach{reverse,uniform}{
+	\pgfplotstablereadnamed{data/shell/two-tier/uint32/#1.txt}{tableShellTwo_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=7/uint32/#1.txt}{tableShell7_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=8/uint32/#1.txt}{tableShell8_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=9/uint32/#1.txt}{tableShell9_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=10/uint32/#1.txt}{tableShell10_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=11/uint32/#1.txt}{tableShell11_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=12/uint32/#1.txt}{tableShell12_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=13/uint32/#1.txt}{tableShell13_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=14/uint32/#1.txt}{tableShell14_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=15/uint32/#1.txt}{tableShell15_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=16/uint32/#1.txt}{tableShell16_32#1}
+	\pgfplotstablereadnamed{data/shell/h1=17/uint32/#1.txt}{tableShell17_32#1}
+}
 
 \IS{} suffers from small elements at the end of the input, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
 \ShS{}, proposed by Donald L. Shell in 1959~\cite{Shell1959AHS}, gets around this by doing multiple passes of \IS{} with different step sizes:
@@ -59,118 +60,69 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\label{fig:shell:two-tier}
 \end{figure}
 
-\NewDocumentCommand{\shellscatter}{m m}{
-	\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={6}] {\tableShellNoThirdStep};
+\NewDocumentCommand{\shellscatter}{m m m}{
+	\addplotnamedtable[select row={#1}, forget plot][x=µ_#2, y expr={6}]{tableShellTwo_#3};
 	\ifnumless{#2}{7}{
-		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={7}] {\tableShellVII};
+		\addplotnamedtable[select row={#1}, forget plot][x=µ_#2, y expr={7}]{tableShell7_#3};
 	}{}
 	\ifnumless{#2}{8}{
-		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={8}] {\tableShellVIII};
+		\addplotnamedtable[select row={#1}, forget plot][x=µ_#2, y expr={8}]{tableShell8_#3};
 	}{}
 	\ifnumless{#2}{9}{
-		\addplot+ plot [select coords between index={#1}{#1}, forget plot] table [x=µ_#2, y expr={9}] {\tableShellIX};
+		\addplotnamedtable[select row={#1}, forget plot][x=µ_#2, y expr={9}]{tableShell9_#3};
 	}{}
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={10}, forget plot] {\tableShellX};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={11}, forget plot] {\tableShellXI};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={12}, forget plot] {\tableShellXII};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={13}, forget plot] {\tableShellXIII};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={14}, forget plot] {\tableShelLxiv};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={15}, forget plot] {\tableShellXV};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={16}, forget plot] {\tableShellXVI};
-	\addplot+ plot [select coords between index={#1}{#1}] table [x=µ_#2, y expr={17}] {\tableShellXVII};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={10}, forget plot]{tableShell10_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={11}, forget plot]{tableShell11_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={12}, forget plot]{tableShell12_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={13}, forget plot]{tableShell13_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={14}, forget plot]{tableShell14_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={15}, forget plot]{tableShell15_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={16}, forget plot]{tableShell16_#3};
+	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={17}]{tableShell17_#3};
+}
+
+\pgfplotsset{
+	shell scatter plot/.style={
+		group/horizontal sep=12mm,
+		adaptive group=3 by 2,
+		groupplot xlabel={Mean [\(10^4\) Cycles]},
+		groupplot ylabel={\(\stepsizes_1\)},
+		scaled x ticks=base 10:-4,
+		xtick scale label code/.code={},  % removes exponent underneath the axis
+		ytick={6, 7, 9, ..., 17},
+		yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
+		/tikz/only marks,
+		cycle list shift=2,  % for sharing colours with the previous figure
+		legend columns=-1,
+	},
 }
 
 \begin{figure}[p]
 	\begin{tikzpicture}[plot]
 		\newcommand{\setn}[1]{\textit{n} = #1}
-		\begin{groupplot}[
-			group/horizontal sep=12mm,
-			adaptive group=3 by 2,
-			groupplot xlabel={Mean [\(10^4\) Cycles]},
-			groupplot ylabel={\(\stepsizes_1\)},
-			scaled x ticks=base 10:-4,
-			xtick scale label code/.code={},  % removes exponent underneath the axis
-			ytick={6, 7, 9, ..., 17},
-			yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
-			/tikz/only marks,
-			cycle list shift=2,  % for sharing colours with the previous figure
-			legend columns=-1,
-		]
-			\nextgroupplot[title={Input Length \setn{24}}]
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{0}{#1}
+		\newcommand{\type}{32uniform}
+		\begin{groupplot}[shell scatter plot]
+			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
+				\nextgroupplot[title={Input Length \setn{#1}}]
+				\pgfplotsforeachungrouped\h in {3,...,9}{
+					\shellscatter{#1}{\h}{\type}
+				}
 			}
-			%
-			\nextgroupplot[title={Input Length \setn{32}}]
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{1}{#1}
-			}
-			%
-			\nextgroupplot[title={Input Length \setn{48}}]
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{2}{#1}
-			}
-			%
-			\nextgroupplot[title={Input Length \setn{64}}]
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{3}{#1}
-			}
-			%
-			\nextgroupplot[title={Input Length \setn{96}}]
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{4}{#1}
-			}
-			%
-			\nextgroupplot[title={Input Length \setn{128}}, legend to name=leg:shell:three_rounds]
+			\pgfplotsset{legend to name=leg:shell:three-tier}
 			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
-			\pgfplotsinvokeforeach{3,...,9}{
-				\shellscatter{5}{#1}
-			}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three_rounds}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption{
 		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
 		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
 		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
 	}
-	\label{fig:shell:three_rounds}
+	\label{fig:shell:three-tier}
 \end{figure}
 
-\begin{figure}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			xtick distance=16,
-			minor xtick=data,
-			legend columns=-1,
-		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=225, extra y ticks={50, 150, 225}, legend to name=leg:shell:against_others]
-			\legend{Insertion, Shell, Quick}
-			\plotpernlogn{InsertSent}{\tableShellCustom}
-			\plotpernlogn{ShellCiura}{\tableShellCustom}
-			\plotpernlogn{Quick}{\tableShellCustom}
-			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1.2]
-			\plotspeedup{InsertSent}{Quick}{\tableShellCustom}
-			\plotspeedup{ShellCiura}{Quick}{\tableShellCustom}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:shell:against_others}\hfil
-	\caption{
-		Comparison of \IS{}, \ShS{} and \QS{}.
-		The \ShS{} uses the step sizes \(\stepsizes = (6, 1)\) for \(n \le 64\) and \(\stepsizes = (17, 4, 1)\) elsewise.
-		The speed-ups are with respect to the \QS{}.
-		\todo[inline]{\QS{} mit Zufallspivot auch noch einbauen?}
-		\todo[inline]{verschiedene Verteilungen?}
-	}
-	\label{fig:shell:against_others}
-\end{figure}
-
-When moving to greater input lengths (\cref{fig:shell:three_rounds}), the differences in performance between the two-tier \ShS*{} become more pronounced;
+When moving to greater input lengths (\cref{fig:shell:three-tier}), the differences in performance between the two-tier \ShS*{} become more pronounced;
 especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
 With more than 64 elements, three passes get worthwhile to consider.
 Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.

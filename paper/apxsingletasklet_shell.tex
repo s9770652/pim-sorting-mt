@@ -1,6 +1,21 @@
 \subsection{\texorpdfstring{\ShS{}}{ShellSort}}
 \label{subapp:single:shell}
 
+\pgfplotsinvokeforeach{reverse,uniform}{
+	\pgfplotstablereadnamed{data/shell/two-tier/uint64/#1.txt}{tableShellTwo_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=7/uint64/#1.txt}{tableShell7_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=8/uint64/#1.txt}{tableShell8_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=9/uint64/#1.txt}{tableShell9_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=10/uint64/#1.txt}{tableShell10_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=11/uint64/#1.txt}{tableShell11_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=12/uint64/#1.txt}{tableShell12_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=13/uint64/#1.txt}{tableShell13_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=14/uint64/#1.txt}{tableShell14_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=15/uint64/#1.txt}{tableShell15_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=16/uint64/#1.txt}{tableShell16_64#1}
+	\pgfplotstablereadnamed{data/shell/h1=17/uint64/#1.txt}{tableShell17_64#1}
+}
+
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -9,6 +24,8 @@
 			groupplot ylabel={Cycles / \(n^2\)},
 			xtick distance=3,
 			minor xtick=data,
+			ymin=0,
+			ymax=40,
 			legend columns=-1,
 		]
 			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint32]
@@ -60,6 +77,8 @@
 			groupplot ylabel={Cycles / \(n^2\)},
 			xtick distance=3,
 			minor xtick=data,
+			ymin=0,
+			ymax=40,
 			legend columns=-1,
 		]
 			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint64]
@@ -101,4 +120,236 @@
 		The data type is 64-bit unsigned integers.
 	}
 	\label{fig:shell:two-tier_uint64}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=3 by 2,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \(n^2\)},
+			xtick distance=3,
+			minor xtick=data,
+			legend columns=-1,
+		]
+			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint32]
+			\legend{\(2\), \(...\), \(9\)}
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiSorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiReverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiAlmost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiUniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiZipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiNormal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint32}\hfil
+	\caption{
+		A continuation of \cref{fig:shell:two-tier} with more input distributions.
+		Instead of total runtimes, the speed-ups with respect to \IS{} are given for better clarity.
+		The data type is 32-bit unsigned integers.
+	}
+	\label{fig:shell:two-tier_uint32}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=3 by 2,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \(n^2\)},
+			xtick distance=3,
+			minor xtick=data,
+			legend columns=-1,
+		]
+			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint64]
+			\legend{\(2\), \(...\), \(9\)}
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivSorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivReverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivAlmost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivUniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivZipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup{#1}{1}{\tableSmallSortsLxivNormal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint64}\hfil
+	\caption{
+		A continuation of \cref{fig:shell:two-tier} with more input distributions.
+		Instead of total runtimes, the speed-ups with respect to \IS{} are given for better clarity.
+		The data type is 64-bit unsigned integers.
+	}
+	\label{fig:shell:two-tier_uint64}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\newcommand{\setn}[1]{\textit{n} = #1}
+		\newcommand{\type}{32reverse}
+		\begin{groupplot}[shell scatter plot]
+			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
+				\nextgroupplot[title={Input Length \setn{#1}}]
+				\pgfplotsforeachungrouped\h in {3,...,9}{
+					\shellscatter{#1}{\h}{\type}
+				}
+			}
+			\pgfplotsset{legend to name=leg:shell:three-tier_uint32reverse}
+			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint32reverse}\hfil
+	\caption[]{
+		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
+		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
+		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
+
+		A variation of \cref{fig:shell:three-tier}.
+		The data type is 32-bit unsigned integers.
+		The input distribution is the reverse sorted one.
+	}
+	\label{fig:shell:three-tier_uint32reverse}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\newcommand{\setn}[1]{\textit{n} = #1}
+		\newcommand{\type}{32uniform}
+		\begin{groupplot}[shell scatter plot]
+			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
+				\nextgroupplot[title={Input Length \setn{#1}}]
+				\pgfplotsforeachungrouped\h in {3,...,9}{
+					\shellscatter{#1}{\h}{\type}
+				}
+			}
+			\pgfplotsset{legend to name=leg:shell:three-tier_uint32uniform}
+			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint32uniform}\hfil
+	\caption[]{
+		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
+		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
+		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
+
+		A repetition of \cref{fig:shell:three-tier}.
+		The data type is 32-bit unsigned integers.
+		The input distribution is the uniform one.
+	}
+	\label{fig:shell:three-tier_uint32uniform}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\newcommand{\setn}[1]{\textit{n} = #1}
+		\newcommand{\type}{64reverse}
+		\begin{groupplot}[shell scatter plot]
+			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
+				\nextgroupplot[title={Input Length \setn{#1}}]
+				\pgfplotsforeachungrouped\h in {3,...,9}{
+					\shellscatter{#1}{\h}{\type}
+				}
+			}
+			\pgfplotsset{legend to name=leg:shell:three-tier_uint64reverse}
+			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint64reverse}\hfil
+	\caption[]{
+		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
+		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
+		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
+
+		A variation of \cref{fig:shell:three-tier}.
+		The data type is 64-bit unsigned integers.
+		The input distribution is the reverse sorted one.
+	}
+	\label{fig:shell:three-tier_uint64reverse}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}[plot]
+		\newcommand{\setn}[1]{\textit{n} = #1}
+		\newcommand{\type}{64uniform}
+		\begin{groupplot}[shell scatter plot]
+			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
+				\nextgroupplot[title={Input Length \setn{#1}}]
+				\pgfplotsforeachungrouped\h in {3,...,9}{
+					\shellscatter{#1}{\h}{\type}
+				}
+			}
+			\pgfplotsset{legend to name=leg:shell:three-tier_uint64uniform}
+			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint64uniform}\hfil
+	\caption[]{
+		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
+		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
+		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
+
+		A variation of \cref{fig:shell:three-tier}.
+		The data type is 64-bit unsigned integers.
+		The input distribution is the uniform one.
+	}
+	\label{fig:shell:three-tier_uint64uniform}
 \end{figure}
