@@ -21,113 +21,7 @@
 		\begin{groupplot}[
 			adaptive group=3 by 2,
 			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \(n^2\)},
-			xtick distance=3,
-			minor xtick=data,
-			ymin=0,
-			ymax=40,
-			legend columns=-1,
-		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint32]
-			\legend{\(1\), \(...\), \(9\)}
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiSorted}
-			}
-			%
-			\nextgroupplot[title={Reverse Sorted}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiReverse}
-			}
-			%
-			\nextgroupplot[title={Almost Sorted}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiAlmost}
-			}
-			%
-			\nextgroupplot[title={Uniform}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiUniform}
-			}
-			%
-			\nextgroupplot[title={Zipf's}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiZipf}
-			}
-			%
-			\nextgroupplot[title={Normal}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiNormal}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint32}\hfil
-	\caption{
-		A continuation of \cref{fig:shell:two-tier} with more input distributions.
-		The data type is 32-bit unsigned integers.
-	}
-	\label{fig:shell:two-tier_uint32}
-\end{figure}
-
-\begin{figure}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \(n^2\)},
-			xtick distance=3,
-			minor xtick=data,
-			ymin=0,
-			ymax=40,
-			legend columns=-1,
-		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint64]
-			\legend{\(1\), \(...\), \(9\)}
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivSorted}
-			}
-			%
-			\nextgroupplot[title={Reverse Sorted}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivReverse}
-			}
-			%
-			\nextgroupplot[title={Almost Sorted}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivAlmost}
-			}
-			%
-			\nextgroupplot[title={Uniform}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivUniform}
-			}
-			%
-			\nextgroupplot[title={Zipf's}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivZipf}
-			}
-			%
-			\nextgroupplot[title={Normal}]
-			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsLxivNormal}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint64}\hfil
-	\caption{
-		A continuation of \cref{fig:shell:two-tier} with more input distributions.
-		The data type is 64-bit unsigned integers.
-	}
-	\label{fig:shell:two-tier_uint64}
-\end{figure}
-
-\begin{figure}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \(n^2\)},
+			groupplot ylabel={Speed-up},
 			xtick distance=3,
 			minor xtick=data,
 			legend columns=-1,
@@ -136,37 +30,37 @@
 			\legend{\(2\), \(...\), \(9\)}
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiSorted}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiSorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiReverse}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiReverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiAlmost}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiAlmost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiUniform}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiUniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiZipf}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiZipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiNormal}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiNormal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -185,7 +79,7 @@
 		\begin{groupplot}[
 			adaptive group=3 by 2,
 			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \(n^2\)},
+			groupplot ylabel={Speed-up},
 			xtick distance=3,
 			minor xtick=data,
 			legend columns=-1,
@@ -194,37 +88,37 @@
 			\legend{\(2\), \(...\), \(9\)}
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivSorted}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivSorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivReverse}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivReverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivAlmost}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivAlmost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivUniform}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivUniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivZipf}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivZipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsLxivNormal}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsLxivNormal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}

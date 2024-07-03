@@ -124,7 +124,7 @@ Common occurrences are \dots{}
 	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 	\pgfplotsset{
 		height=3.5cm,
-		group/horizontal sep=3mm,
+		horizontal sep for naught,
 		adaptive group=2 by 4,
 		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
@@ -249,6 +249,7 @@ Common occurrences are \dots{}
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
+			horizontal sep for labels,
 			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xmode=log,

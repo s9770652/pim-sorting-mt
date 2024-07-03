@@ -24,14 +24,14 @@ Intuitively, the individual \IS*{} are fast since elements which need to travel 
 Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research to this day \cite{skean2023optimization,lee2021empirically} and depends on the cost of the operation types (comparing, swapping, looping).
 
 Let us first focus on small input arrays where only two passes with step sizes~\(\stepsizes_1\) and \(1\) suffice.
-The previous results on \IS{} suggest that \ShS{} should make use of~\(\stepsizes_1\) sentinel values lest bounds checking eats any gain up.
-\Cref{fig:shell:two-tier} shows that the additional passes start to pay off at around 16 elements for \(\stepsizes_1 \ge 3\).
-Bear in mind that these measurements were conducted on a uniform input distribution;
-if \ShS{} is used by another algorithm on a subarray, these thresholds may be higher or even non-existent due to some degree of presorting.
+The previous results on \IS{} suggest that the fastest \ShS{} should make use of~\(\stepsizes_1\) sentinel values.
+\Cref{fig:shell:two-tier,fig:shell:two-tier_uint32,fig:shell:two-tier_uint64} show that, with the exception of the \ShS{} with step size \(\stepsizes_1 = 2\), the additional passes start to pay off at around 16 elements for both 32-bit and 64-bit values with the fully random input distributions, reaching a speed-up of around 15\% at around 24 elements.
+In case of the reverse sorted input, the speed-up is practically always positive even for very small inputs, reaching between 50\% and 110\% at around 24 elements.
 
 \begin{figure}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
+			horizontal sep for labels,
 			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
@@ -41,13 +41,13 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:shell:two-tier]
 			\legend{\(1\), \(...\), \(9\)}
 			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiUniform}
+				\plotpernn[x filter/.expression={x > #1 ? x : nan}]{#1}{\tableSmallSortsXxxiiUniform}
 			}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.6, ymax=1.2]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup{#1}{1}{\tableSmallSortsXxxiiUniform}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiUniform}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -77,13 +77,16 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={13}, forget plot]{tableShell13_#3};
 	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={14}, forget plot]{tableShell14_#3};
 	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={15}, forget plot]{tableShell15_#3};
-	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={16}, forget plot]{tableShell16_#3};
-	\addplotnamedtable[select row={#1}][x=µ_#2, y expr={17}]{tableShell17_#3};
+	\ifnumgreater{#1}{16}{
+		\addplotnamedtable[select row={#1}][x=µ_#2, y expr={16}, forget plot]{tableShell16_#3};
+		\addplotnamedtable[select row={#1}][x=µ_#2, y expr={17}]{tableShell17_#3};
+	}{
+		\addplotnamedtable[select row={#1},opacity=0][x=µ_#2, y expr={17}]{tableShell15_#3};
+	}
 }
 
 \pgfplotsset{
 	shell scatter plot/.style={
-		group/horizontal sep=12mm,
 		adaptive group=3 by 2,
 		groupplot xlabel={Mean [\(10^4\) Cycles]},
 		groupplot ylabel={\(\stepsizes_1\)},
@@ -122,21 +125,22 @@ if \ShS{} is used by another algorithm on a subarray, these thresholds may be hi
 	\label{fig:shell:three-tier}
 \end{figure}
 
-When moving to greater input lengths (\cref{fig:shell:three-tier}), the differences in performance between the two-tier \ShS*{} become more pronounced;
-especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
-With more than 64 elements, three passes get worthwhile to consider.
-Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.
-This is in accordance with \citeauthor{10.1007/3-540-44669-9_12} \cite{10.1007/3-540-44669-9_12} who noted~\(\stepsizes = (17, 4, 1)\) to be the optimal triplet for 128 elements.
-It is noteworthy, though, that he measured the quadruplet~\(\stepsizes = (38, 9, 4, 1)\) to be about 5\% faster in the MIX machine model.
-On a DPU, this sequence leads to a runtime of nearly exactly 74.000 cycles, placing it only mid-table.
-Without access to Ciura's original code, giving a satisfactory explanation for the discrepancy is hard, however.
+When moving to greater input lengths (\cref{fig:shell:three-tier,fig:shell:three-tier_uint32reverse,fig:shell:three-tier_uint32uniform,fig:shell:three-tier_uint64reverse,fig:shell:three-tier_uint64uniform}), the differences in performance between the two-tier \ShS*{} become more pronounced;
+%especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
+Between 48 and 64 elements, three passes get worthwhile to consider.
+%Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.
+On the one hand, the results are in accordance with \citeauthor{10.1007/3-540-44669-9_12}~\cite{10.1007/3-540-44669-9_12} who, for 128 elements, determined \(\stepsizes = (1, 9)\) to be the optimal pair and \(\stepsizes = (17, 4, 1)\) to be the optimal triplet.
+On the other hand, the gain from doing three passes is far smaller:
+While \citeauthor{10.1007/3-540-44669-9_12} calculated an average speed-up of 33\% over doing two passes, while it is only 16\% on a DPU.
+In opposition to his results, this also makes it unlikely that doing four passes would already net any gain at this input length.
+Without access to \citeauthor{10.1007/3-540-44669-9_12}'s original code, giving a satisfactory explanation for the discrepancy is hard, however.
 
 But would pushing the limits of \ShS{} even be rewarding?
-Two issues come up.
 Firstly, greater input lengths require greater steps \Dash well into the three digits for \(n \approx 1000\) \cite{skean2023optimization, 10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
-But the more sentinel values are stored, the less space is available for the actual input array, leading to smaller runs and thus hurting the overall sorting algorithm.
-Explorative testing suggests that falling back to bounds checking for big steps is too punishing.
-Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
-\Cref{fig:shell:against_others} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash apparently achieving a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash\negthinspace, \QS{} beats both from 20 elements onwards.
-Even \QS{}'s standard deviation of 1432 cycles at 128 elements is superior to \ShS{}'s 2670 cycles.
-Together with \cref{fig:shell:two-tier}, this means that \ShS{} is not worth using at all and will, consequently, not be improved upon in this thesis.
+Implicit sentinel values could provide relief since the slow-down from implicitness should trend to zero for large inputs, as was the case for \IS{}.
+\todo[inline]{\enquote{%
+	Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
+	\Cref{fig:shell:against_others} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash apparently achieving a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash\negthinspace, \QS{} beats both from 20 elements onwards.
+	Even \QS{}'s standard deviation of 1432 cycles at 128 elements is superior to \ShS{}'s 2670 cycles.
+	Together with \cref{fig:shell:two-tier}, this means that \ShS{} is not worth using at all and will, consequently, not be improved upon in this thesis.%
+}}
