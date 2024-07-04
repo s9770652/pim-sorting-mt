@@ -197,6 +197,38 @@
 \makeatother
 
 
+%%% Group plots.
+\ifgroupplotsactivated
+\usepgfplotslibrary{groupplots}
+\tikzset{
+	plot/.style={  % Not set globally lest other packages break.
+		trim axis group left, trim axis group right,  % Only axes define the bounding box. Thus, lables can extend into the margins.
+	},
+}
+\pgfplotsset{
+	filter discard warning=false,
+	height=4cm,
+	cycle multiindex list={exotic \nextlist mark list*},  % automatic colouring of plots
+	scale only axis,  % height and width apply only to the axes, not the labels
+	enlargelimits={abs=3mm, auto},  % for axes without specified limits, the limits are a bit bigger than neeeded (→ padding)
+	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
+	ymajorgrids,  % grey, horizontal background lines at each y-tick
+	set layers,  % needed as otherwise extra ticks are drawn above the border
+	legend style={  % adds padding to legends with multiple columns
+		cells={anchor=west},  % left aligned labels
+		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},
+	},
+	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (ticks + labels)
+	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (labels)
+	horizontal sep for naught/.style={group/horizontal sep=3mm},  % padding between groupplots (/)
+	horizontal sep for ticks,
+	group/vertical sep=14mm,  % padding between groupplots
+	title style={font=\sffamily\bfseries},  % changing the style of every plot title
+	every axis title shift=0pt,  % removing default shift upwards of 6pt
+}
+\fi
+
+
 %%% Bibliography.
 % Correct placement of dots and capitalisation when using doi+urldate.
 % taken from: https://github.com/plk/biblatex/issues/112#issuecomment-17075734

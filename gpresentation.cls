@@ -1,6 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{../gpresentation}[2023/07/17]
 
+\newif\ifgroupplotsactivated\groupplotsactivatedfalse
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{beamer}}
 \ProcessOptions\relax
 \LoadClass[xcolor=dvipsnames, t]{beamer}

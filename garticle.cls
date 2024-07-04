@@ -1,6 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{../garticle}[2023/07/17]
 
+\newif\ifgroupplotsactivated\groupplotsactivatedfalse
+\DeclareOption{groupplots}{\groupplotsactivatedtrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrartcl}}
 \ProcessOptions\relax
 \LoadClass{scrartcl}
