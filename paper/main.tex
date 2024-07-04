@@ -1,4 +1,4 @@
-\documentclass[draft, british, oneside]{../garticle}
+\documentclass[overfullrule, british, oneside]{../garticle}
 
 \input{../macros.sty}
 \RequirePackage[final]{listings}
@@ -9,6 +9,14 @@
 	language=C,
 	tabsize=2,
 }
+
+% Automatic export and import of every TikZ picture as PDF.
+\usetikzlibrary{external}
+\tikzsetexternalprefix{figs/}
+\tikzexternalize
+\makeatletter
+\renewcommand{\todo}[2][]{\tikzexternaldisable\@todo[#1]{#2}\tikzexternalenable}  % excluding to-do notes from externalisation
+\makeatother
 
 \titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
 \subject{Master's Thesis}

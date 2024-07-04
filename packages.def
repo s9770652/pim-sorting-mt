@@ -43,7 +43,7 @@
 \makeatletter
 \@ifclassloaded{beamer}{}{
 \RequirePackage{lipsum}  % lorem ipsum dolor sit amet
-\RequirePackage[obeyDraft, colorinlistoftodos, tickmarkheight=.25em, textwidth=2.1cm]{todonotes}  % Notizen
+\RequirePackage[obeyFinal, colorinlistoftodos, tickmarkheight=.25em, textwidth=2.1cm]{todonotes}  % Notizen
 \todostyle{info}{color=CornflowerBlue, textcolor=white}
 \RequirePackage{marginnote}  % benötigt, um \todo in Gleitobjekten benutzen zu können
 \renewcommand{\marginpar}{\marginnote}
