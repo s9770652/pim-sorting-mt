@@ -169,6 +169,12 @@
 \Norm#m
 \Unif#m
 
+# group plots
+\pgfplotstablereadnamed{file}{tableName}#n
+\addplotnamedtable{table}#n
+\addplotnamedtable[tableOptions]{table}#n
+\addplotnamedtable[plotOptions][tableOptions]{table}#n
+
 # Algorithm.
 \nonl#n
 
