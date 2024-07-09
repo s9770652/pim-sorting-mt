@@ -1,8 +1,0 @@
-# reps=1000, upper bound=0, TYPE=UINT32, BLOCK_SIZE=2048, SEQREAD_CACHE_SIZE=1024, NR_TASKLETS=1
-n       µ_Ciura σ_Ciura
-24        9922   426
-32       13956   511
-48       22814   735
-64       32177   937
-96       52428  1391
-128      74165  1802

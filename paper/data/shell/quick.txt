@@ -1,8 +1,0 @@
-# reps=1000, upper bound=0, TYPE=UINT32, BLOCK_SIZE=2048, SEQREAD_CACHE_SIZE=1024, NR_TASKLETS=1
-n       µ_QuickRec σ_QuickRec
-24        8065   868
-32       11480  1033
-48       18742  1354
-64       26471  1678
-96       42673  2228
-128      60064  2930
