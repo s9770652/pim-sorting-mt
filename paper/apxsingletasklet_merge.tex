@@ -1,0 +1,355 @@
+\subsection{\texorpdfstring{\MS{}}{MergeSort}}
+\label{subapx:single:merge}
+
+\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/sorted.txt}{tableMergeStart#1_64sorted}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/reverse.txt}{tableMergeStart#1_64reverse}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/almost.txt}{tableMergeStart#1_64almost}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/uniform.txt}{tableMergeStart#1_64uniform}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/zipf.txt}{tableMergeStart#1_64zipf}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
+}
+
+\begin{figure}[ht]
+	\pgfplotsset{height=3cm}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32sorted}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32sorted}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32sorted}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32sorted}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Sorted
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32reverse}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32reverse}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32reverse}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32reverse}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Reverse Sorted
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32almost}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32almost}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32almost}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32almost}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Almost Sorted
+		}
+		\bigskip
+	\end{subfigure}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\caption{
+		An extension to \cref{fig:merge:starting_runs}.
+		The data type is 32-bit unsigned integers.
+	}
+	\label{fig:merge:starting_runs_uint32sorted}
+\end{figure}
+
+\begin{figure}[ht]
+	\pgfplotsset{height=3cm}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32uniform}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32uniform}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Uniform
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32zipf}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32zipf}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32zipf}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32zipf}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Zipf's
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint32normal}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32normal}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32normal}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32normal}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Normal
+		}
+		\bigskip
+	\end{subfigure}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\caption{
+		An extension to \cref{fig:merge:starting_runs}.
+		The data type is 32-bit unsigned integers.
+	}
+	\label{fig:merge:starting_runs_uint32uniform}
+\end{figure}
+
+\begin{figure}[ht]
+	\pgfplotsset{height=3cm}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64sorted}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64sorted}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64sorted}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64sorted}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Sorted
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64reverse}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64reverse}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64reverse}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64reverse}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Reverse Sorted
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64almost}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64almost}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64almost}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64almost}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Almost Sorted
+		}
+		\bigskip
+	\end{subfigure}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\caption{
+		An extension to \cref{fig:merge:starting_runs}.
+		The data type is 64-bit unsigned integers.
+	}
+	\label{fig:merge:starting_runs_uint64sorted}
+\end{figure}
+
+\begin{figure}[ht]
+	\pgfplotsset{height=3cm}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64uniform}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64uniform}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64uniform}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64uniform}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Uniform
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64zipf}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64zipf}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64zipf}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64zipf}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Zipf's
+		}
+		\medskip
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_starting_runs_uint64normal}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[merge fallback]
+				\nextgroupplot[title={No Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_64normal}
+				}
+				%
+				\nextgroupplot[title={Write-back\strut}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_64normal}
+				}
+				%
+				\nextgroupplot[title={Half Space}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+					\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_64normal}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			Normal
+		}
+		\bigskip
+	\end{subfigure}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\caption{
+		An extension to \cref{fig:merge:starting_runs}.
+		The data type is 64-bit unsigned integers.
+	}
+	\label{fig:merge:starting_runs_uint64uniform}
+\end{figure}

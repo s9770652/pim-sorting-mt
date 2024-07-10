@@ -34,6 +34,10 @@
 	table [x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}] {#3};
 }
 
+\NewDocumentCommand{\plotpernlognnew}{O{} m m}{
+	\addplotnamedtable[#1][x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}]{#3};
+}
+
 % Draws a plot of column µ_#2 of table #3, divided by n² (a column n must be present).
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernn}{O{} m m}{

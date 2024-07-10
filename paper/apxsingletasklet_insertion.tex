@@ -13,7 +13,7 @@
 \pgfplotstableread{data/small sorts/uint64/zipf.txt}{\tableSmallSortsLxivZipf}
 \pgfplotstableread{data/small sorts/uint64/normal.txt}{\tableSmallSortsLxivNormal}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
 	\tikzsetnextfilename{insertion_against_others_uint32}
 	\begin{tikzpicture}[plot]
@@ -62,13 +62,13 @@
 
 	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint32}\hfil
 	\caption{
-		A continuation of \cref{fig:insertion:against_others} with more input distributions.
+		An extension to \cref{fig:insertion:against_others}.
 		The data type is 32-bit unsigned integers.
 	}
 	\label{fig:insertion:against_others_uint32}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
 	\tikzsetnextfilename{insertion_against_others_uint64}
 	\begin{tikzpicture}[plot]
@@ -118,7 +118,7 @@
 
 	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint64}\hfil
 	\caption{
-		A continuation of \cref{fig:insertion:against_others} with more input distributions.
+		An extension to \cref{fig:insertion:against_others}.
 		The data type is 64-bit unsigned integers.
 	}
 	\label{fig:insertion:against_others_uint64}

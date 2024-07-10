@@ -1,27 +1,29 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
 
 \pgfplotstableread{data/wram_sorts.txt}{\tableWramSorts}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=8.txt}{\tableMergeStartVIII}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=12.txt}{\tableMergeStartXII}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=16.txt}{\tableMergeStartXVI}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=24.txt}{\tableMergeStartXXIV}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=32.txt}{\tableMergeStartXxxii}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=48.txt}{\tableMergeStartXLVIII}
-\pgfplotstableread{data/merge/MERGE_TO_INSERTION=64.txt}{\tableMergeStartLxiv}
+\def\mergealgos{16,24,32,48,64,96}
+\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/almost.txt}{tableMergeStart#1_32almost}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/uniform.txt}{tableMergeStart#1_32uniform}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/zipf.txt}{tableMergeStart#1_32zipf}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/normal.txt}{tableMergeStart#1_32normal}
+}
 
 \MS{} repeatedly compares two sorted subarrays and merges them into a bigger sorted array in time \(\bigtheta{n \log n}\).
 Unlike \QS{}, this runtime is guaranteed.
-Furthermore, the sorting is stable naturally.
+Furthermore, the sorting is naturally stable.
 
-A simple but fast implementation of \MS{} writes all merged runs to an output array, raising the need for additional space for \(n\) elements (\enquote{Full space}).
-Since in this implementation, the arrays from which it is read and to which it is written switch each round, the final sorted array may not be saved where the input array was.
-Thus, a final round with a write-back to the original position is sometimes needed.
+A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{Full space}).
+The input array and the auxiliary array then switch roles, and the merging starts again.
+Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is sometimes needed.
 
-A slightly more sophisticated implementation needs additional space for only \(\sfrac{n}{2}\) elements (\enquote{Half space}):
+A slightly more sophisticated implementation needs space for only \(\sfrac{n}{2}\) additional elements (\enquote{Half space}):
 When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
-Then, the copy and the second run are merged to the position of the first run.
-As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged since the last elements of the other run are already in place.
-As a consequence, flushes will only be performed on at most half of the runs.
+Then, the copy and the second run are merged to the start of the first run.
+As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
+%As a consequence, flushes will only be performed on at most half of the runs.
 
 Instead of starting by merging runs of length 1, it is once again beneficial to fall back to simpler algorithms, namely \IS{} and \ShS{}.
 Unlike \QS{}, where partitions naturally acted as sentinels for their neighbours, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
@@ -29,55 +31,52 @@ The optimal length for the starting runs depends on the length of the whole arra
 In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the best.
 \todo{Warum? Widersprüchlich!}
 
+\pgfplotsset{
+	merge fallback/.style={
+		horizontal sep for ticks,
+		adaptive group=1 by 3,
+		groupplot xlabel={Input Length \(n\)},
+		groupplot ylabel={Cycles / \((n \lb n)\)},
+		xmode=log,
+		xtick={16, 64, 256, 1024},
+		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
+		minor xtick={32, 128, 512},
+		legend columns=-1,
+	},
+	merge sort filter 16/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  24) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) ? \pgfmathresult : nan}},
+	merge sort filter 24/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  32) || (\thisrow{n} == 128) || (\thisrow{n} == 512) ? \pgfmathresult : nan}},
+	merge sort filter 32/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  48) || (\thisrow{n} == 192) || (\thisrow{n} == 768) ? \pgfmathresult : nan}},
+	merge sort filter 48/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  64) || (\thisrow{n} == 256) ? \pgfmathresult : nan}},
+	merge sort filter 64/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) ? \pgfmathresult : nan}},
+	merge sort filter 96/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} == 128) || (\thisrow{n} == 512) ? \pgfmathresult : nan}},
+}
+
 \begin{figure}
 	\tikzsetnextfilename{merge_starting_runs}
 	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			group/horizontal sep=10mm,
-			adaptive group=1 by 3,
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Cycles / \((n \lb n)\)},
-			xmode=log,
-			xtick={20, 64, 256, 768},
-			xticklabels={\(20\), \(64\), \(256\), \(768\)},
-			minor xtick={32, 128, 512},
-			legend columns=-1,
-		]
+		\begin{groupplot}[merge fallback]
 			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
-			\legend{16, 24, 32, 48, 64}
-%			\plotpernlogn{Merge}{\tableMergeStartVIII}
-%			\plotpernlogn{Merge}{\tableMergeStartXII}
-			\plotpernlogn{Merge}{\tableMergeStartXVI}
-			\plotpernlogn{Merge}{\tableMergeStartXXIV}
-			\plotpernlogn{Merge}{\tableMergeStartXxxii}
-			\plotpernlogn{Merge}{\tableMergeStartXLVIII}
-			\plotpernlogn{Merge}{\tableMergeStartLxiv}
+			\expandafter\legend\expandafter{\mergealgos}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32uniform}
+			}
 			%
 			\nextgroupplot[title={Write-back\strut}]
-%			\plotpernlogn{MergeWriteBack}{\tableMergeStartVIII}
-%			\plotpernlogn{MergeWriteBack}{\tableMergeStartXII}
-			\plotpernlogn{MergeWriteBack}{\tableMergeStartXVI}
-			\plotpernlogn{MergeWriteBack}{\tableMergeStartXXIV}
-			\plotpernlogn{MergeWriteBack}{\tableMergeStartXxxii}
-			\plotpernlogn{MergeWriteBack}{\tableMergeStartXLVIII}
-			\plotpernlogn{MergeWriteBack}{\tableMergeStartLxiv}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
+			}
 			%
 			\nextgroupplot[title={Half Space}]
-%			\plotpernlogn{MergeHalfSpace}{\tableMergeStartVIII}
-%			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXII}
-			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXVI}
-			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXXIV}
-			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXxxii}
-			\plotpernlogn{MergeHalfSpace}{\tableMergeStartXLVIII}
-			\plotpernlogn{MergeHalfSpace}{\tableMergeStartLxiv}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
+			}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
 		Comparison of \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(\sfrac{n}{2}\) (\enquote{Half Space}), for different lengths of the starting runs.
-		For length 16, they fell back to \IS{}.
-		For lengths 24 to 64, they fell back to a \ShS{} with the step sizes \(\stepsizes = (4, 1)\).
+		The \MS*{} use a \ShS{} with the step sizes \(\stepsizes = (1)\) for length 16, \(\stepsizes = (6, 1)\) for lengths 24 to 48, and \(\stepsizes = (12, 5, 1)\) for lengths 64 and 96, respectively.
 	}
 	\label{fig:merge:starting_runs}
 \end{figure}
@@ -94,7 +93,11 @@ In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the be
 		return, falls nur ein Start-Run
 
 		\item
-		kein Wächterwechsel beim ersten run
+		Wächterwechsel beim ersten run
+
+%		\item
+%		Nur insertionSort ist etwas schlechter als nötig bei Half Space selbst bei n=16 für i32, aber besser für i64
+%		Bzw.: komisch bei Eingaben, die aus nur einem Run bestehen. Ist aber für Merge Sort egal, da große Felder gewollt
 	\end{itemize}
 \end{note}
 
