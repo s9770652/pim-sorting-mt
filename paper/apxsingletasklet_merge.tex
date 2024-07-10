@@ -10,7 +10,7 @@
 	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
 }
 
-\begin{figure}[ht]
+\begin{figure}[!h]
 	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32sorted}
@@ -96,7 +96,7 @@
 	\label{fig:merge:starting_runs_uint32sorted}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}
 	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32uniform}
@@ -182,7 +182,7 @@
 	\label{fig:merge:starting_runs_uint32uniform}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}
 	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64sorted}
@@ -268,7 +268,7 @@
 	\label{fig:merge:starting_runs_uint64sorted}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}
 	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64uniform}
