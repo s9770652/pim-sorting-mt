@@ -1,4 +1,5 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
+\label{subsec:tasklet:merge}
 
 \pgfplotstableread{data/wram_sorts.txt}{\tableWramSorts}
 \def\mergealgos{16,24,32,48,64,96}
@@ -15,21 +16,60 @@
 Unlike \QS{}, this runtime is guaranteed.
 Furthermore, the sorting is naturally stable.
 
-A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{Full space}).
-The input array and the auxiliary array then switch roles, and the merging starts again.
-Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is sometimes needed.
+\paragraph{Memory Consumption}
+A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full space}).
+After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
+Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed for some input lengths.
 
-A slightly more sophisticated implementation needs space for only \(\sfrac{n}{2}\) additional elements (\enquote{Half space}):
+A slightly more sophisticated implementation needs space for only \(\sfrac{n}{2}\) additional elements (\enquote{half space}):
 When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
 Then, the copy and the second run are merged to the start of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
 %As a consequence, flushes will only be performed on at most half of the runs.
 
-Instead of starting by merging runs of length 1, it is once again beneficial to fall back to simpler algorithms, namely \IS{} and \ShS{}.
-Unlike \QS{}, where partitions naturally acted as sentinels for their neighbours, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
-The optimal length for the starting runs depends on the length of the whole array, since it governs the number of rounds of merging, but lengths of 32 elements and 64 elements for the full space and half space \MS*{}, respectively, pose a good compromise, as suggested by \cref{fig:merge:starting_runs}.
-In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the best.
-\todo{Warum? Widersprüchlich!}
+\paragraph{Starting Runs}
+Instead of starting by merging runs of length 1, it is beneficial to first create bigger starting runs using \ShS{}.
+Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up to 16, \(\stepsizes = (6, 1)\) for lengths up to 48, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
+Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
+
+\paragraph{Unrolling}
+There are four common reasons for \emph{flushing}, that is, writing \Dash many oftwhiles \Dash consecutive elements:
+\begin{enumerate}
+	\item
+	When two runs are merged and the end of one of them is reached, the remaining elements of the other one can be moved safely to the output location.
+	Especially with the sorted, reverse sorted, and almost sorted input distributions, the number of remaining elements will be high.
+
+	\item
+	The number of runs is odd, so the full-space \MS{} moves the last run to the output location immediately.
+
+	\item
+	The full-space \MS{} may write all elements from the auxiliary array back to the input array if the former contains the final sorted sequence.
+
+	\item
+	The half-space \MS{} copies runs, whose length is always a multiple of the the starting run length, before each merger.
+\end{enumerate}
+Therefore, the flushing loops account for a considerable part of the runtime, and reducing their overhead (variable incrementation and bounds checking) is helpful.
+This can be done via \emph{unrolling}:
+As long as at least, let us say, \(x\) elements still need to be flushed, the \(x\) foremost elements are moved first and then all necessary variables are incremented by \(x\).
+Is \(x\) a compile-time constant, the compiler implements the moving of the elements through \(x\) instruction which use constant, pre-calculated offsets.
+Once less than \(x\) elements remain, an ordinary loop which moves elements individually is used.
+In good cases, this approach reduces the loop overhead to an \(x\)-th, whilst in bad cases, where less than \(x\) are to be flushed, the overhead is increased by one additional check.
+
+We refrained from doing automatic and extensive tests and relied on manual and exploratory tests to come up with the following strategy:
+\begin{enumerate*}
+	\item
+	When the half-space \MS{} copies the first run or when the full-space \MS{} performs a write-back, \(x\) is set to the starting run length.
+
+	\item
+	In all other cases, \(x\) is set to 24.
+\end{enumerate*}
+Although by no means the optimal strategy, the \MS*{} still becomes significantly faster:
+Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30\%, whereas sorting more random inputs sees speed-ups going into high single-digits at best and slow-downs into low single-digits at worst, depending on the starting run length.
+
+
+
+\subsubsection*{Evaluation of the Performance}
 
 \pgfplotsset{
 	merge fallback/.style={
@@ -38,17 +78,19 @@ In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the be
 		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		xmode=log,
+		xmax=1024,
 		xtick={16, 64, 256, 1024},
 		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
 		minor xtick={32, 128, 512},
+		enlarge x limits=true,
 		legend columns=-1,
 	},
-	merge sort filter 16/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  24) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) ? \pgfmathresult : nan}},
-	merge sort filter 24/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  32) || (\thisrow{n} == 128) || (\thisrow{n} == 512) ? \pgfmathresult : nan}},
-	merge sort filter 32/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  48) || (\thisrow{n} == 192) || (\thisrow{n} == 768) ? \pgfmathresult : nan}},
-	merge sort filter 48/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  64) || (\thisrow{n} == 256) ? \pgfmathresult : nan}},
-	merge sort filter 64/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) ? \pgfmathresult : nan}},
-	merge sort filter 96/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 1024) || (\thisrow{n} == 128) || (\thisrow{n} == 512) ? \pgfmathresult : nan}},
+	merge sort filter 16/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  24) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) || (\thisrow{n} == 1536) ? \pgfmathresult : nan}, /tikz/mark indices={1,2,3,4}},
+	merge sort filter 24/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  32) || (\thisrow{n} == 128) || (\thisrow{n} == 512) || (\thisrow{n} == 2048) ? \pgfmathresult : nan}},
+	merge sort filter 32/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  48) || (\thisrow{n} == 192) || (\thisrow{n} == 768) || (\thisrow{n} == 3072) ? \pgfmathresult : nan}},
+	merge sort filter 48/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  64) || (\thisrow{n} == 256) || (\thisrow{n} == 1024) ? \pgfmathresult : nan}},
+	merge sort filter 64/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) || (\thisrow{n} == 1536) ? \pgfmathresult : nan}, /tikz/mark indices={1,2,3}},
+	merge sort filter 96/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 128) || (\thisrow{n} == 512) || (\thisrow{n} == 2048) ? \pgfmathresult : nan}},
 }
 
 \begin{figure}
@@ -57,16 +99,19 @@ In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the be
 		\begin{groupplot}[merge fallback]
 			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
 			\expandafter\legend\expandafter{\mergealgos}
+			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32uniform}
 			}
 			%
 			\nextgroupplot[title={Write-back\strut}]
+			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
 			}
 			%
 			\nextgroupplot[title={Half Space}]
+			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
 			}
@@ -81,30 +126,60 @@ In both cases, a \ShS{} with the step sizes \(\stepsizes = (4, 1)\) fares the be
 	\label{fig:merge:starting_runs}
 \end{figure}
 
-\begin{note}
-	Yet again, the compiler shows unforeseen behaviour.
-%	Were one to check for short input array at the start in order to
-	For example, when sorting the starting runs, a \ShS{} with step sizes \(\stepsizes = (4, 1)\) may be used.
-	For the very first run,
+Three implementations have been tested:
+full space \MS{} without write-backs, full space \MS{} with write-backs, and half space \MS{}.
+\Cref{fig:merge:starting_runs,fig:merge:starting_runs_uint32sorted,fig:merge:starting_runs_uint32uniform,fig:merge:starting_runs_uint64sorted,fig:merge:starting_runs_uint64uniform} show their performance for various starting run lengths.
+Please note that the plots are smoothed:
+Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots crisscross unswervingly and, thereby, hard to read.
+Thence, the figures contain marks for select measurements only in such a way that the resulting plots act as an upper bound on the runtime.
 
-	Compilation is worsened by:
-	\begin{itemize}
-		\item
-		return, falls nur ein Start-Run
+The measurements show that the \MS*{} guarantee a runtime of \(\bigoh{n \lb n}\) as expected.
+The differences in runtime between the different input distributions are small compared to \QS{} and are ascribable to \ShS{} and the differing suitability of the unrolling;
+cases where the usage of \ShS{} worsened the runtime are unbeknown.
 
-		\item
-		Wächterwechsel beim ersten run
-
-%		\item
-%		Nur insertionSort ist etwas schlechter als nötig bei Half Space selbst bei n=16 für i32, aber besser für i64
-%		Bzw.: komisch bei Eingaben, die aus nur einem Run bestehen. Ist aber für Merge Sort egal, da große Felder gewollt
-	\end{itemize}
-\end{note}
-
-\subsubsection{Comparison with \texorpdfstring{\QS{}}{QuickSort}}
+Even though the tested starting run lengths range from 16 to 96 elements, the mean runtime differences are surprisingly small.
+Notwithstanding that the optimal choice depends on the specific input length, a starting run length of 32 elements fares decidedly well across all tested scenarios.
 
 
 
+\subsubsection*{Investigating the Compilation}
+
+Yet again, the compiler shows unforeseen behaviour.
+The following is a collocation of some of the issues found while engineering \MS{}.
+They will not be discussed in detail here but still provide a point of reference for future work:
+\begin{itemize}
+	\item
+	The half-space \MS{} does not need to copy the first runs immediately.
+	Rather, it would suffice to search for the foremost element of the first run which is bigger than the first element of the second element.
+	All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
+	This is theoretically possible without any additional overhead and would boost the runtimes across all input distributions.
+	Of course, the words \enquote{would} and \enquote{theoretically} would not be written here if this were truly the case:
+	Whilst there is indeed a massive speed-up for sorted input distributions, there is only a little one for almost sorted inputs and actually a slow-down for all other input distributions!
+	For this reason, this optimisation was unused when measuring runtimes.
+
+	\item
+	Yet again concerning the half-space \MS{}:
+	Treating the copied run logically as the second run and the uncopied run as the first one nets a decrease in runtime compared to an implementation with flipped logic.
+	Even worse, only with the former does unrolling improve the speed, being an impairment with the latter.
+
+	\item
+	The sorting of the starting runs via \ShS{} requires the placement and later removal of temporary sentinel values so that the original content of preceding runs is ensured.
+	For the very first starting run, one can omit storing the original values and their later restoration by using permanent sentinel values;
+	this optimisation was used when measuring runtimes.
+	On the downside, this leads to a bigger compilation as \ShS{} is inlined twice.
+	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
+	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slow-down is in the thousands.
+	\todo{immer noch?}
+
+	\item
+	If the input is so short that is contained entirely in the first starting run, one can immediately end the execution after \ShS{} is done.
+	Several ways of implementing were tested, all with the same result:
+	Short inputs where premature termination happens see a relatively big speed-up, whilst longer inputs see a forgettable yet still all to big slow-down.
+	\todo{immer noch?}
+\end{itemize}
+
+\noindent
+In summary, a proper implementation of half-space \MS{} would require some work but has the potential to be the overall best stable sorting algorithm.
 
 \begin{figure}
 	\tikzsetnextfilename{wram_sorts}
