@@ -134,7 +134,12 @@ They will not be discussed in detail here but still provide a point of reference
 \begin{figure}
 	\tikzsetnextfilename{merge_starting_runs}
 	\begin{tikzpicture}[plot]
-		\begin{groupplot}[merge fallback]
+		\begin{groupplot}[
+			merge fallback,
+			ymin=65,
+			ymax=90,
+			ytick distance=5,
+		]
 			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
 			\expandafter\legend\expandafter{\mergealgos}
 			\clip (0, 0) rectangle (1024, 200);

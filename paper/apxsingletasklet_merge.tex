@@ -10,12 +10,19 @@
 	\pgfplotstablereadnamed{data/merge/fallback=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
 }
 
+\pgfplotsset{
+	merge fallback/.append style={height=3.5cm},
+}
+
 \begin{figure}[!h]
-	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32sorted}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=20,
+				ymax=60,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -43,7 +50,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32reverse}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=60,
+				ymax=140,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -71,7 +82,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32almost}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=50,
+				ymax=80,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -106,11 +121,14 @@
 \end{figure}
 
 \begin{figure}
-	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32uniform}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=60,
+				ymax=90,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -138,7 +156,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32zipf}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=60,
+				ymax=90,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -166,7 +188,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint32normal}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=60,
+				ymax=90,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -201,11 +227,14 @@
 \end{figure}
 
 \begin{figure}
-	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64sorted}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=20,
+				ymax=80,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -233,7 +262,12 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64reverse}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=70,
+				ymax=150,
+				ytick={70,90,...,150},
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -261,7 +295,12 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64almost}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=50,
+				ymax=95,
+				ytick={50,65,...,95},
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -296,11 +335,14 @@
 \end{figure}
 
 \begin{figure}
-	\pgfplotsset{height=3cm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64uniform}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=70,
+				ymax=110,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -328,7 +370,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64zipf}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=70,
+				ymax=110,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
@@ -356,7 +402,11 @@
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{merge_starting_runs_uint64normal}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}[merge fallback]
+			\begin{groupplot}[
+				merge fallback,
+				ymin=70,
+				ymax=110,
+			]
 				\nextgroupplot[title={No Write-back\strut}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
