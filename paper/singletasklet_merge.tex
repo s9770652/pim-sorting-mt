@@ -16,7 +16,13 @@
 Unlike \QS{}, this runtime is guaranteed.
 Furthermore, the sorting is naturally stable.
 
-\paragraph{Memory Consumption}
+\paragraph{Starting Runs}
+Instead of starting by merging runs of length 1, it is beneficial to first create bigger starting runs using \ShS{}.
+Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up to 16, \(\stepsizes = (6, 1)\) for lengths up to 48, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
+Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
+
+\paragraph{Memory Footprint}
 A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full space}).
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed for some input lengths.
@@ -26,12 +32,10 @@ When two adjacent runs are to be merged, the first one can be copied to an auxil
 Then, the copy and the second run are merged to the start of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
 %As a consequence, flushes will only be performed on at most half of the runs.
-
-\paragraph{Starting Runs}
-Instead of starting by merging runs of length 1, it is beneficial to first create bigger starting runs using \ShS{}.
-Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
-The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up to 16, \(\stepsizes = (6, 1)\) for lengths up to 48, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
-Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
+Further optimised, \MS{} would not need to copy the first runs immediately.
+It suffices to search for the foremost element of the first run which is bigger than the first element of the second element.
+All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
+This optimisation, although examined during development, was not in use when measuring runtimes since it unfortunately complicates another optimisation, namely unrolling.
 
 \paragraph{Unrolling}
 There are four common reasons for \emph{flushing}, that is, writing \Dash many oftwhiles \Dash consecutive elements:
@@ -47,25 +51,59 @@ There are four common reasons for \emph{flushing}, that is, writing \Dash many o
 	The full-space \MS{} may write all elements from the auxiliary array back to the input array if the former contains the final sorted sequence.
 
 	\item
-	The half-space \MS{} copies runs, whose length is always a multiple of the the starting run length, before each merger.
+	The half-space \MS{} copies runs, whose length are always a multiple of the the starting run length, before each merger of pairs.
 \end{enumerate}
-Therefore, the flushing loops account for a considerable part of the runtime, and reducing their overhead (variable incrementation and bounds checking) is helpful.
+Therefore, flushing account for a considerable part of the runtime, and reducing the loop overhead (variable incrementation and bounds checking) is helpful.
 This can be done via \emph{unrolling}:
 As long as at least, let us say, \(x\) elements still need to be flushed, the \(x\) foremost elements are moved first and then all necessary variables are incremented by \(x\).
 Is \(x\) a compile-time constant, the compiler implements the moving of the elements through \(x\) instruction which use constant, pre-calculated offsets.
 Once less than \(x\) elements remain, an ordinary loop which moves elements individually is used.
 In good cases, this approach reduces the loop overhead to an \(x\)-th, whilst in bad cases, where less than \(x\) are to be flushed, the overhead is increased by one additional check.
 
-We refrained from doing automatic and extensive tests and relied on manual and exploratory tests to come up with the following strategy:
-\begin{enumerate*}
+Due to time reasons, we refrained from doing automatic and extensive tests and relied on manual and exploratory tests to come up with the following strategy:
+When the full-space \MS{} performs a write-back or when the half-space \MS{} copies the first run, \(x\) is set to the starting run length.
+In all other cases, \(x\) is set to 24.
+This strategy, albeit not optimal, makes the \MS*{} significantly faster:
+Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30\%, whereas sorting more random inputs still sees speed-ups for the most part and slow-downs into low single-digits at worst, depending on the starting run length.
+
+
+
+\subsubsection*{Investigating the Compilation}
+
+Yet again, the compiler shows unforeseen behaviour.
+The following is a collocation of some of the issues found while engineering \MS{}.
+They will not be discussed in detail here but still provide a point of reference for future work:
+\begin{itemize}
 	\item
-	When the half-space \MS{} copies the first run or when the full-space \MS{} performs a write-back, \(x\) is set to the starting run length.
+	As already mentioned, sorting the starting runs via \ShS{} requires the placement and later removal of temporary sentinel values.
+	For the very first starting run, one can omit storing and restoring the overwritten elements by using permanent sentinel values;
+	this optimisation was in use when measuring runtimes.
+	On the downside, this leads to a bigger compilation as \ShS{} is inlined twice.
+	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
+	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slow-down is in the thousands.
 
 	\item
-	In all other cases, \(x\) is set to 24.
-\end{enumerate*}
-Although by no means the optimal strategy, the \MS*{} still becomes significantly faster:
-Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30\%, whereas sorting more random inputs sees speed-ups going into high single-digits at best and slow-downs into low single-digits at worst, depending on the starting run length.
+	If the input is so short that it fits entirely within the first starting run, one can immediately end the execution after \ShS{} is done.
+	Several implementations were tested, with unsatisfactory results:
+	Some increased the runtime for longer inputs, others decreased it but also increased it for shorter inputs.
+	The settled-on implementation is of the former variety since the increases hit shorter inputs harder relatively and a more thorough solution would not further the purpose of this section.
+
+	\item
+	Concerning the half-space \MS{}:
+	Treating the copied run logically as the second run and the uncopied run as the first one nets a noticeable decrease in runtime compared to an implementation with flipped logic.
+	Even worse, only with the former does unrolling improve the speed, being an impairment with the latter!
+	This behaviour occurs with both immediate and deferred copying of the first runs.
+	An inspection of the issue unearthed marvels like code of the form
+	\begin{center}
+		\vspace{-\baselineskip}
+		\texttt{*i++ = *j; a = b - i; c = i; i = d;}
+	\end{center}
+	leading to 5\% longer runtimes compared to
+	\begin{center}
+		\texttt{*i = *j; a = b - (i + 1); c = i + 1; i = d;}
+	\end{center}
+	even though executed at most once per merger, but we could sadly not pinpoint the fundamental cause for the behaviour.
+\end{itemize}
 
 
 
@@ -130,56 +168,23 @@ Three implementations have been tested:
 full space \MS{} without write-backs, full space \MS{} with write-backs, and half space \MS{}.
 \Cref{fig:merge:starting_runs,fig:merge:starting_runs_uint32sorted,fig:merge:starting_runs_uint32uniform,fig:merge:starting_runs_uint64sorted,fig:merge:starting_runs_uint64uniform} show their performance for various starting run lengths.
 Please note that the plots are smoothed:
-Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots crisscross unswervingly and, thereby, hard to read.
+Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots cross each other unswervingly and, thereby, hard to read.
 Thence, the figures contain marks for select measurements only in such a way that the resulting plots act as an upper bound on the runtime.
 
 The measurements show that the \MS*{} guarantee a runtime of \(\bigoh{n \lb n}\) as expected.
-The differences in runtime between the different input distributions are small compared to \QS{} and are ascribable to \ShS{} and the differing suitability of the unrolling;
+The differences in runtime between the different input distributions are small compared to \QS{} and are ascribable to \ShS{} and to the differing suitability of the unrolling;
 cases where the usage of \ShS{} worsened the runtime are unbeknown.
 
 Even though the tested starting run lengths range from 16 to 96 elements, the mean runtime differences are surprisingly small.
-Notwithstanding that the optimal choice depends on the specific input length, a starting run length of 32 elements fares decidedly well across all tested scenarios.
+Notwithstanding that the optimal choice depends on the specific input length because of the zigzagging, a starting run length of 32 elements fares decidedly well on average across all tested scenarios.
 
+The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
+With 32-bit integers, it beats the full-space \MS{} without write-backs by 11\% on sorted inputs and effectively ties on all other inputs but the reverse sorted ones where it narrowly falls behind.
+Naturally, the full-space \MS{} with write-backs is consistently (with the exception of reverse sorted inputs) at a disadvantage, despite seeing some light with inferior starting run lengths.
+With 64-bit integers, the full-space \MS{} without write-backs manages to turn the ties into scant leads in the range from 1\% to 3\%.
+Using the \MS{} with write-backs is still unprofitable.
 
-
-\subsubsection*{Investigating the Compilation}
-
-Yet again, the compiler shows unforeseen behaviour.
-The following is a collocation of some of the issues found while engineering \MS{}.
-They will not be discussed in detail here but still provide a point of reference for future work:
-\begin{itemize}
-	\item
-	The half-space \MS{} does not need to copy the first runs immediately.
-	Rather, it would suffice to search for the foremost element of the first run which is bigger than the first element of the second element.
-	All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
-	This is theoretically possible without any additional overhead and would boost the runtimes across all input distributions.
-	Of course, the words \enquote{would} and \enquote{theoretically} would not be written here if this were truly the case:
-	Whilst there is indeed a massive speed-up for sorted input distributions, there is only a little one for almost sorted inputs and actually a slow-down for all other input distributions!
-	For this reason, this optimisation was unused when measuring runtimes.
-
-	\item
-	Yet again concerning the half-space \MS{}:
-	Treating the copied run logically as the second run and the uncopied run as the first one nets a decrease in runtime compared to an implementation with flipped logic.
-	Even worse, only with the former does unrolling improve the speed, being an impairment with the latter.
-
-	\item
-	The sorting of the starting runs via \ShS{} requires the placement and later removal of temporary sentinel values so that the original content of preceding runs is ensured.
-	For the very first starting run, one can omit storing the original values and their later restoration by using permanent sentinel values;
-	this optimisation was used when measuring runtimes.
-	On the downside, this leads to a bigger compilation as \ShS{} is inlined twice.
-	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
-	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slow-down is in the thousands.
-	\todo{immer noch?}
-
-	\item
-	If the input is so short that is contained entirely in the first starting run, one can immediately end the execution after \ShS{} is done.
-	Several ways of implementing were tested, all with the same result:
-	Short inputs where premature termination happens see a relatively big speed-up, whilst longer inputs see a forgettable yet still all to big slow-down.
-	\todo{immer noch?}
-\end{itemize}
-
-\noindent
-In summary, a proper implementation of half-space \MS{} would require some work but has the potential to be the overall best stable sorting algorithm.
+In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm.
 
 \begin{figure}
 	\tikzsetnextfilename{wram_sorts}
