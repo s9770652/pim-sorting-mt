@@ -1,7 +1,7 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
 \label{subsec:tasklet:merge}
 
-\pgfplotstableread{data/wram_sorts.txt}{\tableWramSorts}
+\pgfplotstablereadnamed{data/wram_sorts.txt}{tableWramSorts}
 \def\mergealgos{16,24,32,48,64,96}
 \expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
@@ -144,19 +144,19 @@ They will not be discussed in detail here but still provide a point of reference
 			\expandafter\legend\expandafter{\mergealgos}
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-				\plotpernlognnew[merge sort filter #1]{Merge}{tableMergeStart#1_32uniform}
+				\plotpernlogn[merge sort filter #1]{Merge}{tableMergeStart#1_32uniform}
 			}
 			%
 			\nextgroupplot[title={Write-back\strut}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-				\plotpernlognnew[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
+				\plotpernlogn[merge sort filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
 			}
 			%
 			\nextgroupplot[title={Half Space}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-				\plotpernlognnew[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
+				\plotpernlogn[merge sort filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -205,20 +205,20 @@ In summary, a proper implementation of half-space \MS{} with deferred copying an
 		]
 			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=200, legend to name=leg:wram_sorts]
 			\legend{\MS{} (no write-back), \QS{}, \ShS, \MS{} (write-back), \HS{}, \MS{} (half space)}
-			\plotpernlogn{Merge}{\tableWramSorts}
-			\plotpernlogn{Quick}{\tableWramSorts}
-			\plotpernlogn{Shell}{\tableWramSorts}
-			\plotpernlogn{MergeWriteBack}{\tableWramSorts}
-			\plotpernlogn{Heap}{\tableWramSorts}
-			\plotpernlogn{MergeHalfSpace}{\tableWramSorts}
+			\plotpernlogn{Merge}{tableWramSorts}
+			\plotpernlogn{Quick}{tableWramSorts}
+			\plotpernlogn{Shell}{tableWramSorts}
+			\plotpernlogn{MergeWriteBack}{tableWramSorts}
+			\plotpernlogn{Heap}{tableWramSorts}
+			\plotpernlogn{MergeHalfSpace}{tableWramSorts}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.3, ymax=1, extra y ticks={0.3}]
-			\plotspeedup{Merge}{Quick}{\tableWramSorts}
+			\plotspeedup{Merge}{Quick}{tableWramSorts}
 			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{Shell}{Quick}{\tableWramSorts}
-			\plotspeedup{MergeWriteBack}{Quick}{\tableWramSorts}
-			\plotspeedup{Heap}{Quick}{\tableWramSorts}
-			\plotspeedup{MergeHalfSpace}{Quick}{\tableWramSorts}
+			\plotspeedup{Shell}{Quick}{tableWramSorts}
+			\plotspeedup{MergeWriteBack}{Quick}{tableWramSorts}
+			\plotspeedup{Heap}{Quick}{tableWramSorts}
+			\plotspeedup{MergeHalfSpace}{Quick}{tableWramSorts}
 		\end{groupplot}
 	\end{tikzpicture}
 

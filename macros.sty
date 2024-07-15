@@ -12,46 +12,46 @@
 % Draws a plot of data in column µ_#2 of the table #3.
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotruntime}{O{} m m}{
-	\addplot+
-	plot [#1]
-	table [x=n, y=µ_#2] {#3};
+	\addplotnamedtable
+	[#1]
+	[x=n, y=µ_#2]
+	{#3};
 }
 
 % Draws a plot of column µ_#2 with error bars loaded from σ_#2 of table #3.
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotwithbars}{O{} m m}{
-	\addplot+
-	plot [#1, error bars/.cd, y dir=both, y explicit]
-%	table [x=n, y=µ_#2, y error=σ_#2] {#3};
-	table [x=n, y=µ_#2, y error expr={2 * \thisrow{σ_#2}}] {#3};
+	\addplotnamedtable
+	[#1, error bars/.cd, y dir=both, y explicit]
+	[x=n, y=µ_#2, y error expr={2 * \thisrow{σ_#2}}]
+	{#3};
 }
 
 % Draws a plot of column µ_#2 of table #3, divided by n log n.
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernlogn}{O{} m m}{
-	\addplot+
-	plot [#1]
-	table [x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}] {#3};
-}
-
-\NewDocumentCommand{\plotpernlognnew}{O{} m m}{
-	\addplotnamedtable[#1][x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}]{#3};
+	\addplotnamedtable
+	[#1]
+	[x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}]
+	{#3};
 }
 
 % Draws a plot of column µ_#2 of table #3, divided by n² (a column n must be present).
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernn}{O{} m m}{
-	\addplot+
-	plot [#1]
-	table [x=n, y expr={\thisrow{µ_#2} / \thisrow{n}^2}] {#3};
+	\addplotnamedtable
+	[#1]
+	[x=n, y expr={\thisrow{µ_#2} / \thisrow{n}^2}]
+	{#3};
 }
 
 % Draws a plot of column µ_#3 divided by column µ_#2 of table #4.
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotspeedup}{O{} m m m}{
-	\addplot+
-	plot [#1]
-	table [x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}] {#4};
+	\addplotnamedtable
+	[#1]
+	[x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}]
+	{#4};
 }
 
 % Texts.

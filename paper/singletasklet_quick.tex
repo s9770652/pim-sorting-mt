@@ -1,8 +1,8 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:tasklet:quick}
 
-\pgfplotstableread{data/quick/fallback.txt}{\tableQuickFallback}
-\pgfplotstableread{data/quick/pivot.txt}{\tableQuickPivot}
+\pgfplotstablereadnamed{data/quick/fallback.txt}{tableQuickFallback}
+\pgfplotstablereadnamed{data/quick/pivot.txt}{tableQuickPivot}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements bigger or smaller than the pivot are moved to the right or left of the pivot element, respectively.
@@ -30,7 +30,7 @@ This low threshold also means that even a simple two-round \ShS{} is not worth c
 			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick:fallback]
 			\legend{\(10\), \(11\), \(...\), \(16\)}
 			\pgfplotsinvokeforeach{10,...,16}{
-				\plotspeedup{#1}{None}{\tableQuickFallback}
+				\plotspeedup{#1}{None}{tableQuickFallback}
 			}
 			%
 			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
@@ -38,7 +38,7 @@ This low threshold also means that even a simple two-round \ShS{} is not worth c
 				\ifnumequal{#1}{13}{
 					\pgfplotsset{cycle list shift=1}
 				}{
-					\plotspeedup{#1}{13}{\tableQuickFallback}
+					\plotspeedup{#1}{13}{tableQuickFallback}
 				}
 			}
 		\end{groupplot}
@@ -110,16 +110,16 @@ Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
 		]
 			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:quick:pivot]
 			\legend{Last, Middle, Median of Three, Random}
-			\plotpernlogn{End}{\tableQuickPivot}
-			\plotpernlogn{Middle}{\tableQuickPivot}
-			\plotpernlogn{MedianOfThree}{\tableQuickPivot}
-			\plotpernlogn{Random}{\tableQuickPivot}
+			\plotpernlogn{End}{tableQuickPivot}
+			\plotpernlogn{Middle}{tableQuickPivot}
+			\plotpernlogn{MedianOfThree}{tableQuickPivot}
+			\plotpernlogn{Random}{tableQuickPivot}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.9, ymax=1.01, extra y ticks={1.01}, /pgf/number format/.cd, precision=2, fixed zerofill=true]
-			\plotspeedup{End}{MedianOfThree}{\tableQuickPivot}
-			\plotspeedup{Middle}{MedianOfThree}{\tableQuickPivot}
+			\plotspeedup{End}{MedianOfThree}{tableQuickPivot}
+			\plotspeedup{Middle}{MedianOfThree}{tableQuickPivot}
 			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{Random}{MedianOfThree}{\tableQuickPivot}
+			\plotspeedup{Random}{MedianOfThree}{tableQuickPivot}
 		\end{groupplot}
 	\end{tikzpicture}
 

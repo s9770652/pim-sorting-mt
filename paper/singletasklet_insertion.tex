@@ -1,7 +1,10 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{subsec:tasklet:insertion}
 
-\pgfplotstableread{data/small sorts/uint32/uniform.txt}{\tableSmallSortsXxxiiUniform}
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/small sorts/uint32/#1.txt}{tableSmallSorts_32#1}
+	\pgfplotstablereadnamed{data/small sorts/uint64/#1.txt}{tableSmallSorts_64#1}
+}
 
 This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is bigger, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
 Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, where each of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
@@ -55,20 +58,20 @@ Nonetheless, the two \IS*{} tie.
 		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:insertion:against_others]
 			\legend{\IS{} (no sentinel), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
-			\plotpernn{1NoSentinel}{\tableSmallSortsXxxiiUniform}
-			\plotpernn{1}{\tableSmallSortsXxxiiUniform}
-			\plotpernn{1Implicit}{\tableSmallSortsXxxiiUniform}
-			\plotpernn{BubbleNonAdapt}{\tableSmallSortsXxxiiUniform}
-			\plotpernn{BubbleAdapt}{\tableSmallSortsXxxiiUniform}
-			\plotpernn{Selection}{\tableSmallSortsXxxiiUniform}
+			\plotpernn{1NoSentinel}{tableSmallSorts_32uniform}
+			\plotpernn{1}{tableSmallSorts_32uniform}
+			\plotpernn{1Implicit}{tableSmallSorts_32uniform}
+			\plotpernn{BubbleNonAdapt}{tableSmallSorts_32uniform}
+			\plotpernn{BubbleAdapt}{tableSmallSorts_32uniform}
+			\plotpernn{Selection}{tableSmallSorts_32uniform}
 			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1]
-			\plotspeedup{1NoSentinel}{1}{\tableSmallSortsXxxiiUniform}
+			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1, yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}]
+			\plotspeedup{1NoSentinel}{1}{tableSmallSorts_32uniform}
 			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{1Implicit}{1}{\tableSmallSortsXxxiiUniform}
-			\plotspeedup{BubbleNonAdapt}{1}{\tableSmallSortsXxxiiUniform}
-			\plotspeedup{BubbleAdapt}{1}{\tableSmallSortsXxxiiUniform}
-			\plotspeedup{Selection}{1}{\tableSmallSortsXxxiiUniform}
+			\plotspeedup{1Implicit}{1}{tableSmallSorts_32uniform}
+			\plotspeedup{BubbleNonAdapt}{1}{tableSmallSorts_32uniform}
+			\plotspeedup{BubbleAdapt}{1}{tableSmallSorts_32uniform}
+			\plotspeedup{Selection}{1}{tableSmallSorts_32uniform}
 		\end{groupplot}
 	\end{tikzpicture}
 

@@ -1,18 +1,6 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{subapx:tasklet:insertion}
 
-\pgfplotstableread{data/small sorts/uint32/sorted.txt}{\tableSmallSortsXxxiiSorted}
-\pgfplotstableread{data/small sorts/uint32/reverse.txt}{\tableSmallSortsXxxiiReverse}
-\pgfplotstableread{data/small sorts/uint32/almost.txt}{\tableSmallSortsXxxiiAlmost}
-\pgfplotstableread{data/small sorts/uint32/zipf.txt}{\tableSmallSortsXxxiiZipf}
-\pgfplotstableread{data/small sorts/uint32/normal.txt}{\tableSmallSortsXxxiiNormal}
-\pgfplotstableread{data/small sorts/uint64/sorted.txt}{\tableSmallSortsLxivSorted}
-\pgfplotstableread{data/small sorts/uint64/reverse.txt}{\tableSmallSortsLxivReverse}
-\pgfplotstableread{data/small sorts/uint64/almost.txt}{\tableSmallSortsLxivAlmost}
-\pgfplotstableread{data/small sorts/uint64/uniform.txt}{\tableSmallSortsLxivUniform}
-\pgfplotstableread{data/small sorts/uint64/zipf.txt}{\tableSmallSortsLxivZipf}
-\pgfplotstableread{data/small sorts/uint64/normal.txt}{\tableSmallSortsLxivNormal}
-
 \begin{figure}[!h]
 	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
 	\tikzsetnextfilename{insertion_against_others_uint32}
@@ -30,32 +18,32 @@
 			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint32]
 			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiSorted}
+				\plotpernn{#1}{tableSmallSorts_32sorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiReverse}
+				\plotpernn{#1}{tableSmallSorts_32reverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiAlmost}
+				\plotpernn{#1}{tableSmallSorts_32almost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiUniform}
+				\plotpernn{#1}{tableSmallSorts_32uniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiZipf}
+				\plotpernn{#1}{tableSmallSorts_32zipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsXxxiiNormal}
+				\plotpernn{#1}{tableSmallSorts_32normal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -86,32 +74,32 @@
 			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint64]
 			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivSorted}
+				\plotpernn{#1}{tableSmallSorts_64sorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivReverse}
+				\plotpernn{#1}{tableSmallSorts_64reverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivAlmost}
+				\plotpernn{#1}{tableSmallSorts_64almost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivUniform}
+				\plotpernn{#1}{tableSmallSorts_64uniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivZipf}
+				\plotpernn{#1}{tableSmallSorts_64zipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-				\plotpernn{#1}{\tableSmallSortsLxivNormal}
+				\plotpernn{#1}{tableSmallSorts_64normal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}

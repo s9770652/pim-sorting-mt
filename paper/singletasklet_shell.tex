@@ -1,19 +1,11 @@
 \subsection{\texorpdfstring{\ShS{}}{ShellSort}}
 \label{subsec:tasklet:shell}
 
-\pgfplotsinvokeforeach{reverse,uniform}{
-	\pgfplotstablereadnamed{data/shell/two-tier/uint32/#1.txt}{tableShellTwo_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=7/uint32/#1.txt}{tableShell7_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=8/uint32/#1.txt}{tableShell8_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=9/uint32/#1.txt}{tableShell9_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=10/uint32/#1.txt}{tableShell10_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=11/uint32/#1.txt}{tableShell11_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=12/uint32/#1.txt}{tableShell12_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=13/uint32/#1.txt}{tableShell13_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=14/uint32/#1.txt}{tableShell14_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=15/uint32/#1.txt}{tableShell15_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=16/uint32/#1.txt}{tableShell16_32#1}
-	\pgfplotstablereadnamed{data/shell/h1=17/uint32/#1.txt}{tableShell17_32#1}
+\pgfplotstablereadnamed{data/shell/two-tier/uint32/reverse.txt}{tableShellTwo_32reverse}
+\pgfplotstablereadnamed{data/shell/two-tier/uint32/uniform.txt}{tableShellTwo_32uniform}
+\pgfplotsinvokeforeach{7,...,17}{
+	\pgfplotstablereadnamed{data/shell/h1=#1/uint32/reverse.txt}{tableShell#1_32reverse}
+	\pgfplotstablereadnamed{data/shell/h1=#1/uint32/uniform.txt}{tableShell#1_32uniform}
 }
 
 \IS{} suffers from small elements at the end of the input, since those have to be brought to the front through \(\bigoh{n}\) comparisons and swaps.
@@ -39,23 +31,23 @@ In case of the reverse sorted input, the speed-up is practically always positive
 			minor xtick=data,
 			legend columns=-1,
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:shell:two-tier]
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=50, ytick distance=10, legend to name=leg:shell:two-tier]
 			\legend{\(1\), \(...\), \(9\)}
 			\pgfplotsinvokeforeach{1,...,9}{
-				\plotpernn[x filter/.expression={x > #1 ? x : nan}]{#1}{\tableSmallSortsXxxiiUniform}
+				\plotpernn[x filter/.expression={x > #1 ? x : nan}]{#1}{tableSmallSorts_32uniform}
 			}
 			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.6, ymax=1.2]
+			\nextgroupplot[ylabel=Speed-up, ymin=0.7, ymax=1.2, ytick distance=0.1, yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{\tableSmallSortsXxxiiUniform}
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32uniform}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
 	\caption{
-		Comparison of \IS{} (1) and various two-tier \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are indicated by their label.
+		Comparison of \IS{} (1) and various two-tier \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are indicated by the labels.
 		The speed-ups are with respect to the \IS{}.
 	}
 	\label{fig:shell:two-tier}
@@ -97,6 +89,7 @@ In case of the reverse sorted input, the speed-up is practically always positive
 		yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
 		/tikz/only marks,
 		cycle list shift=2,  % for sharing colours with the previous figure
+		title={Input Length \textit{n} = },
 		legend columns=-1,
 	},
 }
@@ -104,11 +97,10 @@ In case of the reverse sorted input, the speed-up is practically always positive
 \begin{figure}[p]
 	\tikzsetnextfilename{shell_three-tier}
 	\begin{tikzpicture}[plot]
-		\newcommand{\setn}[1]{\textit{n} = #1}
 		\newcommand{\type}{32uniform}
 		\begin{groupplot}[shell scatter plot]
 			\pgfplotsinvokeforeach{16,32,48,64,96,128}{
-				\nextgroupplot[title={Input Length \setn{#1}}]
+				\nextgroupplot[title/.add={}{ #1}]
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}

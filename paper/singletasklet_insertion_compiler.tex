@@ -18,10 +18,10 @@ Two registers are used to store the addresses of \lstinline|curr| and \lstinline
 This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into the additionally used register.
 
 \begin{figure}
-	\def\iscodewidth{0.48\linewidth}
+	\def\iscodewidth{0.47\linewidth}
 	\begin{subfigure}{\iscodewidth}
 		\begin{lstlisting}
-void insertion_sort(int *start, int *end) {
+void InsertionSort(int *start, int *end) {
 	int *curr, *i = start;
 	while ((curr = i++) <= end) {
 		int to_sort = *curr;
@@ -42,7 +42,7 @@ void insertion_sort(int *start, int *end) {
 	\hfill
 	\begin{subfigure}{\iscodewidth}
 		\begin{lstlisting}
-void insertion_sort(int *start, int *end) {
+void InsertionSort(int *start, int *end) {
 	int *curr, *i = start + 1;
 	while ((curr = i++) <= end) {
 		int to_sort = *curr;
@@ -63,12 +63,12 @@ void insertion_sort(int *start, int *end) {
 
 	\begin{subfigure}{\iscodewidth}
 		\begin{lstlisting}
-void insertion_sort(int *start, int *end) {
+void InsertionSort(int *start, int *end) {
 	int *curr, *i = start;
 	while ((curr = i++) <= end) {
 		int to_sort = *curr;
-		while (*(curr-1) > to_sort) {
-			*curr = *(curr-1);
+		while (*(curr - 1) > to_sort) {
+			*curr = *(curr - 1);
 			curr--;
 		}
 		*curr = to_sort;
@@ -83,12 +83,12 @@ void insertion_sort(int *start, int *end) {
 	\hfill
 	\begin{subfigure}{\iscodewidth}
 		\begin{lstlisting}
-void insertion_sort(int *start, int *end) {
+void InsertionSort(int *start, int *end) {
 	int *curr, *i = start + 1;
 	while ((curr = i++) <= end) {
 		int to_sort = *curr;
-		while (*(curr-1) > to_sort) {
-			*curr = *(curr-1);
+		while (*(curr - 1) > to_sort) {
+			*curr = *(curr - 1);
 			curr--;
 		}
 		*curr = to_sort;
