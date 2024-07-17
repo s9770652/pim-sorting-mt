@@ -8,7 +8,7 @@
 	\pgfplotstablereadnamed{data/shell/h1=#1/uint64/uniform.txt}{tableShell#1_64uniform}
 }
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\tikzsetnextfilename{shell_two-tier_uint32}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -20,8 +20,7 @@
 			legend columns=-1,
 			yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint32]
-			\legend{\(2\), \(...\), \(9\)}
+			\nextgroupplot[title={Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32sorted}
@@ -59,7 +58,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint32}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
 		Instead of total runtimes, the speed-ups with respect to \IS{} are given for better clarity.
@@ -80,8 +79,7 @@
 			legend columns=-1,
 			yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:shell:two-tier_uint64]
-			\legend{\(2\), \(...\), \(9\)}
+			\nextgroupplot[title={Sorted}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64sorted}
@@ -119,7 +117,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier_uint64}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
 		Instead of total runtimes, the speed-ups with respect to \IS{} are given for better clarity.
@@ -139,12 +137,10 @@
 					\shellscatter{#1}{\h}{\type}
 				}
 			}
-			\pgfplotsset{legend to name=leg:shell:three-tier_uint32reverse}
-			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint32reverse}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The data type is 32-bit unsigned integers.
@@ -164,12 +160,10 @@
 					\shellscatter{#1}{\h}{\type}
 				}
 			}
-			\pgfplotsset{legend to name=leg:shell:three-tier_uint32uniform}
-			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint32uniform}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption[]{
 		A repetition of \cref{fig:shell:three-tier}.
 		The data type is 32-bit unsigned integers.
@@ -189,12 +183,10 @@
 					\shellscatter{#1}{\h}{\type}
 				}
 			}
-			\pgfplotsset{legend to name=leg:shell:three-tier_uint64reverse}
-			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint64reverse}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The data type is 64-bit unsigned integers.
@@ -214,12 +206,10 @@
 					\shellscatter{#1}{\h}{\type}
 				}
 			}
-			\pgfplotsset{legend to name=leg:shell:three-tier_uint64uniform}
-			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier_uint64uniform}\hfil
+	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The data type is 64-bit unsigned integers.

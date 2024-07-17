@@ -1,7 +1,7 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{subapx:tasklet:insertion}
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\def\algos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
 	\tikzsetnextfilename{insertion_against_others_uint32}
 	\begin{tikzpicture}[plot]
@@ -15,8 +15,7 @@
 			ymax=60,
 			legend columns=3,
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint32]
-			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
+			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 				\plotpernn{#1}{tableSmallSorts_32sorted}
 			}
@@ -48,7 +47,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint32}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
 		The data type is 32-bit unsigned integers.
@@ -71,8 +70,7 @@
 			extra y ticks={70},
 			legend columns=3,
 		]
-			\nextgroupplot[title={Sorted}, legend to name=leg:insertion:against_others_uint64]
-			\legend{\IS{} (no sentinel), \IS{} (sentinel), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
+			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
 				\plotpernn{#1}{tableSmallSorts_64sorted}
 			}
@@ -104,7 +102,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:against_others_uint64}\hfil
+	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
 		The data type is 64-bit unsigned integers.
