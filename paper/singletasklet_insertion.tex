@@ -45,6 +45,8 @@ Yet, even the \IS{} not relying on sentinel values surpasses the implicit \IS{},
 For 64-bit numbers (\cref{fig:insertion:against_others_uint64}), the implicit \IS{} would be expected to perform better than the explicit one, considering that a value check now takes two instructions and an address check still only one.
 Nonetheless, the two \IS*{} tie.
 
+\def\insertionalgos{1NoSentinel,1,1Implicit,BubbleNonAdapt,BubbleAdapt,Selection}
+
 \begin{figure}
 	\tikzsetnextfilename{insertion_against_others}
 	\begin{tikzpicture}[plot]
@@ -58,20 +60,18 @@ Nonetheless, the two \IS*{} tie.
 		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:insertion:against_others]
 			\legend{\IS{} (no sentinel), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
-			\plotpernn{1NoSentinel}{tableSmallSorts_32uniform}
-			\plotpernn{1}{tableSmallSorts_32uniform}
-			\plotpernn{1Implicit}{tableSmallSorts_32uniform}
-			\plotpernn{BubbleNonAdapt}{tableSmallSorts_32uniform}
-			\plotpernn{BubbleAdapt}{tableSmallSorts_32uniform}
-			\plotpernn{Selection}{tableSmallSorts_32uniform}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
+				\plotpernn{#1}{tableSmallSorts_32uniform}
+			}
 			%
 			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1, yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}]
-			\plotspeedup{1NoSentinel}{1}{tableSmallSorts_32uniform}
-			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{1Implicit}{1}{tableSmallSorts_32uniform}
-			\plotspeedup{BubbleNonAdapt}{1}{tableSmallSorts_32uniform}
-			\plotspeedup{BubbleAdapt}{1}{tableSmallSorts_32uniform}
-			\plotspeedup{Selection}{1}{tableSmallSorts_32uniform}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
+				\ifstrequal{#1}{1}{
+					\pgfplotsset{cycle list shift=1}
+				}{
+					\plotspeedup{#1}{1}{tableSmallSorts_32uniform}
+				}
+			}
 		\end{groupplot}
 	\end{tikzpicture}
 

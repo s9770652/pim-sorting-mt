@@ -4,7 +4,6 @@
 \pgfplotsset{heap/.append style={adaptive group=3 by 2}}
 
 \begin{figure}[!ht]
-	\def\algos{HeapOnlyDown,HeapUpDown}
 	\tikzsetnextfilename{heap_runtime_uint32}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -13,32 +12,32 @@
 			ymax=150,
 		]
 			\nextgroupplot[title={Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32sorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32reverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32almost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32uniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32zipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32normal}
 			}
 		\end{groupplot}
@@ -53,7 +52,6 @@
 \end{figure}
 
 \begin{figure}
-	\def\algos{HeapOnlyDown,HeapUpDown}
 	\tikzsetnextfilename{heap_runtime_uint64}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -63,32 +61,32 @@
 			extra y ticks={145,185},
 		]
 			\nextgroupplot[title={Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64sorted}
 			}
 			%
 			\nextgroupplot[title={Reverse Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64reverse}
 			}
 			%
 			\nextgroupplot[title={Almost Sorted}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64almost}
 			}
 			%
 			\nextgroupplot[title={Uniform}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64uniform}
 			}
 			%
 			\nextgroupplot[title={Zipf's}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64zipf}
 			}
 			%
 			\nextgroupplot[title={Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64normal}
 			}
 		\end{groupplot}

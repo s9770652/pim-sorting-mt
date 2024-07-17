@@ -41,6 +41,11 @@ Hence, the calculation of \(2i + 1\) does take one more instruction than \(2n\) 
 	leichter downwards trend
 
 	Effekte stärker für 64 Bit
+
+	\item
+	32 Bit: bis 8192
+
+	64 Bit: bis 6250
 \end{itemize}
 
 \pgfplotsset{
@@ -54,21 +59,20 @@ Hence, the calculation of \(2i + 1\) does take one more instruction than \(2n\) 
 		legend columns=-1,
 	},
 }
+\def\heapalgos{HeapOnlyDown,HeapUpDown}
 
 \begin{figure}
-	\def\algos{HeapOnlyDown,HeapUpDown}
 	\tikzsetnextfilename{heap_runtime}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[heap]
 			\nextgroupplot[title={32-bit\strut}, ymin=130, ymax=145, legend to name=leg:heap:runtime]
 			\legend{\HS{}, \HS{}}
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-%			\expandafter\pgfplotsinvokeforeach\expandafter\pgfkeysvalueof{heap algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32uniform}
 			}
 			%
 			\nextgroupplot[title={64-bit\strut}, ymin=155, ymax=175]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64uniform}
 			}
 		\end{groupplot}
