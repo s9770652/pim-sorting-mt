@@ -1,0 +1,82 @@
+\subsection{\texorpdfstring{\HS{}}{HeapSort}}
+\label{subsec:tasklet:heap}
+
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/heap/uint32/#1.txt}{tableHeap_32#1}
+	\pgfplotstablereadnamed{data/heap/uint64/#1.txt}{tableHeap_64#1}
+}
+
+\paragraph{Indexing}
+With a zero-based indexing, the sons of a vertex \(i\) can be calculated with the well-known formulas \(2i + 1\) and \(2n + 2\).
+With a one-based indexing, the formulas turn into \(2i\) and \(2i + 1\).
+The compiler automatically turns the multiplication by two into a left-shift by one.
+Since DPUs can execute an instruction called \texttt{lsl\_add} which first shifts leftwards and then adds an offset (useful \eg{} for array indexing), the formulas \(2i + 1\) and \(2i\) take the same amount of time to compute.
+
+Nevertheless, the zero-based indexing is about 7\% slower despite \texttt{lsl\_add} being indeed in use.
+The reason is that only the number of bits to shift can be passed as immediate value as plain number but not the offset, which must be passed via a register.
+While DPUs have a read-only register storing the number \(1\) at disposal, read-only registers can only ever be the first register argument, not the second one, which, for \texttt{lsl\_add}, would be the offset.
+As a consequence, the compiler moves the number \(1\) to a register whenever \(2i + 1\) is to be computed, only to immediately overwrite the \(1\) with the result from \texttt{lsl\_add}.
+Hence, the calculation of \(2i + 1\) does take one more instruction than \(2n\) after all.
+
+\paragraph{Sentinel Values}
+
+
+\begin{itemize}
+	\item
+	code duplication:
+	savings around the 7\% mark
+
+	\item
+	sentinel leafs:
+	savings around the 2\% mark
+
+	\item
+	if n even: vor T\_MIN: -5000 -- +15000 Takte
+
+	\item
+	Var 1:
+	leichter trend 1 nach oben
+
+	Var 2:
+	leichter downwards trend
+
+	Effekte stärker für 64 Bit
+\end{itemize}
+
+\pgfplotsset{
+	heap/.style={
+		adaptive group=1 by 2,
+		groupplot xlabel={Input Length \(n\)},
+		groupplot ylabel={Cycles / \(n \lb n\)},
+		xmode=log,
+		xtick={16, 32, 64, 128, 256, 512, 1024},
+		xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+		legend columns=-1,
+	},
+}
+
+\begin{figure}
+	\def\algos{HeapOnlyDown,HeapUpDown}
+	\tikzsetnextfilename{heap_runtime}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[heap]
+			\nextgroupplot[title={32-bit\strut}, ymin=130, ymax=145, legend to name=leg:heap:runtime]
+			\legend{\HS{}, \HS{}}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%			\expandafter\pgfplotsinvokeforeach\expandafter\pgfkeysvalueof{heap algos}{
+				\plotpernlogn{#1}{tableHeap_32uniform}
+			}
+			%
+			\nextgroupplot[title={64-bit\strut}, ymin=155, ymax=175]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64uniform}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\caption{
+		Comparison of the runtimes of the two different \HS{} implementations on uniformly distributed 32-bit integers and 64-bit integers, respectively.
+	}
+	\label{fig:heap:runtime}
+\end{figure}

@@ -1,0 +1,103 @@
+\subsection{\texorpdfstring{\HS{}}{HeapSort}}
+\label{subapx:tasklet:heap}
+
+\pgfplotsset{heap/.append style={adaptive group=3 by 2}}
+
+\begin{figure}[!ht]
+	\def\algos{HeapOnlyDown,HeapUpDown}
+	\tikzsetnextfilename{heap_runtime_uint32}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			heap,
+			ymin=120,
+			ymax=150,
+		]
+			\nextgroupplot[title={Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32sorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32reverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32almost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32uniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32zipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_32normal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\caption{
+		An extension to \cref{fig:heap:runtime}.
+		The data type is 32-bit unsigned integers.
+	}
+	\label{fig:heap:runtime_uint32}
+\end{figure}
+
+\begin{figure}
+	\def\algos{HeapOnlyDown,HeapUpDown}
+	\tikzsetnextfilename{heap_runtime_uint64}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			heap,
+			ymin=145,
+			ymax=185,
+			extra y ticks={145,185},
+		]
+			\nextgroupplot[title={Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64sorted}
+			}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64reverse}
+			}
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64almost}
+			}
+			%
+			\nextgroupplot[title={Uniform}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64uniform}
+			}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64zipf}
+			}
+			%
+			\nextgroupplot[title={Normal}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+				\plotpernlogn{#1}{tableHeap_64normal}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\caption{
+		An extension to \cref{fig:heap:runtime}.
+		The data type is 64-bit unsigned integers.
+	}
+	\label{fig:heap:runtime_uint64}
+\end{figure}
