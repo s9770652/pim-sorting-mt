@@ -1,7 +1,7 @@
 \section{Sorting with One Tasklet}
 
 This section covers the very first phase where each tasklet sorts on its own, \ie{} sequentially.
-Unless specified otherwise, every measurement shown in this section was conducted on a uniform input distribution with each 32-bit integer, and the default configurations of the sorting algorithms were as follows:
+Unless specified otherwise, every measurement shown in this section was conducted a thousand times on a uniform input distribution with 32-bit integers, and the default configurations of the sorting algorithms were as follows:
 \begin{description}
 	\item[\IS{}]
 	using one explicit sentinel value
@@ -14,8 +14,16 @@ Unless specified otherwise, every measurement shown in this section was conducte
 	switching to \IS{} whenever 13 elements or less remain in a partition;
 	median of three as pivot;
 	prioritising the right-hand partition over the left-hand partition
+
+	\item[\MS{}]
+	half space;
+	starting run length of 32 elements
+
+	\item[\HS{}]
+	top-down for 32-bit integers;
+	bottom-up with swap disparity for 64-bit integers
 \end{description}
-Further measurements can be found in \cref{apx:single}.
+Further measurements can be found in \cref{apx:tasklet}.
 
 \input{singletasklet_insertion}
 \input{singletasklet_shell}
