@@ -1,0 +1,97 @@
+\subsubsection*{Evaluation of the Performance}
+\label{subsubsec:tasklet:merge:performance}
+
+\def\mergealgos{16,24,32,48,64,96}
+
+\pgfplotstablereadnamed{data/wram_sorts.txt}{tableWramSorts}
+\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/almost.txt}{tableMergeStart#1_32almost}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/uniform.txt}{tableMergeStart#1_32uniform}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/zipf.txt}{tableMergeStart#1_32zipf}
+	\pgfplotstablereadnamed{data/merge/fallback=#1/uint32/normal.txt}{tableMergeStart#1_32normal}
+}
+
+\pgfplotsset{
+	merge/.style={
+		horizontal sep for ticks,
+		adaptive group=1 by 3,
+		groupplot xlabel={Input Length \(n\)},
+		groupplot ylabel={Cycles / \((n \lb n)\)},
+		xmode=log,
+		xmax=1024,
+		xtick={16, 64, 256, 1024},
+		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
+		minor xtick={32, 128, 512},
+		enlarge x limits={abs=3mm, true},
+		legend columns=-1,
+		every legend image post={mark=none},
+	},
+	merge filter 16/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  24) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) || (\thisrow{n} == 1536) ? \pgfmathresult : nan}},
+	merge filter 24/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  32) || (\thisrow{n} == 128) || (\thisrow{n} == 512) || (\thisrow{n} == 2048) ? \pgfmathresult : nan}},
+	merge filter 32/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  48) || (\thisrow{n} == 192) || (\thisrow{n} == 768) || (\thisrow{n} == 3072) ? \pgfmathresult : nan}},
+	merge filter 48/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  64) || (\thisrow{n} == 256) || (\thisrow{n} == 1024) ? \pgfmathresult : nan}},
+	merge filter 64/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) || (\thisrow{n} == 1536) ? \pgfmathresult : nan}},
+	merge filter 96/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} == 128) || (\thisrow{n} == 512) || (\thisrow{n} == 2048) ? \pgfmathresult : nan}},
+}
+
+\begin{figure}
+	\tikzsetnextfilename{merge_starting_runs}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			ymin=65,
+			ymax=90,
+			ytick distance=5,
+			]
+			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
+			\expandafter\legend\expandafter{\mergealgos}
+			\clip (0, 0) rectangle (1024, 200);
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32uniform}
+			}
+			%
+			\nextgroupplot[title={Write-back\strut}]
+			\clip (0, 0) rectangle (1024, 200);
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
+			}
+			%
+			\nextgroupplot[title={Half Space}]
+			\clip (0, 0) rectangle (1024, 200);
+			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
+				\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\caption{
+		Comparison of \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(\sfrac{n}{2}\) (\enquote{Half Space}), for different lengths of the starting runs.
+		The \MS*{} use a \ShS{} with the step sizes \(\stepsizes = (1)\) for length 16, \(\stepsizes = (6, 1)\) for lengths 24 to 48, and \(\stepsizes = (12, 5, 1)\) for lengths 64 and 96, respectively.
+	}
+	\label{fig:merge:starting_runs}
+\end{figure}
+
+Three implementations have been tested:
+full space \MS{} without write-backs, full space \MS{} with write-backs, and half space \MS{}.
+\Cref{fig:merge:starting_runs,fig:merge:starting_runs_uint32sorted,fig:merge:starting_runs_uint32uniform,fig:merge:starting_runs_uint64sorted,fig:merge:starting_runs_uint64uniform} show their performance for various starting run lengths.
+Please note that the plots are smoothed:
+Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots cross each other unswervingly and, thereby, hard to read.
+Thence, the figures contain marks for select measurements only in such a way that the resulting plots act as an upper bound on the runtime.
+
+The measurements show that the \MS*{} guarantee a runtime of \(\bigoh{n \lb n}\) as expected.
+The differences in runtime between the different input distributions are small compared to \QS{} and are ascribable to \ShS{} and to the differing suitability of the unrolling;
+cases where the usage of \ShS{} worsened the runtime are unbeknown.
+
+Even though the tested starting run lengths range from 16 to 96 elements, the mean runtime differences are surprisingly small.
+Notwithstanding that the optimal choice depends on the specific input length because of the zigzagging, a starting run length of 32 elements fares decidedly well on average across all tested scenarios.
+
+The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
+With 32-bit integers, it beats the full-space \MS{} without write-backs by 11\% on sorted inputs and effectively ties on all other inputs but the reverse sorted ones where it narrowly falls behind.
+Naturally, the full-space \MS{} with write-backs is consistently (with the exception of reverse sorted inputs) at a disadvantage, despite seeing some light with inferior starting run lengths.
+With 64-bit integers, the full-space \MS{} without write-backs manages to turn the ties into scant leads in the range from 1\% to 3\%.
+Using the \MS{} with write-backs is still unprofitable.
+
+In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm.

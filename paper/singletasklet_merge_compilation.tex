@@ -1,0 +1,37 @@
+\subsubsection*{Investigation of the Compilation}
+\label{subsubsec:tasklet:merge:compilation}
+
+Yet again, the compiler shows unforeseen behaviour.
+The following is a collocation of some of the issues found while engineering \MS{}.
+They will not be discussed in detail here but still provide a point of reference for future work:
+\begin{itemize}
+	\item
+	As already mentioned, sorting the starting runs via \ShS{} requires the placement and later removal of temporary sentinel values.
+	For the very first starting run, one can omit storing and restoring the overwritten elements by using permanent sentinel values;
+	this optimisation was in use when measuring runtimes.
+	On the downside, this leads to a bigger compilation as \ShS{} is inlined twice.
+	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
+	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slow-down is in the thousands.
+
+	\item
+	If the input is so short that it fits entirely within the first starting run, one can immediately end the execution after \ShS{} is done.
+	Several implementations were tested, with unsatisfactory results:
+	Some increased the runtime for longer inputs, others decreased it but also increased it for shorter inputs.
+	The settled-on implementation is of the former variety since the increases hit shorter inputs harder relatively and a more thorough solution would not further the purpose of this section.
+
+	\item
+	Concerning the half-space \MS{}:
+	Treating the copied run logically as the second run and the uncopied run as the first one nets a noticeable decrease in runtime compared to an implementation with flipped logic.
+	Even worse, only with the former does unrolling improve the speed, being an impairment with the latter!
+	This behaviour occurs with both immediate and deferred copying of the first runs.
+	An inspection of the issue unearthed marvels like code of the form
+	\begin{center}
+		\vspace{-\baselineskip}
+		\texttt{*i++ = *j; a = b - i; c = i; i = d;}
+	\end{center}
+	leading to 5\% longer runtimes compared to
+	\begin{center}
+		\texttt{*i = *j; a = b - (i + 1); c = i + 1; i = d;}
+	\end{center}
+	even though executed at most once per merger, but we could sadly not pinpoint the fundamental cause for the behaviour.
+\end{itemize}
