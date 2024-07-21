@@ -89,10 +89,10 @@
 		\todo{Bisher nicht. Als Ersatz für die Normalverteilung?}
 
 		\item[Zipf's]
-		Each number is drawn independently from the range \([1, 100]\), with each value \(k\) drawn with a probability proportional to \(\sfrac{1}{k^{0.75}}\).
+		Each number is drawn independently from the range \([1, 100]\), with each value \(k\) drawn with a probability proportional to \(1/k^{0.75}\).
 
 		\item[Normal]
-		Each number is drawn independently according to a normal distribution with mean \(\mu = 2^{31}\) and standard deviation \(\sigma = \min\paren*{1, \floor*{\sfrac{n}{8}}}\).
+		Each number is drawn independently according to a normal distribution with mean \(\mu = 2^{31}\) and standard deviation \(\sigma = \min\paren*{1, \floor*{n/8}}\).
 	\end{description}
 
 	\include{singletasklet}

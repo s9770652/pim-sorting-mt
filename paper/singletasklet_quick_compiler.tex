@@ -25,7 +25,7 @@ base case handling, recursion/iteration, pivot choice, and partition prioritisat
 Before the results are discussed, the first parameter shall be explained in more depth.
 
 Besides falling back to \IS{} if 13 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a full termination if 1, 0, or --1 elements remain (\enquote{trivial length}).
-Theoretically, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such small partitions are rare and the \IS{} would terminate after a few instructions anyway.
+Theoretically, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and the \IS{} would terminate after a few instructions anyway.
 Nonetheless, its inclusion or exclusion can have significant impacts.
 The following \nameCrefs{imp:normal} were tested:
 \begin{enumerate}

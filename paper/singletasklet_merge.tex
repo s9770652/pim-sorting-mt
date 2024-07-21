@@ -1,12 +1,12 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
 \label{subsec:tasklet:merge}
 
-\MS{} repeatedly compares two sorted subarrays and merges them into a bigger sorted array in time \(\bigtheta{n \log n}\).
+\MS{} repeatedly compares two sorted subarrays and merges them into a longer sorted array in time \(\bigtheta{n \log n}\).
 Unlike \QS{}, this runtime is guaranteed.
-Furthermore, the sorting is naturally stable.
+Furthermore, the sorting is naturally stable but at the cost of not happening in-place.
 
 \paragraph{Starting Runs}
-Instead of starting by merging runs of length 1, it is beneficial to first create bigger starting runs using \ShS{}.
+Instead of starting by merging runs of length 1, it is beneficial to first create longer starting runs using \ShS{}.
 Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
 The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up to 16, \(\stepsizes = (6, 1)\) for lengths up to 48, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
 Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
@@ -16,13 +16,13 @@ A simple but fast implementation of \MS{} writes all merged runs to an auxiliary
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed for some input lengths.
 
-A slightly more sophisticated implementation needs space for only \(\sfrac{n}{2}\) additional elements (\enquote{half space}):
+A slightly more sophisticated implementation needs space for only \(n/2\) additional elements (\enquote{half space}):
 When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
 Then, the copy and the second run are merged to the start of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
 %As a consequence, flushes will only be performed on at most half of the runs.
 Further optimised, \MS{} would not need to copy the first runs immediately.
-It suffices to search for the foremost element of the first run which is bigger than the first element of the second element.
+It suffices to search for the foremost element of the first run which is greater than the first element of the second element.
 All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
 This optimisation, although examined during development, was not in use when measuring runtimes since it unfortunately complicates another optimisation, namely unrolling.
 
@@ -47,7 +47,7 @@ This can be done via \emph{unrolling}:
 As long as at least, let us say, \(x\) elements still need to be flushed, the \(x\) foremost elements are moved first and then all necessary variables are incremented by \(x\).
 Is \(x\) a compile-time constant, the compiler implements the moving of the elements through \(x\) instruction which use constant, pre-calculated offsets.
 Once less than \(x\) elements remain, an ordinary loop which moves elements individually is used.
-In good cases, this approach reduces the loop overhead to an \(x\)-th, whilst in bad cases, where less than \(x\) are to be flushed, the overhead is increased by one additional check.
+In good cases, this approach reduces the loop overhead to an \(x\)th, whilst in bad cases, where less than \(x\) are to be flushed, the overhead is increased by one additional check.
 
 Due to time reasons, we refrained from doing automatic and extensive tests and relied on manual and exploratory tests to come up with the following strategy:
 When the full-space \MS{} performs a write-back or when the half-space \MS{} copies the first run, \(x\) is set to the starting run length.

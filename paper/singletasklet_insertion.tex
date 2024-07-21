@@ -1,7 +1,7 @@
 \subsection{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{subsec:tasklet:insertion}
 
-This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is bigger, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
+This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
 Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, where each of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
 Nonetheless, \IS{} does have some saving graces:
 \begin{enumerate*}
@@ -17,7 +17,7 @@ Nonetheless, \IS{} does have some saving graces:
 	\item
 	The overhead is small.
 \end{enumerate*}
-Especially the last two points make \IS{} a good fall-back algorithm for asymptotically better sorting algorithms to use on small subarrays.
+Especially the last two points make \IS{} a good fall-back algorithm for asymptotically better sorting algorithms to use on short subarrays.
 
 \paragraph{Sentinel Values}
 When moving an element to the left, two checks are needed:
@@ -34,8 +34,3 @@ If not, the latter must be the minimum of the first \(i + 1\) elements and, ther
 \input{singletasklet_insertion_performance.tex}
 
 \input{singletasklet_insertion_compilation}
-
-\begin{note}
-	Other known simple sorting algorithm with a runtime complexity similar to \IS{} are \SelS{} and \BS{}.
-	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred (cf.\ \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}).
-\end{note}
