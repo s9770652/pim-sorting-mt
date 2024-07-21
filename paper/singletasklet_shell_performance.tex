@@ -124,7 +124,7 @@ Without access to \citeauthor{10.1007/3-540-44669-9_12}'s original code, giving 
 
 But would pushing the limits of \ShS{} even be rewarding?
 Firstly, greater input lengths require greater steps \Dash well into the three digits for \(n \approx 1000\) \cite{skean2023optimization, 10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
-Implicit sentinel values could provide relief since the slow-down from implicitness should trend to zero for large inputs, as was the case for \IS{}.
+Implicit sentinel values could provide relief since the slow-down from implicitness should trend to zero for longer inputs, as was the case for \IS{}.
 \todo[inline]{\enquote{%
 		Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
 		\Cref{fig:shell:against_others} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash apparently achieving a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash\negthinspace, \QS{} beats both from 20 elements onwards.
