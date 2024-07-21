@@ -18,6 +18,7 @@ Two registers are used to store the addresses of \lstinline|curr| and \lstinline
 This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into the additionally used register.
 
 \begin{figure}
+	\lstset{basicstyle=\ttfamily\small,}
 	\def\iscodewidth{0.47\linewidth}
 	\begin{subfigure}{\iscodewidth}
 		\begin{lstlisting}
@@ -125,7 +126,7 @@ This workaround is clearly the best of the three and, hence, the one used in the
 
 Alas, the struggle with the compiler endeth not herewith.
 A deeper look into the compilation reveals the following three instructions:
-\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB1_4; move r3, r0|.
+\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB; move r3, r0|.
 Without delving further into their meaning \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it and, apparently, it does also not set any flags.
 Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime down to just 3961 cycles while still sorting correctly;
 the gain is even greater for input distributions other than the uniform one.

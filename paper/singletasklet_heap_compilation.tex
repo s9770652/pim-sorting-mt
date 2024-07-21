@@ -1,0 +1,23 @@
+\subsubsection*{Investigation of the Compilation}
+\label{subsubsec:tasklet:heap:compilation}
+
+The reason for the astoundingly poor performance is unclear.
+Building the heap makes up about 10\% of the total runtime, so it can be excluded as reason.
+One major difference to the other sorting algorithms is that array indices instead of pointers are used.
+Nonetheless, this should not make a difference since the manipulation of indices and pointers take equally long, not least because of the \lstinline|lsl_add| instruction, and since the same instructions are used to load and store data.
+Even so, this could factor in a suspected deterioration of the compiler optimisations.
+Unfortunately, time restrains bar as us from a profound investigation.
+
+While engineering, some strange observations were made.
+For example, the runtime difference between stopping \HS{} when only one element remains in the heap and stopping \HS{} when only three elements remain (which then get sorted by \IS{}) can be in the tens of thousands of cycles in both directions.
+Stopping \HS{} even earlier has comparatively little effect.
+The measurements were conducted without employing \IS{}.
+
+The undisputedly strangest observation was the following:
+Before building a heap, a single sentinel leaf must be inserted if the input length is even.
+Adding this leaf if the input length is odd makes no difference algorithmically, being a left leaf never to be accessed due to bounds checks.
+However, adding an if-statement within which the sentinel leaf is placed has dramatic effects compared to placing the sentinel value unconditionally:
+Since the parity of the input length is needed later anyway, the version with the if-statement is expected to gain one instruction.
+Yet, when measuring the runtimes on 1024 elements, for example, one can observe anything between a reduction by 5000 cycles over changes within the margin of error to increases by 25\,000 cycles, depending on the implementation and the input distribution.
+A comparison of the compilations reveals minute differences at the beginnings of functions, none of which affect loops.
+Adding one or more sentinel leafs outside of the functions has no impact on this behaviour.

@@ -9,7 +9,7 @@
 		\begin{groupplot}[
 			heap,
 			ymin=120,
-			ymax=150,
+			ymax=160,
 		]
 			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
@@ -56,9 +56,9 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			heap,
-			ymin=145,
-			ymax=185,
-			extra y ticks={145,185},
+			ymin=140,
+			ymax=190,
+			ytick distance=10,
 		]
 			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{

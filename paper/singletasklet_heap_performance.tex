@@ -1,0 +1,66 @@
+\subsubsection*{Evaluation of the Performance}
+\label{subsubsec:tasklet:heap:performance}
+
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/heap/uint32/#1.txt}{tableHeap_32#1}
+	\pgfplotstablereadnamed{data/heap/uint64/#1.txt}{tableHeap_64#1}
+}
+
+\pgfplotsset{
+	heap/.style={
+		adaptive group=1 by 2,
+		groupplot xlabel={Input Length \(n\)},
+		groupplot ylabel={Cycles / \((n \lb n)\)},
+		xmode=log,
+		xtick={16, 32, 64, 128, 256, 512, 1024},
+		xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+		legend columns=-1,
+	},
+}
+
+\def\heapalgos{HeapOnlyDown,HeapUpDown,HeapSwapParity}
+
+\begin{figure}
+	\tikzsetnextfilename{heap_runtime}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[heap, ytick distance=5]
+			\nextgroupplot[title={32-bit\strut}, ymin=130, ymax=155, legend to name=leg:heap:runtime]
+			\legend{\HS{} (top-down), \HS{} (bottom-up), \HS{} (swap parity)}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
+				\plotpernlogn{#1}{tableHeap_32uniform}
+			}
+			%
+			\nextgroupplot[title={64-bit\strut}, ymin=155, ymax=180]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
+				\plotpernlogn{#1}{tableHeap_64uniform}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\caption{
+		Comparison of the runtimes of three different \HS{} implementations on uniformly distributed 32-bit integers and 64-bit integers, respectively.
+	}
+	\label{fig:heap:runtime}
+\end{figure}
+
+The measurements are visualised in \cref{fig:heap:runtime,fig:heap:runtime_uint32,fig:heap:runtime_uint64}.
+In general, the performance of \HS{} is even less volatile than that of \MS{} with respect to the input distribution.
+Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is short, while sorted inputs are sorted the slowest since they are min-heaps so the heap-building phase is long.
+Nonetheless, the reverse sorted inputs get sorted just about 10\% faster and less on average.
+This low volatility cannot hide the fact that the total runtime is abysmal across the board:
+Compared to \MS{}, the runtimes are between 50\% to 100\% higher, depending on the input distribution!
+
+The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas those of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends with the exception of reverse sorted inputs, where it is also an upwards trend, albeit even slighter.
+Interesting are their rankings relative to each other:
+Value checks on 64-bit integers take two instructions, so that the savings of the bottom-up \HS{} with swap disparity allow it to outperform the top-down \HS{} even for short inputs, and the advantage grows with the input length.
+This makes sense as roughly 50\% of the vertices are leaves and 25\% are fathers of leaves, no matter the total size.
+Therefore, the percentage of formerly last leaves sifting down to the bottom remains steady but the travelled distance increases.
+Value checks on 32-bit integers, on the other hand, take only one instruction, so that their reduction is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting, whence the lead of the top-down \HS{}.
+Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead is narrow even at 6000 elements.
+However, these long inputs are less interesting anyway due to the limited WRAM and the multiple tasklets used in most applications.
+
+The bottom-up \HS{} with swap parity consistently trails behind.
+This comes as no surprise since the overhead of its considerably prolonged upwards-sifting bears no proportion to the few swaps saved.
+This holds true even for 64-bit integers as moves still cost only one instruction.
+Unrolling the upwards-sifting proved to be unhelpful.

@@ -1,14 +1,45 @@
 \subsection{\texorpdfstring{\HS{}}{HeapSort}}
 \label{subsec:tasklet:heap}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-	\pgfplotstablereadnamed{data/heap/uint32/#1.txt}{tableHeap_32#1}
-	\pgfplotstablereadnamed{data/heap/uint64/#1.txt}{tableHeap_64#1}
-}
+Another sorting algorithm with a guaranteed runtime of \(\bigtheta{n \log n}\) is \HS{}, which is unstable but in-place.
+A max-heap is a binary tree of logarithmic depth whose layers are fully filled, possibly with the exception of the last layer, which must be filled from left to right.
+Each vertex contains a key, and the key of each father must be at least as great as those of his sons.
+As a consequence of this heap order, the root contains the greatest key.
 
-\paragraph{Implementation Variants}
-After the root has been extracted, the \emph{mono-directional} \HS{} proceeds as follows:
-The rightmost leaf in the bottom layer is moved
+A heap with \(n\) keys can be represented as an array of length \(n\) using a bijective mapping between the vertex positions and the array indices (cf. later).
+After the heap has been built in-place from the input array in time \(\bigoh{n}\), the sorting works as follows:
+At the start of round \(r = 1, \dots, n\), the first \(n - (r - 1)\) elements of the array represent the heap and the last \(r - 1\) elements the end of the sorted output.
+Upon removal of the root, which contains the \(r\)-th greatest element of the input, the heap structure must be restored in time \(\bigoh{\log n}\).
+Since the heap has shrunken by one key, the key of the removed root can be stored at the freed-up position directly after the end of the heap.
+
+\paragraph{Sifting Direction}
+After the heap is built, the \emph{top-down} \HS{} proceeds as follows:
+At the start of each round, the root and the rightmost leaf (\enquote{last leaf}) in the bottom layer swap places.
+The root is now in the right position, but the formerly last leaf may violate the heap order, that is, the root may have a smaller key than one or both of its sons.
+The greater of the two sons is determined, and the root and the greater son swap places.
+This downwards-sifting of the former leaf continues iteratively until the heap order is restored.
+
+In contrast, the \emph{bottom-up} \HS{} \cite{wegener1993heapsort} works as follows:
+At the start of each round, the key of the root is removed so that a hole is now at the top of the heap.
+Then, the greater of the two sons of the hole is determined, and they swap places.
+This downwards-sifting of the hole continues iteratively until it becomes a leaf.
+Now, the last leaf is moved to the position of the hole, which could violate the heap order if the moved leaf is greater than its father.
+If so, it needs to be sifted upwards by iteratively swapping positions with its respective father until the heap order is restored.
+At last, the original root key can be put where the formerly last leaf used to be.
+
+The motivation behind these variants is at follows:
+In each step where the top-down \HS{} sifts the formerly last leaf downwards, two value checks (Which son is greater? Is the father smaller than the greater son?) need to be done.
+The leaves of a heap tend to be small so the downwards-sifting lasts awhile.
+As opposed to this, each step of the bottom-up \HS{} needs only one value check (Is the father smaller than the greater son?).
+Both \HS*{} sift downwards similarly long so many checks can be saved.
+Since the last leaf effectively takes the place of another leaf and since both are likely small, the upwards-sifting should be short-lived and, hopefully, not eat the gain up.
+
+The upwards-sifting reverts some of the changes done by the downwards-sifting.
+The bottom-up \HS{} can be brought to swap parity with the top-down \HS{} with the following change:
+The downwards-sifting is traced but the keys are not actually moved.
+Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost key which is at least as big as the last leaf.
+This is the position where the last leaf would end up after the upwards-sifting, so all keys below can stay put and all keys above move to their fathers' positions, that is, thither the swaps from the downwards-sifting would have put them.
+This makes the downwards-sifting even cheaper but the upwards-sifting must now go all the way up to the root.
 
 \paragraph{Indexing}
 With a zero-based indexing, the sons of a vertex \(i\) can be calculated with the well-known formulas \(2i + 1\) and \(2n + 2\).
@@ -23,74 +54,26 @@ As a consequence, the compiler moves the number \(1\) to a register whenever \(2
 Hence, the calculation of \(2i + 1\) does take one more instruction than \(2n\) after all.
 
 \paragraph{Sentinel Values}
-Whenever \HS{} moves downwards in the heap and considers a vertex and its two sons, it needs to determine the bigger of the two before deciding whether to proceed.
+When \HS{} sifts a vertex downwards, it needs to determine the greater of its two sons before deciding whether and whither to move.
 If and only if the heap has an even number of vertices, there is a left son without a right brother:
 the rightmost leaf in the bottom layer.
-Instead of adding some check on whether the right brother exists, one can rather add the missing leaf and set it to the smallest possible value each time the heap reaches an even size.
-Thus, if it has been confirmed that a left son exists, a right one does also exist, and if two brothers are set to the same value, the left one should be considered bigger.
+Instead of adding some check on whether the right brother exists, one can rather add the missing leaf and give it the smallest possible key each time the heap reaches an even size.
+Thus, if it has been confirmed that a left son exists, a right one does also exist, and if two brothers contain the same key, the left one should be considered greater.
 
-Likewise, whenever \HS{} moves upwards in the heap and considers the father \(\sfrac{i}{2}\) of a vertex \(i\), it will only proceed if the father is smaller.
-Since the fatherless root has index \(1\) and the result of an integer division is truncated towards \(0\) in C, the formula yields \(0\), so it makes sense to set the element at index \(0\) to the highest possible value to stop any upwards motion.
+Likewise, whenever \HS{} sifts upwards and considers the father \(\sfrac{i}{2}\) of a vertex \(i\), it will only proceed if the father is smaller.
+Since the fatherless root has index \(1\) and the result of an integer division is truncated towards \(0\) in C, the formula yields \(0\), so it makes sense to set the element at index \(0\) to the greatest possible key to stop any upwards-sifting.
 The savings from these approaches were around the 13\% mark.
 
 \paragraph{Code Duplication}
-A strategy of particular use in \HS{}, although also employed in \MS{}, is code duplication:
-Handling the bigger of two sons is the fastest if the logic is written twice, once for either son, and then executed conditionally;
-logic written once for a general variable holding the bigger son is compiled considerably worse.
+A strategy particularly useful for \HS{}, although also employed in \MS{}, is code duplication.
+Handling the greater of two sons is the fastest if the logic is written twice, once for either son, and then executed conditionally;
+logic written once for a generalised variable holding the greater son is compiled considerably worse.
 The savings from this approach were around the 7\% mark.
 
-\begin{itemize}
-	\item
-	if n even: vor T\_MIN: -5000 -- +15000 Takte
+%\paragraph{Fallback Algorithm}
+%Once 15 elements remain in the heap, they are sorted with \IS{}.
+%This threshold is a good compromise, although the impact of \IS{} is rather forgettable, admittedly.
 
-	\item
-	Var 1:
-	leichter trend nach oben
+\input{singletasklet_heap_performance}
 
-	Var 2:
-	leichter downwards trend
-
-	Effekte stärker für 64 Bit
-
-	\item
-	32 Bit: bis 6250
-
-	64 Bit: bis 6250
-\end{itemize}
-
-\pgfplotsset{
-	heap/.style={
-		adaptive group=1 by 2,
-		groupplot xlabel={Input Length \(n\)},
-		groupplot ylabel={Cycles / \(n \lb n\)},
-		xmode=log,
-		xtick={16, 32, 64, 128, 256, 512, 1024},
-		xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-		legend columns=-1,
-	},
-}
-\def\heapalgos{HeapOnlyDown,HeapUpDown}
-
-\begin{figure}
-	\tikzsetnextfilename{heap_runtime}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[heap]
-			\nextgroupplot[title={32-bit\strut}, ymin=130, ymax=145, legend to name=leg:heap:runtime]
-			\legend{\HS{}, \HS{}}
-			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32uniform}
-			}
-			%
-			\nextgroupplot[title={64-bit\strut}, ymin=155, ymax=175]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64uniform}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
-
-	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
-	\caption{
-		Comparison of the runtimes of the two different \HS{} implementations on uniformly distributed 32-bit integers and 64-bit integers, respectively.
-	}
-	\label{fig:heap:runtime}
-\end{figure}
+\input{singletasklet_heap_compilation}
