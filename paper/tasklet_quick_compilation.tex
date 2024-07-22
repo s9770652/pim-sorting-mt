@@ -1,23 +1,23 @@
-\subsubsection{Investigating the Compilation}
-\label{subsubsec:tasklet:quick:compiler}
+\subsubsection*{Investigation of the Compilation}
+\label{subsubsec:tasklet:quick:compilation}
 
-\pgfplotstablereadnamed{data/quick/rec_vs_it.txt}{tableQuickRecVsIter}
-\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/end.txt}{tableQuickRecNssUniEnd}
-\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/middle.txt}{tableQuickRecNssUniMiddle}
-\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{tableQuickRecNssUniMedian}
-\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/random.txt}{tableQuickRecNssUniRandom}
-\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/end.txt}{tableQuickRecSsUniEnd}
-\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/middle.txt}{tableQuickRecSsUniMiddle}
-\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/median_of_three.txt}{tableQuickRecSsUniMedian}
-\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/random.txt}{tableQuickRecSsUniRandom}
-\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/end.txt}{tableQuickIterNssUniEnd}
-\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/middle.txt}{tableQuickIterNssUniMiddle}
-\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{tableQuickIterNssUniMedian}
-\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/random.txt}{tableQuickIterNssUniRandom}
-\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/end.txt}{tableQuickIterSsUniEnd}
-\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/middle.txt}{tableQuickIterSsUniMiddle}
-\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/median_of_three.txt}{tableQuickIterSsUniMedian}
-\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/random.txt}{tableQuickIterSsUniRandom}
+%\pgfplotstablereadnamed{data/quick/rec_vs_it.txt}{tableQuickRecVsIter}
+%\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/end.txt}{tableQuickRecNssUniEnd}
+%\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/middle.txt}{tableQuickRecNssUniMiddle}
+%\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/median_of_three.txt}{tableQuickRecNssUniMedian}
+%\pgfplotstablereadnamed{data/quick/recursive/no switched sides/uniform/random.txt}{tableQuickRecNssUniRandom}
+%\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/end.txt}{tableQuickRecSsUniEnd}
+%\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/middle.txt}{tableQuickRecSsUniMiddle}
+%\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/median_of_three.txt}{tableQuickRecSsUniMedian}
+%\pgfplotstablereadnamed{data/quick/recursive/switched sides/uniform/random.txt}{tableQuickRecSsUniRandom}
+%\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/end.txt}{tableQuickIterNssUniEnd}
+%\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/middle.txt}{tableQuickIterNssUniMiddle}
+%\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/median_of_three.txt}{tableQuickIterNssUniMedian}
+%\pgfplotstablereadnamed{data/quick/iterative/no switched sides/uniform/random.txt}{tableQuickIterNssUniRandom}
+%\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/end.txt}{tableQuickIterSsUniEnd}
+%\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/middle.txt}{tableQuickIterSsUniMiddle}
+%\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/median_of_three.txt}{tableQuickIterSsUniMedian}
+%\pgfplotstablereadnamed{data/quick/iterative/switched sides/uniform/random.txt}{tableQuickIterSsUniRandom}
 
 The quality of the compilation and thus the real performance of \QS{} is erratic to such an extent that one implementation variant may see a speed-up of 25\% over another one even with the same pivot choice although virtually none would be expected.
 As hinted in the preceding paragraphs, this raises the need for a benchmark suite with the following parameters:
@@ -120,161 +120,328 @@ Common occurrences are \dots{}
 	Je Funktionsaufruf kommen ≈3 Extra-Aufrufe hinzu (bei insgesamt ≈104 rekursiven und ≈104 \enquote{Endaufrufen} bei 1024 Elementen), was fast 70\,000 Takte Unterschied nicht erklären kann.
 }
 
+%\begin{figure}[p]
+%	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
+%	\pgfplotsset{
+%		height=3.5cm,
+%		horizontal sep for naught,
+%		adaptive group=2 by 4,
+%		groupplot xlabel={Input Length \(n\)},
+%		groupplot ylabel={Cycles / \((n \lb n)\)},
+%		xmode=log,
+%		xtick={20, 64, 256, 1024},
+%		xticklabels={\(20\), \(64\), \(256\), \(1024\)},
+%		minor xtick={32, 128, 512},
+%		ymin=55,
+%		ymax=80,
+%		ytick distance=5,
+%		legend columns=-1,
+%	}
+%	\begin{subfigure}{\textwidth}
+%		\tikzsetnextfilename{quick_implementations_rec}
+%		\begin{tikzpicture}[plot]
+%			\begin{groupplot}
+%				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick:implementations]
+%				\legend{\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecNssUniEnd}
+%				}
+%				%
+%				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecNssUniMiddle}
+%				}
+%				%
+%				\nextgroupplot[title={Median | Left First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecNssUniMedian}
+%				}
+%				%
+%				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecNssUniRandom}
+%				}
+%				%
+%				\nextgroupplot[title={Last | Right First}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecSsUniEnd}
+%				}
+%				%
+%				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecSsUniMiddle}
+%				}
+%				%
+%				\nextgroupplot[title={Median | Right First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecSsUniMedian}
+%				}
+%				%
+%				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickRecSsUniRandom}
+%				}
+%			\end{groupplot}
+%		\end{tikzpicture}
+%		\caption{
+%			Recursive Approach
+%		}
+%		\bigskip
+%	\end{subfigure}
+%	%
+%	\begin{subfigure}{\textwidth}
+%		\tikzsetnextfilename{quick_implementations_it}
+%		\begin{tikzpicture}[plot]
+%			\begin{groupplot}
+%				\nextgroupplot[title={Last | Left First}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterNssUniEnd}
+%				}
+%				%
+%				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterNssUniMiddle}
+%				}
+%				%
+%				\nextgroupplot[title={Median | Left First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterNssUniMedian}
+%				}
+%				%
+%				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterNssUniRandom}
+%				}
+%				%
+%				\nextgroupplot[title={Last | Right First}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterSsUniEnd}
+%				}
+%				%
+%				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterSsUniMiddle}
+%				}
+%				%
+%				\nextgroupplot[title={Median | Right First}, yticklabels={}]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterSsUniMedian}
+%				}
+%				%
+%				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
+%				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
+%					\plotpernlogn{#1}{tableQuickIterSsUniRandom}
+%				}
+%			\end{groupplot}
+%		\end{tikzpicture}
+%		\caption{
+%			Iterative approach
+%		}
+%	\end{subfigure}
+%
+%	\bigskip
+%	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
+%	\caption{
+%		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
+%		In the first rows, the left-hand partitions are sorted before the right-hand ones, while it is the reverse in the second rows.
+%	}
+%	\label{fig:quick:implementations}
+%\end{figure}
+%
+%\begin{figure}
+%	\tikzsetnextfilename{quick_rec_vs_it}
+%	\begin{tikzpicture}[plot]
+%		\begin{groupplot}[
+%			horizontal sep for labels,
+%			adaptive group=1 by 2,
+%			groupplot xlabel={Input Length \(n\)},
+%			xmode=log,
+%			xtick={20, 32, 64, 128, 256, 512, 1024},
+%			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+%			legend columns=-1,
+%		]
+%			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=65, extra y ticks={55, 65}, legend to name=leg:rec_vs_it]
+%			\legend{Iterative, Recursive}
+%			\plotpernlogn{It}{tableQuickRecVsIter}
+%			\plotpernlogn{Rec}{tableQuickRecVsIter}
+%			%
+%			\nextgroupplot[ylabel=Speed-up, ymin=0.96, ymax=1.04, /pgf/number format/.cd, precision=2, fixed zerofill=true]
+%			\plotspeedup{It}{Rec}{tableQuickRecVsIter}
+%		\end{groupplot}
+%	\end{tikzpicture}
+%
+%	\hfil\pgfplotslegendfromname{leg:rec_vs_it}\hfil
+%	\caption{
+%		Comparison of the fastest recursive and iterative \QS*{} (cf. \cref{subsubsec:tasklet:quick:compiler}).
+%		The actual algorithm is compiled the very same in both cases, so that time differences are only due to the way \QS{} is applied to the partitions.
+%		\todo{nicht mehr wegen des Pivots!}
+%	}
+%	\label{fig:rec_vs_it}
+%\end{figure}
+
+\clearpage
+
+\def\quickpivots{LAST,MEDIAN,RANDOM,MEDIAN_OF_RANDOM}
+\expandafter\pgfplotsinvokeforeach\expandafter{\quickpivots}{
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/shorter/uniform.txt}{tableQuickMatrixIt#1Shorter}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/left/uniform.txt}{tableQuickMatrixIt#1Left}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/right/uniform.txt}{tableQuickMatrixIt#1Right}
+
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/shorter/uniform.txt}{tableQuickMatrixRec#1Shorter}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/left/uniform.txt}{tableQuickMatrixRec#1Left}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/right/uniform.txt}{tableQuickMatrixRec#1Right}
+}
+
+\tikzexternaldisable
+
 \begin{figure}[p]
-	\def\algos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 	\pgfplotsset{
-		height=3.5cm,
+		height=2.6cm,
 		horizontal sep for naught,
-		adaptive group=2 by 4,
+		vertical sep for naught,
+		adaptive group=3 by 4,
 		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		xmode=log,
-		xtick={20, 64, 256, 1024},
-		xticklabels={\(20\), \(64\), \(256\), \(1024\)},
+		xtick={16, 64, 256, 1024},
+		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
 		minor xtick={32, 128, 512},
 		ymin=55,
 		ymax=80,
-		ytick distance=5,
 		legend columns=-1,
 	}
+	\def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
+	\captionsetup[subfigure]{aboveskip=0mm,belowskip=1mm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{quick_implementations_rec}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}
-				\nextgroupplot[title={Last | Left First}, legend to name=leg:quick:implementations]
+				\nextgroupplot[title=Last, xticklabels={}, legend to name=leg:quick:implementations]
 				\legend{\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecNssUniEnd}
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTLeft}
+				}
+				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANLeft}
+				}
+				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMLeft}
+				}
+				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMLeft}
 				}
 				%
-				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecNssUniMiddle}
+				\nextgroupplot[xticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMRight}
 				}
 				%
-				\nextgroupplot[title={Median | Left First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecNssUniMedian}
+				\nextgroupplot
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTShorter}
 				}
-				%
-				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecNssUniRandom}
+				\nextgroupplot[yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANShorter}
 				}
-				%
-				\nextgroupplot[title={Last | Right First}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecSsUniEnd}
+				\nextgroupplot[yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMShorter}
 				}
-				%
-				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecSsUniMiddle}
-				}
-				%
-				\nextgroupplot[title={Median | Right First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecSsUniMedian}
-				}
-				%
-				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickRecSsUniRandom}
+				\nextgroupplot[yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMShorter}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
 			Recursive Approach
 		}
-		\bigskip
 	\end{subfigure}
-	%
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{quick_implementations_it}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}
-				\nextgroupplot[title={Last | Left First}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterNssUniEnd}
+				\nextgroupplot[title=Last, xticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItLASTLeft}
+				}
+				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANLeft}
+				}
+				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMLeft}
+				}
+				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMLeft}
 				}
 				%
-				\nextgroupplot[title={Middle | Left First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterNssUniMiddle}
+				\nextgroupplot[xticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItLASTRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMRight}
+				}
+				\nextgroupplot[xticklabels={}, yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMRight}
 				}
 				%
-				\nextgroupplot[title={Median | Left First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterNssUniMedian}
+				\nextgroupplot
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItLASTShorter}
 				}
-				%
-				\nextgroupplot[title={Random | Left First}, yticklabel pos=right]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterNssUniRandom}
+				\nextgroupplot[yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANShorter}
 				}
-				%
-				\nextgroupplot[title={Last | Right First}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterSsUniEnd}
+				\nextgroupplot[yticklabels={}]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMShorter}
 				}
-				%
-				\nextgroupplot[title={Middle | Right First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterSsUniMiddle}
-				}
-				%
-				\nextgroupplot[title={Median | Right First}, yticklabels={}]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterSsUniMedian}
-				}
-				%
-				\nextgroupplot[title={Random | Right First}, yticklabel pos=right]
-				\expandafter\pgfplotsinvokeforeach\expandafter{\algos}{
-					\plotpernlogn{#1}{tableQuickIterSsUniRandom}
+				\nextgroupplot[yticklabel pos=right]
+				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMShorter}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			Iterative approach
+			Iterative Approach
 		}
 	\end{subfigure}
 
-	\bigskip
 	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
 	\caption{
-		Comparison of the different implementations (1--8) of \QS{} for all possible pivot choices.
-		In the first rows, the left-hand partitions are sorted before the right-hand ones, while it is the reverse in the second rows.
+		Comparison of \crefrange{imp:normal}{imp:one_insertion}.
+		The left-hand partition is preferred in the first rows, the right-hand one in the second rows, and the shorter one in the third rows.
 	}
 	\label{fig:quick:implementations}
 \end{figure}
 
-\begin{figure}
-	\tikzsetnextfilename{quick_rec_vs_it}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			horizontal sep for labels,
-			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			xmode=log,
-			xtick={20, 32, 64, 128, 256, 512, 1024},
-			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			legend columns=-1,
-		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=65, extra y ticks={55, 65}, legend to name=leg:rec_vs_it]
-			\legend{Iterative, Recursive}
-			\plotpernlogn{It}{tableQuickRecVsIter}
-			\plotpernlogn{Rec}{tableQuickRecVsIter}
-			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.96, ymax=1.04, /pgf/number format/.cd, precision=2, fixed zerofill=true]
-			\plotspeedup{It}{Rec}{tableQuickRecVsIter}
-		\end{groupplot}
-	\end{tikzpicture}
+\tikzexternalenable
 
-	\hfil\pgfplotslegendfromname{leg:rec_vs_it}\hfil
-	\caption{
-		Comparison of the fastest recursive and iterative \QS*{} (cf. \cref{subsubsec:tasklet:quick:compiler}).
-		The actual algorithm is compiled the very same in both cases, so that time differences are only due to the way \QS{} is applied to the partitions.
-		\todo{nicht mehr wegen des Pivots!}
-	}
-	\label{fig:rec_vs_it}
-\end{figure}
+\clearpage

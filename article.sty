@@ -218,11 +218,13 @@
 		cells={anchor=west},  % left aligned labels
 		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},
 	},
-	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (ticks + labels)
-	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (labels)
-	horizontal sep for naught/.style={group/horizontal sep=3mm},  % padding between groupplots (/)
+	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (with ticks + labels)
+	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (with ticks)
+	horizontal sep for naught/.style={group/horizontal sep=2mm},  % padding between groupplots (without anything)
 	horizontal sep for ticks,
-	group/vertical sep=14mm,  % padding between groupplots
+	vertical sep for ticks/.style={group/vertical sep=14mm},  % padding between rows of groupplots (with ticks)
+	vertical sep for naught/.style={group/vertical sep=2mm},  % padding between rows of groupplots (without anything)
+	vertical sep for ticks,
 	title style={font=\sffamily\bfseries},  % changing the style of every plot title
 	every axis title shift=0pt,  % removing default shift upwards of 6pt
 }

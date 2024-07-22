@@ -1,12 +1,13 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:tasklet:quick}
 
-\pgfplotstablereadnamed{data/quick/fallback.txt}{tableQuickFallback}
-\pgfplotstablereadnamed{data/quick/pivot.txt}{tableQuickPivot}
+%\pgfplotstablereadnamed{data/quick/fallback.txt}{tableQuickFallback}
+%\pgfplotstablereadnamed{data/quick/pivot.txt}{tableQuickPivot}
 
 \QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left of the pivot element, respectively.
 Finally, \QS{} is used on the left and right partitions.
+The \QS*{} implementations presented here are neither stable nor in-place.
 
 
 \paragraph{Base Cases}
@@ -14,53 +15,52 @@ When only a few elements remain in a partition, \QS{}'s overhead predominates su
 As \cref{fig:quick:fallback} demonstrates, the optimal threshold for switching the sorting algorithm is around 13 elements, netting a speed-up of 30\% and more over a \QS{} without fallback algorithm.
 This low threshold also means that even a simple two-round \ShS{} is not worth considering.
 
-\begin{figure}
-	\tikzsetnextfilename{quick_fallback}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			horizontal sep for labels,
-			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			groupplot ylabel={Speed-up},
-			xmode=log,
-			xtick={20, 32, 64, 128, 256, 512, 1024},
-			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			legend columns=-1,
-		]
-			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick:fallback]
-			\legend{\(10\), \(11\), \(...\), \(16\)}
-			\pgfplotsinvokeforeach{10,...,16}{
-				\plotspeedup{#1}{None}{tableQuickFallback}
-			}
-			%
-			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
-			\pgfplotsinvokeforeach{10,...,16}{
-				\ifnumequal{#1}{13}{
-					\pgfplotsset{cycle list shift=1}
-				}{
-					\plotspeedup{#1}{13}{tableQuickFallback}
-				}
-			}
-		\end{groupplot}
-	\end{tikzpicture}
+%\begin{figure}
+%	\tikzsetnextfilename{quick_fallback}
+%	\begin{tikzpicture}[plot]
+%		\begin{groupplot}[
+%			horizontal sep for labels,
+%			adaptive group=1 by 2,
+%			groupplot xlabel={Input Length \(n\)},
+%			groupplot ylabel={Speed-up},
+%			xmode=log,
+%			xtick={20, 32, 64, 128, 256, 512, 1024},
+%			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+%			legend columns=-1,
+%		]
+%			\nextgroupplot[title={Over No Fallback\strut}, legend to name=leg:quick:fallback]
+%			\legend{\(10\), \(11\), \(...\), \(16\)}
+%			\pgfplotsinvokeforeach{10,...,16}{
+%				\plotspeedup{#1}{None}{tableQuickFallback}
+%			}
+%			%
+%			\nextgroupplot[title={Over a Threshold of 13\strut}, /pgf/number format/.cd, precision=3, fixed zerofill=true]
+%			\pgfplotsinvokeforeach{10,...,16}{
+%				\ifnumequal{#1}{13}{
+%					\pgfplotsset{cycle list shift=1}
+%				}{
+%					\plotspeedup{#1}{13}{tableQuickFallback}
+%				}
+%			}
+%		\end{groupplot}
+%	\end{tikzpicture}
+%
+%	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
+%	\caption{
+%		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
+%	}
+%	\label{fig:quick:fallback}
+%\end{figure}
 
-	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
-	\caption{
-		Comparison of \QS*{} with different thresholds for the fallback to \IS{}, with a \QS{} without fallback algorithm and the fastest \QS{} with a threshold of 13 elements.
-	}
-	\label{fig:quick:fallback}
-\end{figure}
-
-Besides falling back to \IS{}, another base case is imaginable, namely terminating when the partition has a length of 1, 0, or even --1 elements.
-Realistically speaking, this should not be necessary, because even though the extra check is done with just one additional instruction, it is a rare occurrence and the \IS{} would terminate after a few instructions anyway.
-Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases.
-Since these are likely caused by the compiler, they are laid out in \cref{subsec:appendix:quick}.
-\todo{zurückkehren nach Unterunterabschnitt}
+Besides falling back to \IS{}, another base case is imaginable, namely terminating when the partition has a length of at most 1 elements.
+Realistically speaking, checking for this should not be necessary, because even though the extra check is done with just one additional instruction, it occurs rarely, and the \IS{} would terminate after a few instructions anyway.
+Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases, as seen later.
+\todo{zurückkehren}
 
 
 \paragraph{Recursion vs. Iteration}
-In theory, the question of whether an algorithm should be implemented recursively or iteratively comes down to convenience.
-Due to the uniform cost of instructions, putting arguments automatically on the call stack or manually in an array essentially costs the same, as does jumping to the start of a loop and to the start of a function.
+In theory, the question of whether a DPU algorithm should be implemented recursively or iteratively comes down to convenience.
+Due to the uniform costs of instructions, putting arguments automatically on the call stack or manually in an array essentially costs the same, as does jumping to the start of a loop and to the start of a function.
 Furthermore, in case of \QS{}, the compiler turns tail-recursive calls into jumps back to the function start, so that one partition is sorted recursively and the other iteratively.
 All this would suggest a recursive implementation with less code complexity.
 
@@ -68,7 +68,7 @@ In practice, it comes down to the compilation.
 Selcouthly, even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
 Overall though, iterative implementations tend to be compiled better with superior register usage and less instructions used for the actual \QS{} algorithm.
 The fastest implementation is indeed an iterative one, even if it beats the fastest recursive implementations \Dash outliers, admittedly \Dash by less than 4\%.
-More details are given in \cref{subsubsec:tasklet:quick:compiler}.
+\todo{zurückkehren}
 
 
 \paragraph{Pivot Choice}
@@ -76,17 +76,25 @@ Another parameter to tune is the way in which the pivot is chosen.
 The following were implemented and tested:
 \begin{itemize}
 	\item
-	Using the \emph{last element} is the fastest way, requiring zero instructions.
+	Using the \emph{last element} is the fastest way, requiring zero additional instructions.
+
+%	\item
+%	Choosing the \emph{middle element} is slower than choosing the last one, requiring a calculation of its address and swapping it with the last element so that it can act as sentinel value during partitioning.
+%	The upside is that it is more suited for sorted and nearly sorted inputs.
 
 	\item
-	Choosing the \emph{middle element} is slower than choosing the last one, requiring a calculation of its address and swapping it with the last element so that it can act as sentinel value during partitioning.
-	The upside is that it is more suited for sorted and nearly sorted inputs.
-
-	\item
-	Taking the \emph{median of three elements}, namely the first, middle, and last one, is even more computationally expensive but increases the chances of choosing a pivot that is neither particularly high nor particularly low.
+	Taking the \emph{median of three elements}, namely the first, middle, and last one, is far more computationally expensive since the position of the middle element must be calculated, the median be determined, and the pivot be swapped with the last element of the array, where it acts as sentinel.
+	The plus side is that this method increases the chances of choosing a pivot that is neither particularly high nor particularly low.
+	This leads to more balanced partitions so the call stack is less likely to overflow and the base cases are reached faster.
 
 	\item
 	A \emph{random element} is most efficiently drawn using an xorshift random number generator and rejection sampling \cite{lukas_geis}.
+	This takes some instructions but impedes worst-case inputs.
+
+	\item
+	Taking \emph{median of three random elements} is a combination of the previous two methods.
+	For simplicity, there is no check on whether an element is drawn twice or even thrice.
+	Since the partitions are rather long, this should happen seldom, though.
 \end{itemize}
 Luckily, the pivot choice seldom has bearing on the overall compilation, making a comparison easier.
 \todo{Stimmt nicht!}
@@ -94,48 +102,51 @@ The results are shown in \cref{fig:quick:pivot}.
 Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
 At 1024 elements, the runtime with a random pivot is 10\% worse than with the median of three elements.
 Since drawing the random index is more than thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times, should one need randomisation.
-Again, more details are given in \cref{subsubsec:tasklet:quick:compiler}.
+Again, more details are given in \cref{subsubsec:tasklet:quick:compilation}.
+\todo{zurückkehren}
 
-\begin{figure}
-	\tikzsetnextfilename{quick_pivot}
-	\begin{tikzpicture}[plot]
-		\begin{groupplot}[
-			horizontal sep for labels,
-			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			xmode=log,
-			xtick={20, 32, 64, 128, 256, 512, 1024},
-			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			legend columns=-1,
-		]
-			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:quick:pivot]
-			\legend{Last, Middle, Median of Three, Random}
-			\plotpernlogn{End}{tableQuickPivot}
-			\plotpernlogn{Middle}{tableQuickPivot}
-			\plotpernlogn{MedianOfThree}{tableQuickPivot}
-			\plotpernlogn{Random}{tableQuickPivot}
-			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.9, ymax=1.01, extra y ticks={1.01}, /pgf/number format/.cd, precision=2, fixed zerofill=true]
-			\plotspeedup{End}{MedianOfThree}{tableQuickPivot}
-			\plotspeedup{Middle}{MedianOfThree}{tableQuickPivot}
-			\pgfplotsset{cycle list shift=1}
-			\plotspeedup{Random}{MedianOfThree}{tableQuickPivot}
-		\end{groupplot}
-	\end{tikzpicture}
+%\begin{figure}
+%	\tikzsetnextfilename{quick_pivot}
+%	\begin{tikzpicture}[plot]
+%		\begin{groupplot}[
+%			horizontal sep for labels,
+%			adaptive group=1 by 2,
+%			groupplot xlabel={Input Length \(n\)},
+%			xmode=log,
+%			xtick={20, 32, 64, 128, 256, 512, 1024},
+%			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+%			legend columns=-1,
+%		]
+%			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=55, ymax=70, legend to name=leg:quick:pivot]
+%			\legend{Last, Middle, Median of Three, Random}
+%			\plotpernlogn{End}{tableQuickPivot}
+%			\plotpernlogn{Middle}{tableQuickPivot}
+%			\plotpernlogn{MedianOfThree}{tableQuickPivot}
+%			\plotpernlogn{Random}{tableQuickPivot}
+%			%
+%			\nextgroupplot[ylabel=Speed-up, ymin=0.9, ymax=1.01, extra y ticks={1.01}, /pgf/number format/.cd, precision=2, fixed zerofill=true]
+%			\plotspeedup{End}{MedianOfThree}{tableQuickPivot}
+%			\plotspeedup{Middle}{MedianOfThree}{tableQuickPivot}
+%			\pgfplotsset{cycle list shift=1}
+%			\plotspeedup{Random}{MedianOfThree}{tableQuickPivot}
+%		\end{groupplot}
+%	\end{tikzpicture}
+%
+%	\hfil\pgfplotslegendfromname{leg:quick:pivot}\hfil
+%	\caption{
+%		Comparison of \QS{} with different pivot choices.
+%		The speed-ups are with respect to the \QS{} with the median of three as pivot choice.
+%	}
+%	\label{fig:quick:pivot}
+%\end{figure}
 
-	\hfil\pgfplotslegendfromname{leg:quick:pivot}\hfil
-	\caption{
-		Comparison of \QS{} with different pivot choices.
-		The speed-ups are with respect to the \QS{} with the median of three as pivot choice.
-	}
-	\label{fig:quick:pivot}
-\end{figure}
 
-
-\paragraph{Prioritisation of Partitions}
-After partitioning, in order to minimise the call stack, \QS{} should be used on the lesser of the two partitions first.
-For code simplicity and to reduce the overhead, no such mechanism was implemented.
-As shown in \cref{subsubsec:tasklet:quick:compiler}, the choice between always sorting the left-hand partition or the right-hand partition first can have tremendous effects nevertheless.
+\paragraph{Partition Prioritisation}
+Whether the left-hand or the right-hand is put on the stack should not make any difference for the runtime.
+However, always putting the longer partition on the stack guarantees that the problem size is at least halved each step, meaning the call stack stores \(\bigoh{log n}\) elements at most.
+This last approach, as shown later, is linked to huge speed penalties, so always prioritising the same partition is actually used throughout this Thesis in general.
+But even then, the choice between the two sides can have tremendous effects.
+\todo{zurückkehren}
 
 
 
