@@ -1,9 +1,6 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subsec:tasklet:quick}
 
-\pgfplotstablereadnamed{data/quick/fallback/uint32/composite.txt}{tableQuickFallback_32}
-\pgfplotstablereadnamed{data/quick/fallback/uint64/composite.txt}{tableQuickFallback_64}
-
 \QS{} \cite{hoare1962quicksort} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh{n^2}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left side of the array, respectively.
 Finally, \QS{} is used on the left and right side (the \enquote{partitions}).
@@ -28,6 +25,15 @@ The downside to this approach is that elements equal to the pivot are also swapp
 \paragraph{Base Cases}
 
 \begin{figure}
+	\pgfplotstableset{
+		create on use/n/.style={create col/copy column from table={data/quick/fallback/uint32/16.txt}{n}},
+	}
+	\pgfplotsinvokeforeach{14,15,16,17,18,19,20}{
+		\pgfplotstableset{create on use/µ_#1_32/.style={create col/copy column from table={data/quick/fallback/uint32/#1.txt}{µ_TrivialBC}}}
+		\pgfplotstableset{create on use/µ_#1_64/.style={create col/copy column from table={data/quick/fallback/uint64/#1.txt}{µ_TrivialBC}}}
+	}
+	\pgfplotstablenew[columns={n,µ_14_32,µ_15_32,µ_16_32,µ_17_32,µ_18_32,µ_19_32,µ_20_32,µ_14_64,µ_15_64,µ_16_64,µ_17_64,µ_18_64,µ_19_64,µ_20_64}]{\pgfplotstablegetrowsof{data/quick/fallback/uint32/16.txt}}{\tableQuickFallback}
+
 	\tikzsetnextfilename{quick_fallback}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
@@ -39,36 +45,46 @@ The downside to this approach is that elements equal to the pivot are also swapp
 			xtick={16, 64, 256, 1024},
 			xticklabels={\(16\), \(64\), \(256\), \(1024\)},
 			minor xtick={32, 128, 512},
-			ymin=0.994,
+			ymin=0.993,
 			ymax=1.001,
-			extra y ticks={1.001},
+			extra y ticks={0.993,1.001},
 			yticklabel style={/pgf/number format/.cd, precision=3, fixed, zerofill},
 			legend columns=-1,
 		]
 			\nextgroupplot[title=32-bit\strut]
-			\pgfplotsset{legend to name=leg:quick:fallback, legend entries={16,17,19,20}}
-			\pgfplotsinvokeforeach{16,17,19,20}{
-				\plotspeedup{#1}{18}{tableQuickFallback_32}
+			\pgfplotsset{legend to name=leg:quick:fallback, legend entries={15,...,20}}
+			\pgfplotsset{update limits=false} \addplot coordinates {(15,0.99)}; \pgfplotsset{update limits=true}
+			\pgfplotsinvokeforeach{16,17,18,19,20}{
+				\ifnumequal{#1}{18}{
+					\addplot coordinates {(18,0.99)};
+				}{
+					\plotspeedup{#1_32}{18_32}{tableQuickFallback}
+				}
 			}
 			%
 			\nextgroupplot[title=64-bit\strut]
-			\pgfplotsinvokeforeach{16,17,19,20}{
-				\plotspeedup{#1}{18}{tableQuickFallback_64}
+			\pgfplotsinvokeforeach{15,16,17,18,19}{
+				\ifnumequal{#1}{17}{
+					\addplot coordinates {(17,0.99)};
+				}{
+					\plotspeedup{#1_64}{17_64}{tableQuickFallback}
+				}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
 	\caption{
-		Speed-ups of \QS*{} with different thresholds for when to fall back to \IS{} over a threshold of 18 elements.
+		Speed-ups of \QS*{} with different thresholds (15--20) for when to fall back to \IS{} over a threshold of 18 elements (32-bit) and 17 elements (64-bit).
 		Using \ShS{} was not beneficial overall, likely because many partitions fall below the thresholds.
 	}
 	\label{fig:quick:fallback}
 \end{figure}
 
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
-As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for uniform inputs and likely similar for inputs following Zipf's or normal distributions;
-about 15\% of the runtime is saved compared to a \QS{} never falling back.
+As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for 32-bit integers on uniform inputs and likely similar on inputs following Zipf's or normal distributions.
+For 64-bit integers, the optimal threshold is 17 elements, but since the difference are minuscule, we set 18 elements to be the default threshold for both data types.
+About 15\% of the runtime is saved compared to a \QS{} never falling back.
 For sorted and almost sorted inputs, the threshold is higher since \IS{} is very fast on them so falling back earlier and, thus, ending the sorting process is better.
 The same is true for reverse sorted inputs even though these are the worst-case inputs for \IS{} because \QS{}'s two pointers invert large swaths of the input.
 However, these input distributions should be catered for by a pattern-defeating \QS{} as laid out in \todo{Verweis auf später}, hence the 18 elements as default threshold.
