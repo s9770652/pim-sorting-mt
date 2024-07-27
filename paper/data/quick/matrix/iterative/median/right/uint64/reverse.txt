@@ -1,0 +1,10 @@
+# reps=1000, dist name=reverse, dist param=0, TYPE=UINT64, BLOCK_SIZE=16512, SEQREAD_CACHE_SIZE=1024, NR_TASKLETS=1, CALL_OVERHEAD=128
+# QUICK_THRESHOLD=18, PIVOT=MEDIAN, PARTITION_PRIO=RIGHT, RECURSIVE=false, MERGE_THRESHOLD=32
+n	µ_Normal σ_Normal	µ_TrivialBC σ_TrivialBC	µ_NoTrivial σ_NoTrivial	µ_OneInsertion σ_OneInsertion	µ_ThreshBC σ_ThreshBC	µ_ThreshTrivBC σ_ThreshTrivBC	µ_ThreshThenTriv σ_ThreshThenTriv	µ_TrivInThresh σ_TrivInThresh
+16  	   8482    13	   8469    15	   8457    13	   8633    12	   4546     6	   4569     8	   8469    15	   8470    15
+24  	   5594     9	   5594     9	   5530     8	   5966    12	   6661     9	   6683     9	   5571     8	   5549    12
+32  	   7313    13	   7313    12	   7248    12	   7777    12	   8777    12	   8799    11	   7293    10	   7270    10
+48  	  18484    17	  18089    17	  18420    16	  20117    17	  20537    18	  20579    18	  18730    17	  18307    17
+64  	  34707    24	  33780    23	  34639    22	  37835    24	  38081    23	  38124    24	  35302    23	  34355    24
+96  	  75608    33	  73627    34	  75544    35	  81737    33	  81629    35	  81673    36	  76911    34	  74904    33
+128 	 127799    45	 124759    43	 127733    43	 136922    45	 136462    46	 136509    46	 129802    44	 126740    44
