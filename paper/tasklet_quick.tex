@@ -12,9 +12,9 @@ The \QS*{} implementations presented here are neither stable nor in-place.
 
 \paragraph{Sentinel Values}
 The partitioning is implemented using \citeauthor{hoare1962quicksort}'s original scheme \cite{hoare1962quicksort}:
-At the start of each partitioning step, a pivot is chosen and swapped with the last element.
+At the start of each partitioning step, a pivot \lstinline|p| is chosen and swapped with the last element.
 Then, two pointers are set to either end of the partition.
-The left pointer moves rightwards until finding an element at least as great as the pivot, while the right pointer moves leftwards until finding an element at most as great as the pivot.
+The left pointer \lstinline|i| moves rightwards until finding an element at least as great as the pivot (\lstinline|*i >= p|), while the right pointer \lstinline|j| moves leftwards until finding an element at most as great as the pivot (\lstinline|*l <= p|).
 The two elements found are in the wrong order so they are swapped, and the pointers move onwards.
 This process continues until the pointers meet.
 Finally, the pivot is swapped with the first element of the right partition.
@@ -91,7 +91,8 @@ Overall though, iterative implementations \emph{tend} to be compiled better with
 \paragraph{Partition Prioritisation}
 Whether the left-hand or the right-hand partition is sorted first should not make any difference for the runtime but actually does so because of different compilation, as shown later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
 Always sorting the shorter partition first and putting the longer partition on the call stack guarantees that the problem size is at least halved each step, so that the call stack stores \(\bigoh{log n}\) elements at most.
-This approach, however, is linked to huge speed penalties, which is why it is advisable to always prioritise the same side.
+This approach, however, is linked to huge speed penalties, which is why it is advisable to always prioritise the same side;
+in this Thesis, the right-hand partitions are prioritised.
 An overflow of the call stack becomes unlikely with the right pivot choice.
 
 

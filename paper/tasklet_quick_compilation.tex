@@ -17,7 +17,7 @@ The quality of the compilation of \QS{} is highly erratic to such an extent that
 There are small details influencing the runtime, like storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changing the runtime by a few percentage points in both directions, depending on the rest of implementation.
 But as hinted at in the preceding part of this section, there are four major parameters to examine:
 handling of the base cases, recursion/iteration, pivot choice, and partition prioritisation.
-Before the results are discussed, the first parameter shall be explained in more depth.
+Before the findings are discussed, the first parameter shall be explained in more depth.
 
 Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
 Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and \IS{} would terminate after a few instructions anyway.
@@ -90,8 +90,8 @@ The following handlings were tested:
 		For example, the other handlings use \IS{} roughly 91 times on 1024 uniformly distributed elements.
 	\end{itemize}
 \end{enumerate}
-The results for 32-bit integers are shown in \cref{fig:quick:implementations}.
-The numbers are uniformly distributed so the deterministic pivots are of the same quality as the random ones in expectation.
+The performances of all tested implementation for 32-bit integers are shown in \cref{fig:quick:implementations}.
+The measurements were done on uniform input distributions so the deterministic pivots are, in expectation, of the same quality as the random ones.
 
 \pgfplotsset{
 	quick matrix/.style={
@@ -256,13 +256,21 @@ However, recursion is more susceptible to the partition prioritisation than iter
 The correlation of recursive and iterative performance is weak.
 On one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
 On the other hand, there is \cref{imp:one_insertion} with deterministic medians and prioritisation of right-hand partitions where recursion is slower by more than a third.
-All in all, iterative implementations usually perform better, though.
+All in all, iterative implementations usually perform better, though, especially when focussing on the top-performing implementations of each pivot choice.
 
 The ranking of the different handlings is rather incoherent.
-\Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all handlings, being amongst the top performers across all tested combinations.
+\Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all handlings, being amongst the top performers across all tested implementations.
 \Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call}, which call \QS{} even less often than \cref{imp:triviality_before_call}, are the polar opposite and bring up the rear of the ranking every single time.
 Recursive implementations of \cref{imp:triviality_within_threshold}, where triviality is checked for only if the threshold is undercut, are often worse than recursive implementations of \cref{imp:normal}, where triviality is always checked for, whilst it is the other way around for iterative implementations.
-Interestingly, for all investigated combinations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the function start, regardless of whether these were properly tail recursive or not.
+Interestingly, for all investigated implementations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the function start, regardless of whether these were properly tail recursive or not.
+
+These observations, however, only apply to 32-bit integers.
+\Cref{fig:quick:implementations_64} shows the same measurements for 64-bit integers.
+Whilst the general trend for pivots, partition prioritisation and recursion/iteration hold true, the rankings are vastly different.
+\Cref{imp:triviality_before_call} is not undisputedly the best anymore.
+\Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call} switch back and forth between being the worst and the best handlings.
+Most notably, the two top-performing implementations using deterministic and random medians as pivots, respectively, are actually recursive.
+Luckily, both use \cref{imp:triviality_before_call} so the only difference between the default configurations of 32-bit and 64-bit \QS{} is the usage of recursion/iteration.
 
 What is causing these huge disparities?
 There is a great variety in the compilations but some of the common occurrences are \dots{}
@@ -279,6 +287,12 @@ There is a great variety in the compilations but some of the common occurrences 
 	\item
 	\dots{} more stores and loads when entering and leaving the function.
 \end{itemize}
-This focus on the left pointer is partially explainable by it being used to calculate the inner boundaries of both new partitions.
-We spot-checked combinations to see whether using the other pointer or both of them to calculate the boundaries could alleviate the problems but the results were mixed:
+This focus on the left pointer \lstinline|i| is partially explainable by it being used to calculate the final position of the pivot \lstinline|p| and, thus, the inner boundaries of both new partitions:
+When the left pointer \lstinline|i| stops, it holds \lstinline|*i >= p|.
+Also, the left pointer either passed over the preceding element if \lstinline|*(i - 1) < p|, or it stopped there if \lstinline|*(i - 1) >= p|.
+However, the right pointer \lstinline|j| stopped on some value fulfilling \lstinline|*j <= p|, so it holds \lstinline|*(i - 1) <= p| after swapping.
+Either way, it holds \lstinline|*(i - 1) <= p|.
+If the right pointer \lstinline|j| meets the left pointer \lstinline|i|, it either stops there immediately if \lstinline|*i = p|, or it stops at address \lstinline|i - 1| because of \lstinline|*(i - 1) <= p|.
+In all cases, the pivot, which was moved to the right of the partition at the start, can now swap with pointer \lstinline|i|, and the addresses \lstinline|i - 1| and \lstinline|i + 1| form the end of the left-hand partition and the start of the right-hand partition, respectively.
+We spot-checked implementations to see whether using the right pointer alone or both of them to calculate the boundaries could alleviate the problems but the results were mixed:
 from betterment over indifference to worsening, everything was observable.
