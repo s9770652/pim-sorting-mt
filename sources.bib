@@ -1,6 +1,6 @@
 @article{Shell1959AHS,
-	title={A high-speed sorting procedure},
 	author={Donald L. Shell},
+	title={A high-speed sorting procedure},
 	journal={Commun. ACM},
 	year={1959},
 	volume={2},
@@ -9,8 +9,8 @@
 }
 
 @misc{skean2023optimization,
-	title={Optimization Perspectives on Shellsort},
 	author={Oscar Skean and Richard Ehrenborg and Jerzy W. Jaromczyk},
+	title={Optimization Perspectives on Shellsort},
 	date={2023-01-01},
 	eprint={2301.00316v1},
 	archivePrefix={arXiv},
@@ -34,8 +34,8 @@
 }
 
 @misc{lee2021empirically,
-	title={Empirically Improved Tokuda Gap Sequence in Shellsort},
 	author={Ying Wai Lee},
+	title={Empirically Improved Tokuda Gap Sequence in Shellsort},
 	date={2021-12-21},
 	eprint={2112.11112v1},
 	archivePrefix={arXiv},
@@ -64,6 +64,7 @@
 }
 
 @article{wegener1993heapsort,
+	author={Ingo Wegener},
 	title={BOTTOM-UP-HEAPSORT, a new variant of HEAPSORT beating, on an average, QUICKSORT (if \(n\) is not very small)},
 	journal={Theoretical Computer Science},
 	volume={118},
@@ -74,6 +75,61 @@
 	doi={10.1016/0304-3975(93)90364-Y},
 %	doi={https://doi.org/10.1016/0304-3975(93)90364-Y},
 %	url={https://www.sciencedirect.com/science/article/pii/030439759390364Y},
-	author={Ingo Wegener},
 	abstract={A variant of HEAPSORT, called BOTTOM-UP-HEAPSORT, is presented. It is based on a new reheap procedure. This sequential sorting algorithm is easy to implement and beats, on an average, QUICKSORT if n⩾400 and a clever version of QUICKSORT (where the split object is the median of 3 randomly chosen objects) if n⩾16000. The worst-case number of comparisons is bounded by 1.5n log n+O(n). Moreover, the new reheap procedure improves the delete procedure for the heap data structure for all n.}
+}
+
+@article{hoare1962quicksort,
+	author={Hoare, C. A. R.},
+	title={Quicksort},
+	journal={The Computer Journal},
+	volume={5},
+	number={1},
+	pages={10-16},
+	year={1962},
+	month={01},
+	abstract="{A description is given of a new method of sorting in the random-access store of a computer. The method compares very favourably with other known methods in speed, in economy of storage, and in ease of programming. Certain refinements of the method, which may be useful in the optimization of inner loops, are described in the second part of the paper.}",
+	issn={0010-4620},
+	doi={10.1093/comjnl/5.1.10},
+%	url={https://doi.org/10.1093/comjnl/5.1.10},
+%	eprint={https://academic.oup.com/comjnl/article-pdf/5/1/10/1111445/050010.pdf},
+}
+
+@article{erkiö1984worstcase,
+	author={Erkiö, H.},
+	title={The Worst Case Permutation for Median-of-Three Quicksort},
+	journal={The Computer Journal},
+	volume={27},
+	number={3},
+	pages={276-277},
+	year={1984},
+	month={01},
+	abstract="{An algorithm is given which forms the worst case permutation for one of the most efficient versions of quicksort (median-of-three quicksort). This makes the experimental evaluation of this important algorithm possible. The paper includes a simple experimental comparison of the median-of-three and original versions of quicksort.}",
+	issn={0010-4620},
+	doi={10.1093/comjnl/27.3.276},
+%	url={https://doi.org/10.1093/comjnl/27.3.276},
+%	eprint={https://academic.oup.com/comjnl/article-pdf/27/3/276/1049274/270276.pdf},
+}
+
+@online{blum2011probabilistic,
+	author={Avrim Blum and Manuel Blum},
+	title={Probabilistic Analysis and Randomized Quicksort},
+	date={2011-09-06},
+	url={https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0906.pdf},
+	titleaddon={Lecture 3},
+	organization={Carnegie Mellon University},
+	urldate={2024-07-26},
+}
+
+@article{blum1973median,
+	author={Manuel Blum and Robert W. Floyd and Vaughan Pratt and Ronald L. Rivest and Robert E. Tarjan},
+	title={Time bounds for selection},
+	journal={Journal of Computer and System Sciences},
+	volume={7},
+	number={4},
+	pages={448--461},
+	date={1973-08},
+	issn={0022-0000},
+	doi={https://doi.org/10.1016/S0022-0000(73)80033-9},
+%	url={https://www.sciencedirect.com/science/article/pii/S0022000073800339},
+	abstract={The number of comparisons required to select the i-th smallest of n numbers is shown to be at most a linear function of n by analysis of a new selection algorithm—PICK. Specifically, no more than 5.4305 n comparisons are ever required. This bound is improved for extreme values of i, and a new lower bound on the requisite number of comparisons is also proved.}
 }

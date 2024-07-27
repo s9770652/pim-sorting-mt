@@ -1,0 +1,38 @@
+\subsubsection*{Evaluation of the Performance}
+\label{subsubsec:tasklet:quick:performance}
+
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/MEDIAN_OF_RANDOM/left/uint32/#1.txt}{tableQuick_32#1}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/MEDIAN_OF_RANDOM/left/uint64/#1.txt}{tableQuick_64#1}
+}
+
+\begin{figure}
+	\tikzsetnextfilename{quick_distributions}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=1 by 2,
+			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \((n \lb n)\)},
+			xmode=log,
+			xtick={16, 32, 64, 128, 256, 512, 1024},
+			xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+			ytick distance=10,
+			legend columns=-1,
+		]
+			\nextgroupplot[title=32-bit\strut, ymin=30, ymax=80]
+			\pgfplotsset{legend to name=leg:quick:distributions, legend entries={Sorted,Reverse Sorted,Almost Sorted,Uniform,Zipf's,Normal}}
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\plotpernlogn{NoTrivial}{tableQuick_32#1}
+			}
+			%
+			\nextgroupplot[title=64-bit\strut, ymin=40,ymax=90]
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\plotpernlogn{ThreshThenTriv}{tableQuick_64#1}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick:distributions}\hfil
+	\caption{}
+	\label{fig:quick:distributions}
+\end{figure}

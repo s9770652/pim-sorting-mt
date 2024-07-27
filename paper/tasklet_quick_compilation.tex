@@ -3,121 +3,99 @@
 
 \def\quickpivots{LAST,MEDIAN,RANDOM,MEDIAN_OF_RANDOM}
 \expandafter\pgfplotsinvokeforeach\expandafter{\quickpivots}{
-	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/shorter/uniform.txt}{tableQuickMatrixIt#1Shorter}
-	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/left/uniform.txt}{tableQuickMatrixIt#1Left}
-	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/right/uniform.txt}{tableQuickMatrixIt#1Right}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/shorter/uint32/uniform.txt}{tableQuickMatrixIt#1Shorter_32}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/left/uint32/uniform.txt}{tableQuickMatrixIt#1Left_32}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/right/uint32/uniform.txt}{tableQuickMatrixIt#1Right_32}
 
-	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/shorter/uniform.txt}{tableQuickMatrixRec#1Shorter}
-	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/left/uniform.txt}{tableQuickMatrixRec#1Left}
-	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/right/uniform.txt}{tableQuickMatrixRec#1Right}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/shorter/uint32/uniform.txt}{tableQuickMatrixRec#1Shorter_32}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/left/uint32/uniform.txt}{tableQuickMatrixRec#1Left_32}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/right/uint32/uniform.txt}{tableQuickMatrixRec#1Right_32}
 }
+\def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 
-The quality of the compilation and thus the real performance of \QS{} is erratic to such an extent that one implementation variant may see a speed-up of 25\% over another one even with the same pivot choice although virtually none would be expected.
-As hinted in the preceding paragraphs, this raises the need for a benchmark suite with the following parameters:
-base case handling, recursion/iteration, pivot choice, and partition prioritisation.
+The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots! \Dash one implementation variant may see a reduction of 25\% from another one where none should be.
+There are small details influencing the runtime, like storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changing the runtime by a few percentage points in both directions, depending on the rest of implementation.
+But as hinted at in the preceding part of this section, there are four major parameters to examine:
+handling of the base cases, recursion/iteration, pivot choice, and partition prioritisation.
 Before the results are discussed, the first parameter shall be explained in more depth.
 
-Besides falling back to \IS{} if 13 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a full termination if 1, 0, or --1 elements remain (\enquote{trivial length}).
-Theoretically, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and the \IS{} would terminate after a few instructions anyway.
+Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
+Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and \IS{} would terminate after a few instructions anyway.
 Nonetheless, its inclusion or exclusion can have significant impacts.
-The following \nameCrefs{imp:normal} were tested:
-\begin{enumerate}
+The following handlings were tested:
+\begin{enumerate}[label=(\liningnums{\arabic*})]
 	\item\label[implementation]{imp:normal}
-	If the length is trivial, terminate.
-	If not and if the threshold is undercut, sort with \IS{}.
+	If the length is trivial, terminate immediately.
+	If if the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, sort with \QS{} and use \QS{} on both partitions.
 %	\textcolor{red}{[Normal]}
 
 	\item\label[implementation]{imp:triviality_within_threshold}
-	If the threshold is undercut, check if the length is trivial and terminate or sort with \IS{}, respectively.
+	If the threshold is undercut, check if the length is trivial and terminate immediately or sort with \IS{} and then terminate, respectively.
 	Otherwise, sort with \QS{} and use \QS{} on both partitions.
 %	\textcolor{red}{[TrivInThresh]}
 	\begin{itemize}
 		\item
-		This \nameCref{imp:triviality_within_threshold} significantly reduces the number of checks for trivial length.
+		This handling significantly reduces the number of checks for trivial length.
 	\end{itemize}
 
 	\item\label[implementation]{imp:no_triviality}
-	If the threshold is undercut, sort with \IS{}.
+	If the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, sort with \QS{} and use \QS{} on both partitions.
 %	\textcolor{red}{[NoTrivial]}
 	\begin{itemize}
 		\item
-		This \nameCref{imp:no_triviality} forgoes the check for a trivial length completely, at the cost of unneeded \IS*{}.
+		This handling forgoes the check for a trivial length completely, at the cost of some unneeded \IS*{}.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_then_triviality}
-	If the threshold is undercut, sort with \IS{}.
-	If not and if the length is trivial, terminate.
+	If the threshold is undercut, sort with \IS{} and terminate.
+	If the length is trivial, terminate immediately.
 	Otherwise, sort with \QS{} and use \QS{} on both partitions.
 %	\textcolor{red}{[ThreshThenTriv]}
 	\begin{itemize}
 		\item
-		This \nameCref{imp:threshold_then_triviality}, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
+		This handling, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
-	If the threshold is undercut, sort with \IS{}.
+	If the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, sort with \QS{}.
 	Then check for either partition if its length is trivial and use \QS{} if not.
 %	\textcolor{red}{[TrivialBC]}
 	\begin{itemize}
 		\item
-		This \nameCref{imp:triviality_before_call}, as well as the next two, gets rid of some unneeded uses of \QS{}.
-		In the recursive case, these \nameCrefs{imp:triviality_before_call} lose the property of being tail-recursive.
+		This handling, as well as the next two, gets rid of some unneeded uses of \QS{}.
+		In the recursive case, these handlings lose the property of being tail-recursive.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
 	Sort with \QS{}.
-	Check for either partition if the threshold is undercut and use \IS{} or \QS{}, respectively.
+	Check for either partition if the threshold is undercut and use \IS{} or \QS{} on them, respectively.
 %	\textcolor{red}{[ThreshBC]}
 
 	\item\label[implementation]{imp:threshold_and_triviality_before_call}
 	Sort with \QS{}.
-	Check for either partition if its length is trivial or if the threshold is undercut and use \IS{}, \QS{}, or nothing, respectively.
+	Check for either partition if its length is trivial or if the threshold is undercut and use \IS{}, \QS{}, or nothing on them, respectively.
 %	\textcolor{red}{[ThreshTrivBC]}
 
 	\item\label[implementation]{imp:one_insertion}
-	If the threshold is undercut, terminate.
+	If the threshold is undercut, terminate immediately.
 	Otherwise, sort with \QS{} and use \QS{} on both partitions.
 	After all \QS*{} are done, sort the whole input array with \IS{}.
 %	\textcolor{red}{[OneInsertion]}
 	\begin{itemize}
 		\item
-		This \nameCref{imp:one_insertion} always does one pass of \IS{}.
-		For example, the other \nameCrefs{imp:normal} do roughly 90 at 1024 elements.
+		This handling always does one pass of \IS{}.
+		For example, the other handlings use \IS{} roughly 91 times on 1024 uniformly distributed elements.
 	\end{itemize}
 \end{enumerate}
+The results for 32-bit integers are shown in \cref{fig:quick:implementations}.
+The numbers are uniformly distributed so the deterministic pivots are of the same quality as the random ones in expectation.
 
-All results are shown in \cref{fig:quick:implementations}.
-When using recursion, \cref{imp:normal,imp:triviality_before_call} perform the best, especially for longer inputs.
-Their compilations are fundamentally the same, including the conversion of the second recursive call into a jump back to the function start.
-All other \nameCrefs{imp:normal} fare vastly worse.
-Common occurrences are \dots{}
-\begin{itemize}
-	\item
-	\dots{} one more instruction in the loop finding the next element to move to the right, \dots{}
-
-	\item
-	\dots{} one more instruction after such an element has been found, \dots{}
-
-	\item
-	\dots{} more stores and loads when entering and leaving the function.
-\end{itemize}
-
-\todo[inline]{%
-	Ich kann mir leider nicht alles erklären.
-	Als Beispiel habe ich die Kompilate von \cref{imp:normal} / Recursive / Last für Left First und Right First hochgeladen (die verkürzten Varianten besitzen nur noch Befehle und Sprungmarken).
-	Ersteres ist ja die schnellste rekursive Variante, während letzteres deutlich schlechter abschneidet.
-	Dennoch sehe ich bei der langsameren Variante keinen fundamental anderen Algorithmus.
-	Je Funktionsaufruf kommen ≈3 Extra-Aufrufe hinzu (bei insgesamt ≈104 rekursiven und ≈104 \enquote{Endaufrufen} bei 1024 Elementen), was fast 70\,000 Takte Unterschied nicht erklären kann.
-}
-
-\clearpage
-
-\begin{figure}[p]
-	\pgfplotsset{
-		height=2.574cm,
+\pgfplotsset{
+	quick matrix/.style={
+		height=2.567cm,
 		horizontal sep for naught,
 		vertical sep for naught,
 		adaptive group=3 by 4,
@@ -129,64 +107,67 @@ Common occurrences are \dots{}
 		minor xtick={32, 128, 512},
 		ymin=55,
 		ymax=80,
+		/tikz/mark repeat=2,
 		legend columns=-1,
 	}
-	\def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
+}
+
+\begin{figure}[p]
 	\captionsetup[subfigure]{aboveskip=0mm,belowskip=1mm}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{quick_implementations_rec}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}
-				\nextgroupplot[title=Last, xticklabels={}, legend to name=leg:quick:implementations]
-				\legend{\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}
+			\begin{groupplot}[quick matrix]
+				\nextgroupplot[title=Last, xticklabels={}]
+				\pgfplotsset{legend to name=leg:quick:implementations, legend entries={\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTLeft}
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTLeft_32}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANLeft}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANLeft_32}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMLeft}
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMLeft_32}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMLeft}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMLeft_32}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTRight}
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANRight}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMRight}
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMRight}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMRight_32}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTShorter}
+					\plotpernlogn{#1}{tableQuickMatrixRecLASTShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANShorter}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMShorter}
+					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMShorter_32}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMShorter}
+					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMShorter_32}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -197,56 +178,56 @@ Common occurrences are \dots{}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{quick_implementations_it}
 		\begin{tikzpicture}[plot]
-			\begin{groupplot}
+			\begin{groupplot}[quick matrix]
 				\nextgroupplot[title=Last, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTLeft}
+					\plotpernlogn{#1}{tableQuickMatrixItLASTLeft_32}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANLeft}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANLeft_32}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMLeft}
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMLeft_32}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMLeft}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMLeft_32}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTRight}
+					\plotpernlogn{#1}{tableQuickMatrixItLASTRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANRight}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMRight}
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMRight}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMRight_32}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTShorter}
+					\plotpernlogn{#1}{tableQuickMatrixItLASTShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANShorter}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIANShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMShorter}
+					\plotpernlogn{#1}{tableQuickMatrixItRANDOMShorter_32}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMShorter}
+					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMShorter_32}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -260,9 +241,44 @@ Common occurrences are \dots{}
 	\tikzexternalenable
 	\caption{
 		Comparison of \crefrange{imp:normal}{imp:one_insertion} and different pivots.
-		Left-hand partitions are prioritised in the first rows, right-hand ones in the second rows, and shorter ones in the third rows.
+		Left-hand partitions are prio\-ri\-tised in the first rows, right-hand ones in the second rows, and shorter ones in the third~rows.
 	}
 	\label{fig:quick:implementations}
 \end{figure}
 
-\clearpage
+Even when ignoring the differences between specific handlings, the high fluctuations between the plots leap to the eye.
+Plots within the same column share the same method to chose pivots, plots within the same row share the same prioritisation of partitions.
+In general, it would be expected that plots within the same column are fairly similar, yet prioritising the shorter partition is almost universally associated with an increase in runtime.
+When focussing on the top-performing implementations, the increase can reach more than 15\%.
+There is no clear trend between the consistent prioritisations of either side, although the difference can be huge in individual cases as well.
+However, recursion is more susceptible to the partition prioritisation than iteration.
+
+The correlation of recursive and iterative performance is weak.
+On one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
+On the other hand, there is \cref{imp:one_insertion} with deterministic medians and prioritisation of right-hand partitions where recursion is slower by more than a third.
+All in all, iterative implementations usually perform better, though.
+
+The ranking of the different handlings is rather incoherent.
+\Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all handlings, being amongst the top performers across all tested combinations.
+\Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call}, which call \QS{} even less often than \cref{imp:triviality_before_call}, are the polar opposite and bring up the rear of the ranking every single time.
+Recursive implementations of \cref{imp:triviality_within_threshold}, where triviality is checked for only if the threshold is undercut, are often worse than recursive implementations of \cref{imp:normal}, where triviality is always checked for, whilst it is the other way around for iterative implementations.
+Interestingly, for all investigated combinations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the function start, regardless of whether these were properly tail recursive or not.
+
+What is causing these huge disparities?
+There is a great variety in the compilations but some of the common occurrences are \dots{}
+\begin{itemize}
+	\item
+	\dots{} one instruction more before (re-)starting to move the pointers, \dots{}
+
+	\item
+	\dots{} one instruction more while moving the left pointer by one element, \dots{}
+
+	\item
+	\dots{} one instruction more after the left pointer has stopped, \dots{}
+
+	\item
+	\dots{} more stores and loads when entering and leaving the function.
+\end{itemize}
+This focus on the left pointer is partially explainable by it being used to calculate the inner boundaries of both new partitions.
+We spot-checked combinations to see whether using the other pointer or both of them to calculate the boundaries could alleviate the problems but the results were mixed:
+from betterment over indifference to worsening, everything was observable.

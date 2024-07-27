@@ -4,15 +4,31 @@
 \pgfplotstablereadnamed{data/quick/fallback/uint32/composite.txt}{tableQuickFallback_32}
 \pgfplotstablereadnamed{data/quick/fallback/uint64/composite.txt}{tableQuickFallback_64}
 
-\QS{} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\):
-A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left of the pivot, respectively.
-Finally, \QS{} is used on the left and right partitions.
+\QS{} \cite{hoare1962quicksort} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh{n^2}\):
+A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left side of the array, respectively.
+Finally, \QS{} is used on the left and right side (the \enquote{partitions}).
 The \QS*{} implementations presented here are neither stable nor in-place.
 
+
+\paragraph{Sentinel Values}
+The partitioning is implemented using \citeauthor{hoare1962quicksort}'s original scheme \cite{hoare1962quicksort}:
+At the start of each partitioning step, a pivot is chosen and swapped with the last element.
+Then, two pointers are set to either end of the partition.
+The left pointer moves rightwards until finding an element at least as great as the pivot, while the right pointer moves leftwards until finding an element at most as great as the pivot.
+The two elements found are in the wrong order so they are swapped, and the pointers move onwards.
+This process continues until the pointers meet.
+Finally, the pivot is swapped with the first element of the right partition.
+
+Only an explicit check for whether the pointers have met after stopping is needed.
+Since the elements of the partitions to the left are at most as great as the elements of the current partition, they naturally act as bounds check for the pointer moving rightwards.
+The pivot at the end acts as bounds check for the pointer moving leftwards.
+Since the leftmost partitions have no neighbour to the left, one explicit sentinel values set to the minimum possible value must be placed at the start of the input.
+The downside to this approach is that elements equal to the pivot are also swapped.
 
 \paragraph{Base Cases}
 
 \begin{figure}
+	\tikzsetnextfilename{quick_fallback}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			horizontal sep for labels,
@@ -51,39 +67,32 @@ The \QS*{} implementations presented here are neither stable nor in-place.
 \end{figure}
 
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
-As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for uniform inputs and likely similar for inputs following Zipf's or normal distributions.
-For sorted and almost sorted inputs, the threshold is higher since \QS{} does not move elements which are already on the correct side of the pivot so (almost) no changes are made.
-Since \IS{} does little more than one scan of these inputs, falling back earlier and, thus, ending the sorting process is better.
-For reverse sorted inputs, the threshold is also higher even though these are the worst-case inputs for \IS{}.
-The reason lies within the implementation of \QS{} which repeatedly swaps the foremost element greater than the pivot and the hindmost element lesser than the pivot.
-This way, reverse sorted inputs are reversed in the very first partition step.
+As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for uniform inputs and likely similar for inputs following Zipf's or normal distributions;
+about 15\% of the runtime is saved compared to a \QS{} never falling back.
+For sorted and almost sorted inputs, the threshold is higher since \IS{} is very fast on them so falling back earlier and, thus, ending the sorting process is better.
+The same is true for reverse sorted inputs even though these are the worst-case inputs for \IS{} because \QS{}'s two pointers invert large swaths of the input.
 However, these input distributions should be catered for by a pattern-defeating \QS{} as laid out in \todo{Verweis auf später}, hence the 18 elements as default threshold.
 
-Besides falling back to \IS{}, another base case is imaginable, namely terminating when a partition has a length of at most 1 elements.
-Realistically speaking, checking for this should not be necessary, because even though the extra check is doable with just one additional instruction, it occurs rarely, and the \IS{} would terminate after a few instructions anyway.
-Yet, there are tremendous consequences for the runtime depending on the exact implementation of the base cases, as seen later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
+To avoid unnecessary uses of \IS{}, another base case is imaginable, namely terminating when a partition contains at most 1 elements.
+There are tremendous consequences for the runtime depending on the exact implementation of the base cases, as shown later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
 
 
 \paragraph{Recursion vs.\ Iteration}
 In theory, the question of whether a DPU algorithm should be implemented recursively or iteratively comes down to convenience.
-Due to the uniform costs of instructions, putting arguments automatically on the call stack or manually in an array essentially costs the same, as does jumping to the start of a loop and to the start of a function.
-\todo{Kann jump r23 es kaputtmachen?}
+Due to the uniform costs of instructions, jumping to the start of a loop or to the start of a function essentially costs the same, as does managing arguments automatically through the regular call stack and manually through a simulated one.
 Furthermore, in case of \QS{}, the compiler turns tail-recursive calls into jumps back to the function start, so that one partition is sorted recursively and the other iteratively.
-All this would suggest a recursive implementation due to less code complexity.
+All this would suggest a recursive implementation due to the reduced maintenance.
 
 In practice, it comes down to the compilation.
-Selcouthly, even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
-Overall though, iterative implementations tend to be compiled better with superior register usage and less instructions used for the actual \QS{} algorithm.
-The fastest implementation is indeed an iterative one, even if it beats the fastest recursive implementations \Dash outliers, admittedly \Dash by less than 4\%.
-\todo{zurückkehren}
+Even parts of the algorithms which are independent from the choice between recursion and iteration can be compiled differently, such that there are implementations where iteration is faster than recursion and the other way around.
+Overall though, iterative implementations \emph{tend} to be compiled better with superior register usage and less instructions used for the actual \QS{} algorithm.
 
 
 \paragraph{Partition Prioritisation}
-Whether the left-hand or the right-hand is put on the stack should not make any difference for the runtime.
-However, always putting the longer partition on the stack guarantees that the problem size is at least halved each step, meaning the call stack stores \(\bigoh{log n}\) elements at most.
-This last approach, as shown later, is linked to huge speed penalties, so always prioritising the same partition is actually used throughout this Thesis in general.
-But even then, the choice between the two sides can have tremendous effects.
-\todo{zurückkehren}
+Whether the left-hand or the right-hand partition is sorted first should not make any difference for the runtime but actually does so because of different compilation, as shown later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
+Always sorting the shorter partition first and putting the longer partition on the call stack guarantees that the problem size is at least halved each step, so that the call stack stores \(\bigoh{log n}\) elements at most.
+This approach, however, is linked to huge speed penalties, which is why it is advisable to always prioritise the same side.
+An overflow of the call stack becomes unlikely with the right pivot choice.
 
 
 \paragraph{Pivot Choice}
@@ -95,8 +104,6 @@ The following were implemented and tested:
 
 	\item
 	Taking the \emph{median of three elements}, namely the first, middle, and last one, is far more computationally expensive since the position of the middle element must be calculated, the median be determined, and the pivot be swapped with the last element of the array, where it acts as sentinel.
-	The plus side is that this method increases the chances of choosing a pivot that is neither particularly high nor particularly low.
-	This leads to more balanced partitions such that the call stack is less likely to overflow and the base cases are reached faster.
 
 	\item
 	A \emph{random element} is most efficiently drawn using an xorshift random number generator and rejection sampling \cite{lukas_geis}.
@@ -107,18 +114,21 @@ The following were implemented and tested:
 	For simplicity, there is no check on whether an element is drawn twice or thrice.
 	Since the partitions are rather long, this should happen seldom, anyhow.
 \end{itemize}
+A median increases the chances of choosing a pivot that is neither particularly high nor particularly low.
+This leads to more balanced partitions such that the call stack is less likely to overflow and the base cases are reached faster.
+But even then it is still possible to construct inputs where the runtime climbs up to \(\bigtheta{n^2}\) \cite{erkiö1984worstcase}, as everything is moved to the same partition so that the problem size is reduced by only one element (namely the pivot) after each partitioning step.
 
+The random pivots circumvent this problem.
+Whilst the pivots could, by ill luck, also lead to the same unbalanced partitions as the deterministic pivots, the worst-case expected runtime is \(\bigoh{n \log n}\) \cite{blum2011probabilistic}.
+Using the median of medians \cite{blum1973median} could guarantee a runtime of \(\bigoh{n \log n}\) but was not implemented because a performant implementation would probably be quite complex and its benefit minuscule for this Thesis.
 
-
-Luckily, the pivot choice seldom has bearing on the overall compilation, making a comparison easier.
-\todo{Stimmt nicht!}
-The results are shown in \cref{fig:quick:pivot}.
-Choosing the middle element is cheap enough for the runtime to be slowed down by a low single-digit percentage, and the increased pivot quality from choosing the median of three elements more than offsets the cost increase, thus making it the best choice.
-At 1024 elements, the runtime with a random pivot is 10\% worse than with the median of three elements.
-Since drawing the random index is more than thrice as costly as computing the middle index, a median of three random elements would likely yield even worse times, should one need randomisation.
-Again, more details are given in \cref{subsubsec:tasklet:quick:compilation}.
-\todo{zurückkehren}
-
+The general trend, as seen in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}, is the following:
+A median gets more beneficial for the average runtime, the longer the input becomes, and leads to small pay-offs in the end.
+Moreover, the standard deviations of the runtimes are cut roughly in half, although not shown in the figures of \enquote{\nameref{subsubsec:tasklet:quick:compilation}} for reasons of clarity.
+If the input is known to be fairly random, a deterministic choice yields a noticeably speed-up.
+However, the gain remains in the single digits percentage-wise, supporting the findings by \citeauthor{lukas_geis}~\cite{lukas_geis} that drawing random numbers is quite cheap.
+For this reason, the median of three random elements is used as default configuration throughout this Thesis.
 
 
 \input{tasklet_quick_compilation}
+\input{tasklet_quick_performance}
