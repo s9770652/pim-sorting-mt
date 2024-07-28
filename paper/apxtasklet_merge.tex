@@ -1,15 +1,6 @@
 \subsection{\texorpdfstring{\MS{}}{MergeSort}}
 \label{subapx:tasklet:merge}
 
-\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/sorted.txt}{tableMergeStart#1_64sorted}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/reverse.txt}{tableMergeStart#1_64reverse}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/almost.txt}{tableMergeStart#1_64almost}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/uniform.txt}{tableMergeStart#1_64uniform}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/zipf.txt}{tableMergeStart#1_64zipf}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
-}
-
 \pgfplotsset{merge/.append style={height=3.5cm}}
 
 \begin{figure}[!ht]

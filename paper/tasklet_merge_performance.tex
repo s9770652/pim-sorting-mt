@@ -3,7 +3,6 @@
 
 \def\mergealgos{16,24,32,48,64,96}
 
-\pgfplotstablereadnamed{data/wram_sorts.txt}{tableWramSorts}
 \expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
@@ -11,6 +10,13 @@
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/uniform.txt}{tableMergeStart#1_32uniform}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/zipf.txt}{tableMergeStart#1_32zipf}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/normal.txt}{tableMergeStart#1_32normal}
+
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/sorted.txt}{tableMergeStart#1_64sorted}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/reverse.txt}{tableMergeStart#1_64reverse}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/almost.txt}{tableMergeStart#1_64almost}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/uniform.txt}{tableMergeStart#1_64uniform}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/zipf.txt}{tableMergeStart#1_64zipf}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
 }
 
 \pgfplotsset{

@@ -1,0 +1,98 @@
+\subsection{Interim Conclusion}
+\label{subsec:tasklet:conclusion}
+
+\begin{figure}[p]
+	\pgfplotsset{
+		height=2.925cm,
+		adaptive group=2 by 3,
+		groupplot ylabel={Cycles / \((n \lb n)\)},
+		x from 16 to 1024 minor,
+		/tikz/mark repeat=2,
+	}
+
+	\NewDocumentCommand{\allalgos}{m}{
+		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32#1}
+		\pgfplotsset{update limits=false}
+		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_32#1}
+		\pgfplotsset{update limits=true}
+		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_32#1}
+	}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{tasklet_summary_32}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				ymin=0,
+				ymax=150,
+			]
+				\nextgroupplot[title=Sorted\strut]
+				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{}, \HS{}}}
+				\allalgos{sorted}
+				%
+				\nextgroupplot[title=Reverse Sorted\strut]
+				\allalgos{reverse}
+				%
+				\nextgroupplot[title=Almost Sorted\strut]
+				\allalgos{almost}
+				%
+				\nextgroupplot[title=Uniform\strut]
+				\allalgos{uniform}
+				%
+				\nextgroupplot[title=Zipf's\strut]
+				\allalgos{zipf}
+				%
+				\nextgroupplot[title=Normal\strut]
+				\allalgos{normal}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			32-bit
+		}
+		\medskip
+	\end{subfigure}
+
+	\RenewDocumentCommand{\allalgos}{m}{
+		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64#1}
+		\pgfplotsset{update limits=false}
+		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_64#1}
+		\pgfplotsset{update limits=true}
+		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_64#1}
+	}
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{tasklet_summary_64}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				ymin=0,
+				ymax=200,
+			]
+				\nextgroupplot[title=Sorted\strut]
+				\allalgos{sorted}
+				%
+				\nextgroupplot[title=Reverse Sorted\strut]
+				\allalgos{reverse}
+				%
+				\nextgroupplot[title=Almost Sorted\strut]
+				\allalgos{almost}
+				%
+				\nextgroupplot[title=Uniform\strut]
+				\allalgos{uniform}
+				%
+				\nextgroupplot[title=Zipf's\strut]
+				\allalgos{zipf}
+				%
+				\nextgroupplot[title=Normal\strut]
+				\allalgos{normal}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			64-bit
+		}
+		\bigskip
+	\end{subfigure}
+
+	\hfil\pgfplotslegendfromname{leg:tasklet:summary}\hfil
+	\caption{
+		Comparison of the average runtimes of all algorithms presented in this section.
+		The coloured areas denote the three-sigma intervals, that is, the 99.7\% confidence intervals.
+	}
+	\label{fig:tasklet:summary}
+\end{figure}
