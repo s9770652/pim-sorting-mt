@@ -45,7 +45,7 @@
 % Automatic export and import of every TikZ picture as PDF.
 \usetikzlibrary{external}
 \tikzsetexternalprefix{figs/}
-\tikzexternalize
+%\tikzexternalize
 \makeatletter
 \renewcommand{\todo}[2][]{\tikzexternaldisable\@todo[#1]{#2}\tikzexternalenable}  % excluding to-do notes from externalisation
 \makeatother
