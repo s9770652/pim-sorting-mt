@@ -11,32 +11,32 @@
 			ymin=120,
 			ymax=160,
 		]
-			\nextgroupplot[title={Sorted}]
+			\nextgroupplot[title={Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32sorted}
 			}
 			%
-			\nextgroupplot[title={Reverse Sorted}]
+			\nextgroupplot[title={Reverse Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32reverse}
 			}
 			%
-			\nextgroupplot[title={Almost Sorted}]
+			\nextgroupplot[title={Almost Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32almost}
 			}
 			%
-			\nextgroupplot[title={Uniform}]
+			\nextgroupplot[title={Uniform\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32uniform}
 			}
 			%
-			\nextgroupplot[title={Zipf's}]
+			\nextgroupplot[title={Zipf's\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32zipf}
 			}
 			%
-			\nextgroupplot[title={Normal}]
+			\nextgroupplot[title={Normal\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_32normal}
 			}
@@ -60,32 +60,32 @@
 			ymax=190,
 			ytick distance=10,
 		]
-			\nextgroupplot[title={Sorted}]
+			\nextgroupplot[title={Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64sorted}
 			}
 			%
-			\nextgroupplot[title={Reverse Sorted}]
+			\nextgroupplot[title={Reverse Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64reverse}
 			}
 			%
-			\nextgroupplot[title={Almost Sorted}]
+			\nextgroupplot[title={Almost Sorted\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64almost}
 			}
 			%
-			\nextgroupplot[title={Uniform}]
+			\nextgroupplot[title={Uniform\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64uniform}
 			}
 			%
-			\nextgroupplot[title={Zipf's}]
+			\nextgroupplot[title={Zipf's\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64zipf}
 			}
 			%
-			\nextgroupplot[title={Normal}]
+			\nextgroupplot[title={Normal\strut}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlogn{#1}{tableHeap_64normal}
 			}
