@@ -12,11 +12,11 @@ The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up 
 Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
 
 \paragraph{Memory Footprint}
-A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full space}).
+A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full-space}).
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed for some input lengths.
 
-A slightly more sophisticated implementation needs space for only \(n/2\) additional elements (\enquote{half space}):
+A slightly more sophisticated implementation needs space for only \(n/2\) additional elements (\enquote{half-space}):
 When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
 Then, the copy and the second run are merged to the start of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.

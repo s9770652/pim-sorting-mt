@@ -53,7 +53,7 @@
 				\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
 			}
 			%
-			\nextgroupplot[title={Half Space}]
+			\nextgroupplot[title={Half-Space}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
@@ -63,14 +63,14 @@
 
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
-		Comparison of \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(\sfrac{n}{2}\) (\enquote{Half Space}), for different lengths of the starting runs.
+		Comparison of \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(n/2\) (\enquote{Half-Space}), for different lengths of the starting runs.
 		The \MS*{} use a \ShS{} with the step sizes \(\stepsizes = (1)\) for length 16, \(\stepsizes = (6, 1)\) for lengths 24 to 48, and \(\stepsizes = (12, 5, 1)\) for lengths 64 and 96, respectively.
 	}
 	\label{fig:merge:starting_runs}
 \end{figure}
 
 Three implementations have been tested:
-full space \MS{} without write-backs, full space \MS{} with write-backs, and half space \MS{}.
+full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
 \Cref{fig:merge:starting_runs,fig:merge:starting_runs_uint32sorted,fig:merge:starting_runs_uint32uniform,fig:merge:starting_runs_uint64sorted,fig:merge:starting_runs_uint64uniform} show their performance for various starting run lengths.
 Please note that the plots are smoothed:
 Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots cross each other unswervingly and, thereby, hard to read.
