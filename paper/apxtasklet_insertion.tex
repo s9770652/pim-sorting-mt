@@ -6,13 +6,11 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Cycles / \(n^2\)},
 			xtick distance=3,
 			minor xtick=data,
 			ymin=0,
 			ymax=60,
-			legend columns=3,
 		]
 			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
@@ -59,14 +57,12 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Cycles / \(n^2\)},
 			xtick distance=3,
 			minor xtick=data,
 			ymin=0,
 			ymax=70,
 			extra y ticks={70},
-			legend columns=3,
 		]
 			\nextgroupplot[title={Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{

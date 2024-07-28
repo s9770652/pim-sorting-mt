@@ -9,12 +9,8 @@
 \pgfplotsset{
 	heap/.style={
 		adaptive group=1 by 2,
-		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
-		xmode=log,
-		xtick={16, 32, 64, 128, 256, 512, 1024},
-		xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-		legend columns=-1,
+		x from 16 to 1024,
 	},
 }
 

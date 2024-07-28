@@ -13,11 +13,9 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Speed-up},
 			xtick distance=3,
 			minor xtick=data,
-			legend columns=-1,
 			yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}
 		]
 			\nextgroupplot[title={Sorted}]
@@ -72,11 +70,9 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			adaptive group=3 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Speed-up},
 			xtick distance=3,
 			minor xtick=data,
-			legend columns=-1,
 			yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}
 		]
 			\nextgroupplot[title={Sorted}]

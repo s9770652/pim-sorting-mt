@@ -99,16 +99,11 @@ The measurements were done on uniform input distributions so the deterministic p
 		horizontal sep for naught,
 		vertical sep for naught,
 		adaptive group=3 by 4,
-		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
-		xmode=log,
-		xtick={16, 64, 256, 1024},
-		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
-		minor xtick={32, 128, 512},
+		x from 16 to 1024 minor,
 		ymin=55,
 		ymax=80,
 		/tikz/mark repeat=2,
-		legend columns=-1,
 	}
 }
 

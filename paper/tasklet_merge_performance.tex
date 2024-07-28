@@ -17,15 +17,10 @@
 	merge/.style={
 		horizontal sep for ticks,
 		adaptive group=1 by 3,
-		groupplot xlabel={Input Length \(n\)},
 		groupplot ylabel={Cycles / \((n \lb n)\)},
-		xmode=log,
+		x from 16 to 1024 minor,
 		xmax=1024,
-		xtick={16, 64, 256, 1024},
-		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
-		minor xtick={32, 128, 512},
 		enlarge x limits={abs=3mm, true},
-		legend columns=-1,
 		every legend image post={mark=none},
 	},
 	merge filter 16/.style={x filter/.expression={(\thisrow{n} == 16) || (\thisrow{n} ==  24) || (\thisrow{n} ==  96) || (\thisrow{n} == 384) || (\thisrow{n} == 1536) ? \pgfmathresult : nan}},
@@ -44,7 +39,7 @@
 			ymin=65,
 			ymax=90,
 			ytick distance=5,
-			]
+		]
 			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
 			\expandafter\legend\expandafter{\mergealgos}
 			\clip (0, 0) rectangle (1024, 200);

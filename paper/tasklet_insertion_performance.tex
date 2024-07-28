@@ -28,7 +28,7 @@ Nonetheless, the two \IS*{} tie.
 			xtick distance=3,
 			minor xtick=data,
 			legend columns=3,
-			]
+		]
 			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60, legend to name=leg:insertion:against_others]
 			\legend{\IS{} (no sentinel), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{

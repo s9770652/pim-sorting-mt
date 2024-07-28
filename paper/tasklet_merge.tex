@@ -65,11 +65,7 @@ Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30
 		\begin{groupplot}[
 			horizontal sep for labels,
 			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
-			xmode=log,
-			xtick={20, 32, 64, 128, 256, 512, 1024},
-			xticklabels={\(20\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
-			legend columns=-1,
+			x from 16 to 1024,
 		]
 			\nextgroupplot[ylabel=Cycles / \((n \lb n)\), ymin=0, ymax=150, legend to name=leg:wram_sorts]
 			\legend{\QS{}, \ShS, \HS{}, \MS{}}
