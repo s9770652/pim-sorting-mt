@@ -16,6 +16,32 @@
 \renewcommand{\topfraction}{.8}
 \renewcommand{\floatpagefraction}{.8}
 
+\pgfplotsset{
+	height=4cm,
+	cycle multiindex list={exotic \nextlist mark list*},  % automatic colouring of plots
+	x from 16 to 1024/.style={
+		xmode=log,
+		xtick={16, 32, 64, 128, 256, 512, 1024},
+		xticklabels={\(16\), \(32\), \(64\), \(128\), \(256\), \(512\), \(1024\)},
+	},
+	x from 16 to 1024 minor/.style={
+		xmode=log,
+		xtick={16, 64, 256, 1024},
+		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
+		minor xtick={32, 128, 512},
+	},
+	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
+	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (with ticks + labels)
+	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (with ticks)
+	horizontal sep for naught/.style={group/horizontal sep=2mm},  % padding between groupplots (without anything)
+	horizontal sep for ticks,
+	vertical sep for ticks/.style={group/vertical sep=14mm},  % padding between rows of groupplots (with ticks)
+	vertical sep for naught/.style={group/vertical sep=2mm},  % padding between rows of groupplots (without anything)
+	vertical sep for ticks,
+	groupplot xlabel={Input Length \(n\)},
+	legend columns=-1,
+}
+
 % Automatic export and import of every TikZ picture as PDF.
 \usetikzlibrary{external}
 \tikzsetexternalprefix{figs/}

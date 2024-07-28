@@ -1,6 +1,11 @@
 \subsection{\texorpdfstring{\QS{}}{QuickSort}}
 \label{subapx:tasklet:quick}
 
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/median/right/uint32/#1.txt}{tableQuickDet_32#1}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/median/right/uint64/#1.txt}{tableQuickDet_64#1}
+}
+
 \expandafter\pgfplotsinvokeforeach\expandafter{\quickpivots}{
 	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/shorter/uint64/uniform.txt}{tableQuickMatrixIt#1Shorter_64}
 	\pgfplotstablereadnamed{data/quick/matrix/iterative/#1/left/uint64/uniform.txt}{tableQuickMatrixIt#1Left_64}
@@ -11,7 +16,96 @@
 	\pgfplotstablereadnamed{data/quick/matrix/recursive/#1/right/uint64/uniform.txt}{tableQuickMatrixRec#1Right_64}
 }
 
-\clearpage
+\begin{figure}[!ht]
+	\tikzsetnextfilename{quick_runtime_uint32}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=3 by 2,
+			groupplot ylabel={Cycles / \((n \lb n)\)},
+			x from 16 to 1024,
+			ymin=20,
+			ymax=80,
+		]
+			\nextgroupplot[title={Sorted}]
+			\pgfplotsset{legend to name=leg:quick:runtime_32, legend entries={Deterministic Median,Random Median}}
+			\plotpernlogn{TrivialBC}{tableQuickDet_32sorted}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32sorted}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_32reverse}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32reverse}
+			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_32sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_32almost}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32almost}
+			%
+			\nextgroupplot[title={Uniform}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_32uniform}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32uniform}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_32zipf}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32zipf}
+			%
+			\nextgroupplot[title={Normal}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_32normal}
+			\plotpernlogn{TrivialBC}{tableQuickRand_32normal}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
+	\caption{
+		An extension to \cref{fig:quick:runtime} with two different pivot choices.
+		The data type is 32-bit unsigned integers.
+	}
+	\label{fig:quick:runtime_uint32}
+\end{figure}
+
+\begin{figure}
+	\tikzsetnextfilename{quick_runtime_uint64}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=3 by 2,
+			groupplot ylabel={Cycles / \((n \lb n)\)},
+			x from 16 to 1024,
+			ymin=20,
+			ymax=100,
+		]
+			\nextgroupplot[title={Sorted}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64sorted}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64sorted}
+			%
+			\nextgroupplot[title={Reverse Sorted}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64reverse}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64reverse}
+			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_64sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
+			%
+			\nextgroupplot[title={Almost Sorted}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64almost}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64almost}
+			%
+			\nextgroupplot[title={Uniform}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64uniform}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64uniform}
+			%
+			\nextgroupplot[title={Zipf's}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64zipf}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64zipf}
+			%
+			\nextgroupplot[title={Normal}]
+			\plotpernlogn{TrivialBC}{tableQuickDet_64normal}
+			\plotpernlogn{TrivialBC}{tableQuickRand_64normal}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
+	\caption{
+		An extension to \cref{fig:quick:runtime} with two different pivot choices.
+		The data type is 64-bit unsigned integers.
+	}
+	\label{fig:quick:runtime_uint64}
+\end{figure}
 
 \begin{figure}[p]
 	\captionsetup[subfigure]{aboveskip=0mm,belowskip=1mm}

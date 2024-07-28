@@ -39,17 +39,12 @@ The downside to this approach is that elements equal to the pivot are also swapp
 		\begin{groupplot}[
 			horizontal sep for labels,
 			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			groupplot ylabel={Speed-up},
-			xmode=log,
-			xtick={16, 64, 256, 1024},
-			xticklabels={\(16\), \(64\), \(256\), \(1024\)},
-			minor xtick={32, 128, 512},
+			x from 16 to 1024,
 			ymin=0.993,
 			ymax=1.001,
 			extra y ticks={0.993,1.001},
 			yticklabel style={/pgf/number format/.cd, precision=3, fixed, zerofill},
-			legend columns=-1,
 		]
 			\nextgroupplot[title=32-bit\strut]
 			\pgfplotsset{legend to name=leg:quick:fallback, legend entries={15,...,20}}
@@ -83,8 +78,8 @@ The downside to this approach is that elements equal to the pivot are also swapp
 
 When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
 As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for 32-bit integers on uniform inputs and likely similar on inputs following Zipf's or normal distributions.
-For 64-bit integers, the optimal threshold is 17 elements, but since the difference are minuscule, we set 18 elements to be the default threshold for both data types.
-About 15\% of the runtime is saved compared to a \QS{} never falling back.
+For 64-bit integers, the optimal threshold is 17 elements, but we set 18 elements to be the default threshold for both data types to simplify matters since the impact is minuscule.
+Up to 40\% of the runtime is saved compared to a \QS{} never falling back.
 For sorted and almost sorted inputs, the threshold is higher since \IS{} is very fast on them so falling back earlier and, thus, ending the sorting process is better.
 The same is true for reverse sorted inputs even though these are the worst-case inputs for \IS{} because \QS{}'s two pointers invert large swaths of the input.
 However, these input distributions should be catered for by a pattern-defeating \QS{} as laid out in \todo{Verweis auf später}, hence the 18 elements as default threshold.
@@ -120,14 +115,13 @@ The following were implemented and tested:
 	Using the \emph{last element} is the fastest way, requiring zero additional instructions.
 
 	\item
-	Taking the \emph{median of three elements}, namely the first, middle, and last one, is far more computationally expensive since the position of the middle element must be calculated, the median be determined, and the pivot be swapped with the last element of the array, where it acts as sentinel.
+	Taking the \emph{deterministic median} of three elements, namely the first, middle, and last one, is far more computationally expensive since the position of the middle element must be calculated, the median be determined, and the pivot be swapped with the last element of the array, where it acts as sentinel.
 
 	\item
 	A \emph{random element} is most efficiently drawn using an xorshift random number generator and rejection sampling \cite{lukas_geis}.
-	This takes some instructions but impedes deterministically chosen worst-case inputs.
 
 	\item
-	Taking the \emph{median of three random elements} is a combination of the previous two methods.
+	The \emph{random median} is a combination of the previous two methods, where the median of three random elements is taken.
 	For simplicity, there is no check on whether an element is drawn twice or thrice.
 	Since the partitions are rather long, this should happen seldom, anyhow.
 \end{itemize}
