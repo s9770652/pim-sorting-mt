@@ -24,6 +24,7 @@ jobs:
           root_file: main.tex
           latexmk_shell_escape: true
           latexmk_use_lualatex: true
+          args: -interaction=nonstopmode
 
       - name: Package
         shell: sh
