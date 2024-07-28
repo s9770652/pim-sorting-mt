@@ -29,7 +29,7 @@
 \pgfplotsset{compat=1.18}
 \RequirePackage{pgfplotstable}  % erlaubt es, Daten aus Textdateien in Tabellen und Grafiken umzuwandeln
 \ifgroupplotsactivated
-\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{groupplots,fillbetween}
 \fi
 
 \RequirePackage{algorithm2e}  % Algorithmen setzen

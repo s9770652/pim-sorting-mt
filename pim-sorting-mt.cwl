@@ -9,6 +9,8 @@
 \plotwithbars[options]{column}{table}
 \plotpernlogn{column}{table}
 \plotpernlogn[options]{column}{table}
+\plotpernlognwitherrors{column}{table}
+\plotpernlognwitherrors[options]{column}{table}
 \plotpernn{column}{table}
 \plotpernn[options]{column}{table}
 \plotspeedup{denominator}{numerator}{table}

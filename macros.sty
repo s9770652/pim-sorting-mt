@@ -36,6 +36,27 @@
 	{#3};
 }
 
+% Draws a plot of column µ_#2 of table #3, divided by n log n. Also draws the 2σ interval.
+% A column n must be present. Applies custom options #1.
+\NewDocumentCommand{\plotpernlognwitherrors}{O{} m m}{
+	\addplotnamedtable
+	[name path=top, no marks, forget plot, opacity=0.75, #1]
+	[x=n, y expr={(\thisrow{µ_#2} + 3 * \thisrow{σ_#2}) / (\thisrow{n} * log2(\thisrow{n}))}]
+	{#3};
+	%
+	\addplotnamedtable
+	[name path=bottom, no marks, forget plot, opacity=0.75, #1]
+	[x=n, y expr={(\thisrow{µ_#2} - 3 * \thisrow{σ_#2}) / (\thisrow{n} * log2(\thisrow{n}))}]
+	{#3};
+	%
+	\addplot +[fill opacity=0.5, forget plot] fill between[of=top and bottom];
+	%
+	\addplotnamedtable
+	[#1]
+	[x=n, y expr={\thisrow{µ_#2} / (\thisrow{n} * log2(\thisrow{n}))}]
+	{#3};
+}
+
 % Draws a plot of column µ_#2 of table #3, divided by n² (a column n must be present).
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernn}{O{} m m}{
