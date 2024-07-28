@@ -2,8 +2,8 @@
 \label{subapx:tasklet:quick}
 
 \pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-	\pgfplotstablereadnamed{data/quick/matrix/iterative/median/right/uint32/#1.txt}{tableQuickDet_32#1}
-	\pgfplotstablereadnamed{data/quick/matrix/recursive/median/right/uint64/#1.txt}{tableQuickDet_64#1}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/Median/right/uint32/#1.txt}{tableQuickDet_32#1}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/Median/right/uint64/#1.txt}{tableQuickDet_64#1}
 }
 
 \expandafter\pgfplotsinvokeforeach\expandafter{\quickpivots}{
@@ -115,53 +115,53 @@
 			\begin{groupplot}[quick matrix]
 				\nextgroupplot[title=Last, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_32}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_32}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_32}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomLeft_32}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomRight_32}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomShorter_32}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomShorter_32}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -175,53 +175,53 @@
 			\begin{groupplot}[quick matrix]
 				\nextgroupplot[title=Last, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_32}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_32}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_32}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMLeft_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomLeft_32}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixItLastRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomRight_32}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMRight_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomRight_32}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixItLastShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianShorter_32}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomShorter_32}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMShorter_32}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomShorter_32}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -250,53 +250,53 @@
 			\begin{groupplot}[quick matrix]
 				\nextgroupplot[title=Last, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_64}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_64}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_64}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomLeft_64}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomRight_64}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecLASTShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecLastShorter_64}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIANShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedianShorter_64}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecRANDOMShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecRandomShorter_64}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixRecMEDIAN_OF_RANDOMShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomShorter_64}
 				}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -310,53 +310,53 @@
 			\begin{groupplot}[quick matrix]
 				\nextgroupplot[title=Last, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_64}
 				}
 				\nextgroupplot[title=Median, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_64}
 				}
 				\nextgroupplot[title=Random, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_64}
 				}
 				\nextgroupplot[title=Median (Random), xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMLeft_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomLeft_64}
 				}
 				%
 				\nextgroupplot[xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixItLastRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomRight_64}
 				}
 				\nextgroupplot[xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMRight_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomRight_64}
 				}
 				%
 				\nextgroupplot
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItLASTShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixItLastShorter_64}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIANShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedianShorter_64}
 				}
 				\nextgroupplot[yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItRANDOMShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixItRandomShorter_64}
 				}
 				\nextgroupplot[yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
-					\plotpernlogn{#1}{tableQuickMatrixItMEDIAN_OF_RANDOMShorter_64}
+					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomShorter_64}
 				}
 			\end{groupplot}
 		\end{tikzpicture}

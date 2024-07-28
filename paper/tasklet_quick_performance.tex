@@ -2,8 +2,8 @@
 \label{subsubsec:tasklet:quick:performance}
 
 \pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-	\pgfplotstablereadnamed{data/quick/matrix/iterative/median_of_random/right/uint32/#1.txt}{tableQuickRand_32#1}
-	\pgfplotstablereadnamed{data/quick/matrix/recursive/median_of_random/right/uint64/#1.txt}{tableQuickRand_64#1}
+	\pgfplotstablereadnamed{data/quick/matrix/iterative/Median_of_random/right/uint32/#1.txt}{tableQuickRand_32#1}
+	\pgfplotstablereadnamed{data/quick/matrix/recursive/Median_of_random/right/uint64/#1.txt}{tableQuickRand_64#1}
 }
 
 \begin{figure}

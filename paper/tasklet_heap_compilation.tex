@@ -20,4 +20,4 @@ However, adding an if-statement within which the sentinel leaf is placed has dra
 Since the parity of the input length is needed later anyway, the version with the if-statement is expected to gain one instruction.
 Yet, when measuring the runtimes on 1024 elements, for example, one can observe anything between a reduction by 5000 cycles over changes within the margin of error to increases by 25\,000 cycles, depending on the implementation and the input distribution.
 A comparison of the compilations reveals minute differences at the beginnings of functions, none of which affect loops.
-Adding one or more sentinel leafs outside of the functions has no impact on this behaviour.
+Adding one or more sentinel leaves outside of the functions has no impact on this behaviour.
