@@ -113,7 +113,7 @@ The measurements were done on uniform input distributions so the deterministic p
 		\tikzsetnextfilename{quick_implementations_rec}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last\strut}, xticklabels={}]
+				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
 				\pgfplotsset{legend to name=leg:quick:implementations, legend entries={\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_32}
@@ -122,7 +122,7 @@ The measurements were done on uniform input distributions so the deterministic p
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_32}
 				}
-				\nextgroupplot[title={Random\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_32}
 				}
@@ -174,7 +174,7 @@ The measurements were done on uniform input distributions so the deterministic p
 		\tikzsetnextfilename{quick_implementations_it}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last\strut}, xticklabels={}]
+				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_32}
 				}
@@ -182,7 +182,7 @@ The measurements were done on uniform input distributions so the deterministic p
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_32}
 				}
-				\nextgroupplot[title={Random\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_32}
 				}
