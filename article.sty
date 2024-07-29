@@ -209,7 +209,8 @@
 	filter discard warning=false,
 	scale only axis,  % height and width apply only to the axes, not the labels
 	enlargelimits={abs=3mm, auto},  % for axes without specified limits, the limits are a bit bigger than neeeded (→ padding)
-	ymajorgrids,  % grey, horizontal background lines at each y-tick
+	grid=major,  % grey, horizontal background lines at each y-tick
+	grid style={thin, black!50, loosely dotted},
 	set layers,  % needed as otherwise extra ticks are drawn above the border
 	legend style={  % adds padding to legends with multiple columns
 		cells={anchor=west},  % left aligned labels
