@@ -2,14 +2,17 @@
 \label{subsec:tasklet:merge}
 
 \MS{} repeatedly compares two sorted subarrays and merges them into a longer sorted array in time \(\bigtheta{n \log n}\).
-Unlike \QS{}, this runtime is guaranteed.
-Furthermore, the sorting is naturally stable but at the cost of not happening in-place.
+Unlike \QS{}, this runtime is guaranteed at the cost of even more needed additional space of size \(\bigtheta{n}\).
+Besides \IS{}, \MS{} is the only stable sorting algorithm presented in this section.
 
 \paragraph{Starting Runs}
-Instead of starting by merging runs of length 1, it is beneficial to first create longer starting runs using \ShS{}.
+Instead of starting by merging runs of length 1, it is beneficial to first create longer starting runs using either \IS{} or \ShS{}.
+An important downside to \ShS{} is that while it does allow to sort bigger starting runs quicker, it is not stable unlike \IS{}.
+If \MS{} is supposed to sort stably, then \IS{} has to be used.
+
 Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
-The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for lengths up to 16, \(\stepsizes = (6, 1)\) for lengths up to 48, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
-Spot-check inspection suggest no deterioration of \ShS{}'s compilation due to inlining.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = (6, 1)\) for lengths up to 48 elements, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
+Spot-check inspection suggest no deterioration of \IS{}'s and \ShS{}'s compilation due to inlining.
 
 \paragraph{Memory Footprint}
 A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full-space}).

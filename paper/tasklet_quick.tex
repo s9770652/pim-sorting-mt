@@ -4,7 +4,8 @@
 \QS{} \cite{hoare1962quicksort} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh{n^2}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left side of the array, respectively.
 Finally, \QS{} is used on the left and right side (the \enquote{partitions}).
-The \QS*{} implementations presented here are neither stable nor in-place.
+\QS{} does not sort in-place, as additional space of size \(\bigoh{\log n}\) is needed for a call stack.
+Furthermore, \QS{} is not stable.
 
 
 \paragraph{Sentinel Values}

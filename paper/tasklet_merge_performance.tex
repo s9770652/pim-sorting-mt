@@ -69,8 +69,7 @@
 
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
-		Comparison of \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(n/2\) (\enquote{Half-Space}), for different lengths of the starting runs.
-		The \MS*{} use a \ShS{} with the step sizes \(\stepsizes = (1)\) for length 16, \(\stepsizes = (6, 1)\) for lengths 24 to 48, and \(\stepsizes = (12, 5, 1)\) for lengths 64 and 96, respectively.
+		Comparison of the average runtimes of the \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(n/2\) (\enquote{Half-Space}), for different lengths of the starting runs.
 	}
 	\label{fig:merge:starting_runs}
 \end{figure}
@@ -88,11 +87,21 @@ cases where the usage of \ShS{} worsened the runtime are unbeknown.
 
 Even though the tested starting run lengths range from 16 to 96 elements, the mean runtime differences are surprisingly small.
 Notwithstanding that the optimal choice depends on the specific input length because of the zigzagging, a starting run length of 32 elements fares decidedly well on average across all tested scenarios.
+Please note that starting runs of length 16 were sorted using \IS{}, all others using \ShS{}.
+This means that a stable \MS{} must stick to a starting run length of 16 and will, therefore, be slower, albeit not too much.
+We tested starting run lengths lesser and greater than 16 with \IS{} but they are not worth it;
+those measurements have been omitted from the figures for clarity.
+It should be no surprise, however, that 16 is in sweet spot:
+Fewer elements is obviously detrimental since the longer starting run lengths with \ShS{} fare better.
+More elements is also detrimental as the \MS{} with \ShS{} and 24 elements per starting run performs mostly worse than the one with \IS{} and 16 elements, as the overhead from managing more sentinel values eats the gain up.
+The disbenefit from using \IS{} instead of \ShS{} on 24 elements dwarfs having less sentinel values to manage.
+Values between 16 and 24 lead back to the problem of zigzagging and the dependence of the optimal starting run length on the total length.
 
-The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
+Focussing on the starting runs of length 32, the half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
 With 32-bit integers, it beats the full-space \MS{} without write-backs by 11\% on sorted inputs and effectively ties on all other inputs but the reverse sorted ones where it narrowly falls behind.
 Naturally, the full-space \MS{} with write-backs is consistently (with the exception of reverse sorted inputs) at a disadvantage, despite seeing some light with inferior starting run lengths.
 With 64-bit integers, the full-space \MS{} without write-backs manages to turn the ties into scant leads in the range from 1\% to 3\%.
 Using the \MS{} with write-backs is still unprofitable.
+With starting runs of length 16, the half-space \MS{} does fall behind on random input distributions, but the gap to the full-space \MS{} stays in the single digits.
 
 In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm.
