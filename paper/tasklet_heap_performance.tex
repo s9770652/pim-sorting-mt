@@ -45,7 +45,7 @@ In general, the performance of \HS{} is even less volatile than that of \MS{} wi
 Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is short, while sorted inputs are sorted the slowest since they are min-heaps so the heap-building phase is long.
 Nonetheless, the reverse sorted inputs get sorted just about 10\% faster and less on average.
 This low volatility cannot hide the fact that the total runtime is abysmal across the board:
-Compared to \MS{}, the runtimes are between 50\% to 100\% higher, depending on the input distribution!
+Compared to \QS{} and \MS{}, the runtimes are between 50\% to 250\% higher, depending on the input distribution and the data type!
 
 The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas those of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends with the exception of reverse sorted inputs, where it is also an upwards trend, albeit even slighter.
 Interesting are their rankings relative to each other:

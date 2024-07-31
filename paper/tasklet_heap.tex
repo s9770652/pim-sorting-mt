@@ -1,10 +1,10 @@
 \subsection{\texorpdfstring{\HS{}}{HeapSort}}
 \label{subsec:tasklet:heap}
 
-Another sorting algorithm with a guaranteed runtime of \(\bigtheta{n \log n}\) is \HS{}, which is unstable but in-place.
-A max-heap is a binary tree of logarithmic depth whose layers are fully filled, possibly with the exception of the last layer, which must be filled from left to right.
+This algorithm guarantees a runtime of \(\bigoh{n \log n}\), too, and also sorts in-place at the cost of being unstable.
+A \emph{max-heap} (or, simpler, \emph{heap}) is a binary tree of logarithmic depth whose layers are fully filled, possibly with the exception of the last layer, which must be filled from left to right.
 Each vertex contains a key, and the key of each father must be at least as great as those of his sons.
-As a consequence of this heap order, the root contains the greatest key.
+As a consequence of this \emph{heap order}, the root contains the greatest key.
 
 A heap with \(n\) keys can be represented as an array of length \(n\) using a bijective mapping between the vertex positions and the array indices (see later).
 After the heap has been built in-place from the input array in time \(\bigoh{n}\), the sorting works as follows:
