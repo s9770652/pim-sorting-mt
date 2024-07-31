@@ -3,9 +3,27 @@
 
 \newif\ifgroupplotsactivated\groupplotsactivatedfalse
 \DeclareOption{groupplots}{\groupplotsactivatedtrue}
+
+\newif\ifisarticle\isarticletrue
+\newif\ifisreport\isreportfalse
+\DeclareOption{article}{\isarticletrue\isreportfalse}
+\DeclareOption{report}{\isarticlefalse\isreporttrue}
+\DeclareOption{book}{\isarticlefalse\isreportfalse}
+
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrartcl}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrreport}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrbook}}
 \ProcessOptions\relax
-\LoadClass{scrartcl}
+
+\ifisarticle
+	\LoadClass{scrartcl}
+\else
+	\ifisreport
+		\LoadClass{scrreport}
+	\else
+		\LoadClass{scrbook}
+	\fi
+\fi
 
 %%% Checks whether a string is not given/empty/blank or not.
 % Ex.: \NewDocumentCommand{\test}{O{}}{\IfEmptyTF{#1}{true}{false}}

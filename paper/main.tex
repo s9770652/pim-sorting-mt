@@ -1,4 +1,11 @@
-\documentclass[overfullrule, british, oneside, groupplots]{../garticle}
+\documentclass[
+	book,  % underlying KOMA document class to load
+	chapterprefix,  % word ‘Chapter’/‘Appendix’ in line before heading
+	overfullrule,  % draw block boxes where lines overrun?
+	british,  % language
+	oneside,  % discrimination between left and right pages?
+	groupplots,  % loading code for group plots
+]{../garticle}
 
 \input{../macros.sty}
 %\RequirePackage{showframe}
@@ -75,11 +82,9 @@
 \makeatother
 
 \begin{document}
-	\today
+	\frontmatter
 
-	\pagenumbering{gobble}  % turn off pagenumbering
-
-%	\maketitle
+	\maketitle
 
 %	\include{abstract}
 
@@ -87,10 +92,7 @@
 
 	\listoftodos
 
-	\begingroup
-%	\clearpage
-	\pagenumbering{arabic}  % turn on pagenumbering
-	\endgroup
+	\mainmatter
 
 	\bigskip
 	\todo[inline]{Architektur}

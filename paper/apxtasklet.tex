@@ -1,20 +1,44 @@
-\section{Further Measurements on Sorting with One Tasklet}
+\chapter{Further Measurements on Sorting with One Tasklet}
 \label{apx:tasklet}
 
+Every measurement in this section was repeated a thousand times on a uniform input distribution with 32-bit unsigned integers, and the default configurations of the sorting algorithms were as follows:
+\begin{description}
+	\item[\IS{}]
+	using one explicit sentinel value
+
+	\item[\ShS{}]
+	using explicit sentinel values;
+	step sizes \(\stepsizes = (6, 1)\) for inputs with at most 64 elements and \(\stepsizes = (17, 4, 1)\) for longer ones
+
+	\item[\QS{}]
+	fallback threshold of 18 elements;
+	random median as pivot;
+	prioritising the right-hand partition over the left-hand partition;
+	iterative for 32-bit integers;
+	recursive for 64-bit integers;
+	\Cref{imp:triviality_before_call}
+
+	\item[\MS{}]
+	half-space;
+	starting run length of 32 elements if unstable;
+	starting run length of 16 elements if stable
+
+	\item[\HS{}]
+	top-down for 32-bit integers;
+	bottom-up with swap disparity for 64-bit integers
+\end{description}
+
+\clearpage
 \input{apxtasklet_insertion}
 
 \clearpage
-
 \input{apxtasklet_shell}
 
 \clearpage
-
 \input{apxtasklet_quick}
 
 \clearpage
-
 \input{apxtasklet_merge}
 
 \clearpage
-
 \input{apxtasklet_heap}

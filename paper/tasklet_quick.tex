@@ -1,5 +1,5 @@
-\subsection{\texorpdfstring{\QS{}}{QuickSort}}
-\label{subsec:tasklet:quick}
+\section{\texorpdfstring{\QS{}}{QuickSort}}
+\label{sec:tasklet:quick}
 
 \QS{} \cite{hoare1962quicksort} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh{n^2}\):
 A pivot element is chosen from the input array, then the input array gets scanned and elements greater or lesser than the pivot are moved to the right or left side of the array, respectively.
@@ -83,10 +83,10 @@ For 64-bit integers, the optimal threshold is 17 elements, but we set 18 element
 Up to 40\% of the runtime is saved compared to a \QS{} never falling back.
 For sorted and almost sorted inputs, the threshold is higher since \IS{} is very fast on them so falling back earlier and, thus, ending the sorting process is better.
 The same is true for reverse sorted inputs even though these are the worst-case inputs for \IS{} because \QS{}'s two pointers invert large swaths of the input.
-However, these input distributions should be catered for by a pattern-defeating \QS{} as laid out in \cref{subsec:tasklet:conclusion}, hence the 18 elements as default threshold.
+However, these input distributions should be catered for by a pattern-defeating \QS{} as laid out in \cref{sec:tasklet:conclusion}, hence the 18 elements as default threshold.
 
 To avoid unnecessary uses of \IS{}, another base case is imaginable, namely terminating when a partition contains at most 1 elements.
-There are tremendous consequences for the runtime depending on the exact implementation of the base cases, as shown later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
+There are tremendous consequences for the runtime depending on the exact implementation of the base cases, as shown later in \enquote{\nameref{sec:tasklet:quick:compilation}}.
 
 
 \paragraph{Recursion vs.\ Iteration}
@@ -101,7 +101,7 @@ Overall though, iterative implementations \emph{tend} to be compiled better with
 
 
 \paragraph{Partition Prioritisation}
-Whether the left-hand or the right-hand partition is sorted first should not make any difference for the runtime but actually does so because of different compilation, as shown later in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}.
+Whether the left-hand or the right-hand partition is sorted first should not make any difference for the runtime but actually does so because of different compilation, as shown later in \enquote{\nameref{sec:tasklet:quick:compilation}}.
 Always sorting the shorter partition first and putting the longer partition on the call stack guarantees that the problem size is at least halved each step, so that the call stack stores \(\bigoh{\log n}\) elements at most.
 This approach, however, is linked to huge speed penalties, which is why it is advisable to always prioritise the same side;
 in this Thesis, the right-hand partitions are prioritised.
@@ -134,9 +134,9 @@ The random pivots circumvent this problem.
 Whilst the pivots could, by ill luck, also lead to the same unbalanced partitions as the deterministic pivots, the worst-case expected runtime is \(\bigoh{n \log n}\) \cite{blum2011probabilistic}.
 Using the median of medians \cite{blum1973median} could guarantee a runtime of \(\bigoh{n \log n}\) but was not implemented because a performant implementation would probably be quite complex and its benefit minuscule for this Thesis.
 
-The general trend, as seen in \enquote{\nameref{subsubsec:tasklet:quick:compilation}}, is the following:
+The general trend, as seen in \enquote{\nameref{sec:tasklet:quick:compilation}}, is the following:
 A median gets more beneficial for the average runtime, the longer the input becomes, and leads to small pay-offs in the end.
-Moreover, the standard deviations of the runtimes are cut roughly in half, although not shown in the figures of \enquote{\nameref{subsubsec:tasklet:quick:compilation}} for reasons of clarity.
+Moreover, the standard deviations of the runtimes are cut roughly in half, although not shown in the figures of \enquote{\nameref{sec:tasklet:quick:compilation}} for reasons of clarity.
 If the input is known to be fairly random, a deterministic choice yields a noticeably speed-up.
 However, the gain remains in the single digits percentage-wise, supporting the findings by \citeauthor{lukas_geis}~\cite{lukas_geis} that drawing random numbers is quite cheap.
 For this reason, the median of three random elements is used as default configuration throughout this Thesis.

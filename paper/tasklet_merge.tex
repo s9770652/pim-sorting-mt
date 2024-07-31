@@ -1,5 +1,5 @@
-\subsection{\texorpdfstring{\MS{}}{MergeSort}}
-\label{subsec:tasklet:merge}
+\section{\texorpdfstring{\MS{}}{MergeSort}}
+\label{sec:tasklet:merge}
 
 \MS{} repeatedly compares two sorted subarrays and merges them into a longer sorted array in time \(\bigtheta{n \log n}\).
 Unlike \QS{}, this runtime is guaranteed at the cost of even more needed additional space of size \(\bigtheta{n}\).
@@ -11,7 +11,7 @@ An important downside to \ShS{} is that while it does allow to sort bigger start
 If \MS{} is supposed to sort stably, then \IS{} has to be used.
 
 Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
-The step sizes used for \ShS{} \Dash namely \(\stepsizes = (6, 1)\) for lengths up to 48 elements, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{subsec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = (6, 1)\) for lengths up to 48 elements, and \(\stepsizes = (12, 5, 1)\) for everything above \Dash have been chosen based on the results in \cref{sec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
 Spot-check inspection suggest no deterioration of \IS{}'s and \ShS{}'s compilation due to inlining.
 
 \paragraph{Memory Footprint}

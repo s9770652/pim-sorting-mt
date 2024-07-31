@@ -36,8 +36,8 @@
 %\addtokomafont{author}{\LibertinusSerifSB\bfseries\color{white}}
 %\addtokomafont{date}{\LibertinusSerifSB\bfseries\color{white}}
 %\addtokomafont{dedication}{\LibertinusSerifSB\bfseries\color{white}}
-%\addtokomafont{subject}{\color{white}}
-%\addtokomafont{subtitle}{\color{white}}
+%\addtokomafont\begin{subject}{\color{white}}
+%\addtokomafont\begin{subtitle}{\color{white}}
 \addtokomafont{title}{\color{black}}
 \setkomafont{publishers}{\color{black}}  % \publishers in normalsized font
 %\addtokomafont{titlehead}{\LibertinusSerifSB\bfseries\color{white}}
@@ -74,10 +74,14 @@
 \flushbottom  % the last line of all non-final pages flushed to bottom margin
 
 \captionsetup{format=plain}
-\KOMAoptions{
-	abstract,  % heading for abstract
-	titlepage,  % dedicated titlepage without abstract
+\makeatletter
+\@ifclassloaded{scrbook}{}{
+	\KOMAoptions{
+		abstract,  % heading for abstract
+		titlepage,  % dedicated titlepage without abstract
+	}
 }
+\makeatother
 
 % Foot notes.
 \deffootnote[1em]{1em}{1em}{\thefootnotemark.~}

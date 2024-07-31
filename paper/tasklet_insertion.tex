@@ -1,5 +1,5 @@
-\subsection{\texorpdfstring{\IS{}}{InsertionSort}}
-\label{subsec:tasklet:insertion}
+\section{\texorpdfstring{\IS{}}{InsertionSort}}
+\label{sec:tasklet:insertion}
 
 This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
 Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, where each of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
