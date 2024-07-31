@@ -81,6 +81,7 @@ In case of the reverse sorted input, the speed-up is practically always positive
 		yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
 		/tikz/only marks,
 		cycle list shift=2,  % for sharing colours with the previous figure
+		ymajorgrids,
 		title={Input Length \textit{n} = },
 		legend columns=-1,
 	},
@@ -124,9 +125,8 @@ Without access to \citeauthor{10.1007/3-540-44669-9_12}'s original code, giving 
 But would pushing the limits of \ShS{} even be rewarding?
 Firstly, greater input lengths require greater steps \Dash well into the three digits for \(n \approx 1000\) \cite{skean2023optimization, 10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
 Implicit sentinel values could provide relief since the slow-down from implicitness should trend to zero for longer inputs, as was the case for \IS{}.
-\todo[inline]{\enquote{%
-		Secondly, there simply are better alternatives, namely \QS{} (which will be discussed in more detail in the next section).
-		\Cref{fig:shell:against_others} shows that even though \ShS{} takes just a fraction of the time \IS{} takes \Dash apparently achieving a runtime between \(\bigomega{n \lb n}\) and \(\bigoh{n \lb^2 n}\) \Dash\negthinspace, \QS{} beats both from 20 elements onwards.
-		Even \QS{}'s standard deviation of 1432 cycles at 128 elements is superior to \ShS{}'s 2670 cycles.
-		Together with \cref{fig:shell:two-tier}, this means that \ShS{} is not worth using at all and will, consequently, not be improved upon in this thesis.%
-}}
+Secondly, finding the best step sizes for longer inputs requires a lot more work because the length and, thus, the number of reasonable combinations of step sizes become larger and, as also seen in this subsection, longer optimal tuples cannot be constructed straightforwardly from shorter optimal ones.
+
+Its application, on the other hand, would likely be niche.
+\ShS{} is outperformed by other algorithms presented hereafter, and those have no use for a \ShS{} adjusted to longer inputs.
+Its only saving grace could be its in-place property combined with medium speed, although even with relying solely on implicit sentinel value, not much space would be saved compared to the fastest sorting algorithm, namely \QS{}.
