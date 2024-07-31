@@ -104,4 +104,5 @@ With 64-bit integers, the full-space \MS{} without write-backs manages to turn t
 Using the \MS{} with write-backs is still unprofitable.
 With starting runs of length 16, the half-space \MS{} does fall behind on random input distributions, but the gap to the full-space \MS{} stays in the single digits.
 
-In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm.
+In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm with a guaranteed runtime of \(\bigoh{n \log n}\).
+If, however, stability is not wished for but rather a much lower memory footprint, then one might want to turn to \HS{}.
