@@ -1,6 +1,17 @@
 \subsection{Interim Conclusion}
 \label{subsec:tasklet:conclusion}
 
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablereadnamed{data/shell/ciura/uint32/#1.txt}{tableShellCiura_32#1}
+	\pgfplotstablereadnamed{data/shell/ciura/uint64/#1.txt}{tableShellCiura_64#1}
+}
+
+This subsection offers a summary the algorithms presented so far and the findings on them.
+\Cref{fig:tasklet:summary} serves as succinct overview of their runtimes on all tested input distributions and data types.
+
+For small inputs with up to 16 elements, \IS{} is arguably the best sorting algorithm as it offers the best performance on the tested input distributions and, additionally, sorts stably and in-place.
+However, there is still room for improvement as its compilation is suboptimal, especially in case of the \IS{} with implicit sentinel values.
+
 \begin{figure}[p]
 	\pgfplotsset{
 		height=2.925cm,
@@ -8,6 +19,7 @@
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		x from 16 to 1024 minor,
 		/tikz/mark repeat=2,
+		legend columns=3,
 	}
 
 	\NewDocumentCommand{\allalgos}{m}{
@@ -17,6 +29,8 @@
 		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_32#1}
 		\pgfplotsset{update limits=true}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_32#1}
+		\pgfplotsset{update limits=false}
+		\plotpernlognwitherrors{Ciura}{tableShellCiura_32#1}
 	}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{tasklet_summary_32}
@@ -26,7 +40,7 @@
 				ymax=150,
 			]
 				\nextgroupplot[title=Sorted\strut]
-				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{} (stable), \MS{} (unstable), \HS{}}}
+				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{} (stable), \MS{} (unstable), \HS{}, \ShS{}}}
 				\allalgos{sorted}
 				%
 				\nextgroupplot[title=Reverse Sorted\strut]
@@ -58,6 +72,8 @@
 		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_64#1}
 		\pgfplotsset{update limits=true}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_64#1}
+		\pgfplotsset{update limits=false}
+		\plotpernlognwitherrors{Ciura}{tableShellCiura_64#1}
 	}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{tasklet_summary_64}
