@@ -40,12 +40,14 @@
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
 	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (with ticks + labels)
 	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (with ticks)
-	horizontal sep for naught/.style={group/horizontal sep=2mm},  % padding between groupplots (without anything)
+	horizontal sep for naught/.style={group/horizontal sep=3mm/2},  % padding between groupplots (without anything)
 	horizontal sep for ticks,
 	vertical sep for ticks/.style={group/vertical sep=14mm},  % padding between rows of groupplots (with ticks)
-	vertical sep for naught/.style={group/vertical sep=2mm},  % padding between rows of groupplots (without anything)
+	vertical sep for naught/.style={group/vertical sep=3mm/2},  % padding between rows of groupplots (without anything)
 	vertical sep for ticks,
 	groupplot xlabel={Input Length \(n\)},
+	title dummy/.style={title=\vphantom{gh|}},  % invisible title that increases the margin; to be used in conjuction with title/.add={…}{…}
+	title dummy,
 	legend columns=-1,
 }
 

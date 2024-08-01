@@ -26,29 +26,29 @@
 			ymin=20,
 			ymax=80,
 		]
-			\nextgroupplot[title={Sorted\strut}]
+			\nextgroupplot[title/.add={}{Sorted}]
 			\pgfplotsset{legend to name=leg:quick:runtime_32, legend entries={Deterministic Median,Random Median}}
 			\plotpernlogn{TrivialBC}{tableQuickDet_32sorted}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32sorted}
 			%
-			\nextgroupplot[title={Reverse Sorted\strut}]
+			\nextgroupplot[title/.add={}{Reverse Sorted}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_32reverse}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32reverse}
 			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_32sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
 			%
-			\nextgroupplot[title={Almost Sorted\strut}]
+			\nextgroupplot[title/.add={}{Almost Sorted}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_32almost}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32almost}
 			%
-			\nextgroupplot[title={Uniform\strut}]
+			\nextgroupplot[title/.add={}{Uniform}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_32uniform}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32uniform}
 			%
-			\nextgroupplot[title={Zipf's\strut}]
+			\nextgroupplot[title/.add={}{Zipf's}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_32zipf}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32zipf}
 			%
-			\nextgroupplot[title={Normal\strut}]
+			\nextgroupplot[title/.add={}{Normal}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_32normal}
 			\plotpernlogn{TrivialBC}{tableQuickRand_32normal}
 		\end{groupplot}
@@ -72,28 +72,28 @@
 			ymin=20,
 			ymax=100,
 		]
-			\nextgroupplot[title={Sorted\strut}]
+			\nextgroupplot[title/.add={}{Sorted}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64sorted}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64sorted}
 			%
-			\nextgroupplot[title={Reverse Sorted\strut}]
+			\nextgroupplot[title/.add={}{Reverse Sorted}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64reverse}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64reverse}
 			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_64sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
 			%
-			\nextgroupplot[title={Almost Sorted\strut}]
+			\nextgroupplot[title/.add={}{Almost Sorted}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64almost}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64almost}
 			%
-			\nextgroupplot[title={Uniform\strut}]
+			\nextgroupplot[title/.add={}{Uniform}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64uniform}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64uniform}
 			%
-			\nextgroupplot[title={Zipf's\strut}]
+			\nextgroupplot[title/.add={}{Zipf's}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64zipf}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64zipf}
 			%
-			\nextgroupplot[title={Normal\strut}]
+			\nextgroupplot[title/.add={}{Normal}]
 			\plotpernlogn{TrivialBC}{tableQuickDet_64normal}
 			\plotpernlogn{TrivialBC}{tableQuickRand_64normal}
 		\end{groupplot}
@@ -113,19 +113,19 @@
 		\tikzsetnextfilename{quick_implementations_rec_32}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_32}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_32}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_32}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomLeft_32}
 				}
@@ -173,19 +173,19 @@
 		\tikzsetnextfilename{quick_implementations_it_32}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_32}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_32}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_32}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomLeft_32}
 				}
@@ -248,19 +248,19 @@
 		\tikzsetnextfilename{quick_implementations_rec_64}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_64}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_64}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_64}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomLeft_64}
 				}
@@ -308,19 +308,19 @@
 		\tikzsetnextfilename{quick_implementations_it_64}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_64}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_64}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_64}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomLeft_64}
 				}

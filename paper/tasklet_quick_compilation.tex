@@ -21,47 +21,48 @@ Before the findings are discussed, the first parameter shall be explained in mor
 
 Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
 Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and \IS{} would terminate after a few instructions anyway.
-Nonetheless, its inclusion or exclusion can have significant impacts.
+Nonetheless, its inclusion or exclusion can have significant impacts as does the position at which the checks for the base cases happen.
 The following handlings were tested:
 \begin{enumerate}[label=(\liningnums{\arabic*})]
 	\item\label[implementation]{imp:normal}
 	If the length is trivial, terminate immediately.
-	If if the threshold is undercut, sort with \IS{} and terminate.
-	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	Otherwise, if the threshold is undercut, sort with \IS{} and terminate.
+	Otherwise, partition the input and use \QS{} on both partitions.
 %	\textcolor{red}{[Normal]}
 
 	\item\label[implementation]{imp:triviality_within_threshold}
-	If the threshold is undercut, check if the length is trivial and terminate immediately or sort with \IS{} and then terminate, respectively.
-	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	If the threshold is undercut, check if the length is trivial and terminate immediately or sort with \IS{} and terminate, respectively.
+	Otherwise, partition the input and use \QS{} on both partitions.
 %	\textcolor{red}{[TrivInThresh]}
 	\begin{itemize}
 		\item
-		This handling significantly reduces the number of checks for trivial length.
+		This handling significantly reduces the number of checks on triviality.
 	\end{itemize}
 
 	\item\label[implementation]{imp:no_triviality}
 	If the threshold is undercut, sort with \IS{} and terminate.
-	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	Otherwise, partition the input and use \QS{} on both partitions.
 %	\textcolor{red}{[NoTrivial]}
 	\begin{itemize}
 		\item
-		This handling forgoes the check for a trivial length completely, at the cost of some unneeded \IS*{}.
+		This handling forgoes the check on triviality completely, at the cost of some unneeded uses of \IS{}.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_then_triviality}
 	If the threshold is undercut, sort with \IS{} and terminate.
-	If the length is trivial, terminate immediately.
-	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	Otherwise, if the length is trivial, terminate immediately.
+	Otherwise, partition the input and use \QS{} on both partitions.
 %	\textcolor{red}{[ThreshThenTriv]}
 	\begin{itemize}
 		\item
-		This handling, while nonsensical from a logical point of view, gives the compiler an explicit guarantee that the partitioning loop does not end immediately.
+		This handling is nonsensical from a logical point of view, since if the threshold is not undercut, the length cannot be trivial.
+		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
 	If the threshold is undercut, sort with \IS{} and terminate.
-	Otherwise, sort with \QS{}.
-	Then check for either partition if its length is trivial and use \QS{} if not.
+	Otherwise, partition the input.
+	Then check for either partition if its length is trivial and use \QS{} on it if not.
 %	\textcolor{red}{[TrivialBC]}
 	\begin{itemize}
 		\item
@@ -70,18 +71,18 @@ The following handlings were tested:
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
-	Sort with \QS{}.
-	Check for either partition if the threshold is undercut and use \IS{} or \QS{} on them, respectively.
+	Partition the input.
+	Check for either partition if the threshold is undercut and use either \IS{} or \QS{} on it.
 %	\textcolor{red}{[ThreshBC]}
 
 	\item\label[implementation]{imp:threshold_and_triviality_before_call}
-	Sort with \QS{}.
-	Check for either partition if its length is trivial or if the threshold is undercut and use \IS{}, \QS{}, or nothing on them, respectively.
+	Partition the input.
+	Check for either partition if its length is trivial or if the threshold is undercut and use either \IS{}, \QS{}, or nothing on it.
 %	\textcolor{red}{[ThreshTrivBC]}
 
 	\item\label[implementation]{imp:one_insertion}
 	If the threshold is undercut, terminate immediately.
-	Otherwise, sort with \QS{} and use \QS{} on both partitions.
+	Otherwise, partition the input and use \QS{} on both partitions.
 	After all \QS*{} are done, sort the whole input array with \IS{}.
 %	\textcolor{red}{[OneInsertion]}
 	\begin{itemize}
@@ -95,7 +96,7 @@ The measurements were done on uniform input distributions so the deterministic p
 
 \pgfplotsset{
 	quick matrix/.style={
-		height=2.525cm,
+		height=2.519cm,
 		horizontal sep for naught,
 		vertical sep for naught,
 		adaptive group=3 by 4,
@@ -113,20 +114,20 @@ The measurements were done on uniform input distributions so the deterministic p
 		\tikzsetnextfilename{quick_implementations_rec}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\pgfplotsset{legend to name=leg:quick:implementations, legend entries={\ref{imp:normal}, \ref{imp:triviality_within_threshold}, \ref{imp:no_triviality}, \ref{imp:threshold_then_triviality}, \ref{imp:triviality_before_call}, \ref{imp:threshold_before_call}, \ref{imp:threshold_and_triviality_before_call}, \ref{imp:one_insertion}}}
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecLastLeft_32}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedianLeft_32}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecRandomLeft_32}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixRecMedian_of_randomLeft_32}
 				}
@@ -174,19 +175,19 @@ The measurements were done on uniform input distributions so the deterministic p
 		\tikzsetnextfilename{quick_implementations_it}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[quick matrix]
-				\nextgroupplot[title={Last El.\strut}, xticklabels={}]
+				\nextgroupplot[title/.add={}{Last Element}, xticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItLastLeft_32}
 				}
-				\nextgroupplot[title={Det.\ Median\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Determ.\ Median}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedianLeft_32}
 				}
-				\nextgroupplot[title={Random El.\strut}, xticklabels={}, yticklabels={}]
+				\nextgroupplot[title/.add={}{Random Element}, xticklabels={}, yticklabels={}]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItRandomLeft_32}
 				}
-				\nextgroupplot[title={Rand.\ Median\strut}, xticklabels={}, yticklabel pos=right]
+				\nextgroupplot[title/.add={}{Random Median}, xticklabels={}, yticklabel pos=right]
 				\expandafter\pgfplotsinvokeforeach\expandafter{\quickalgos}{
 					\plotpernlogn{#1}{tableQuickMatrixItMedian_of_randomLeft_32}
 				}
@@ -235,7 +236,7 @@ The measurements were done on uniform input distributions so the deterministic p
 	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
 	\tikzexternalenable
 	\caption{
-		Comparison of \crefrange{imp:normal}{imp:one_insertion} and different pivots.
+		Average runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot choices.
 		Left-hand partitions are prio\-ri\-tised in the first rows, right-hand ones in the second rows, and shorter ones in the third~rows.
 	}
 	\label{fig:quick:implementations}
