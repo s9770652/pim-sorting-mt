@@ -46,20 +46,20 @@
 			ymax=90,
 			ytick distance=5,
 		]
-			\nextgroupplot[title={No Write-back\strut}, legend to name=leg:merge:starting_runs]
+			\nextgroupplot[title/.add={}{No Write-back}, legend to name=leg:merge:starting_runs]
 			\expandafter\legend\expandafter{\mergealgos}
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32uniform}
 			}
 			%
-			\nextgroupplot[title={Write-back\strut}]
+			\nextgroupplot[title/.add={}{Write-back}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
 			}
 			%
-			\nextgroupplot[title={Half-Space}]
+			\nextgroupplot[title/.add={}{Half-Space}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
@@ -89,7 +89,7 @@ Even though the tested starting run lengths range from 16 to 96 elements, the me
 Notwithstanding that the optimal choice depends on the specific input length because of the zigzagging, a starting run length of 32 elements fares decidedly well on average across all tested scenarios.
 Please note that starting runs of length 16 were sorted using \IS{}, all others using \ShS{}.
 This means that a stable \MS{} must stick to a starting run length of 16 and will, therefore, be slower, albeit not too much.
-We tested starting run lengths lesser and greater than 16 with \IS{} but they are not worth it;
+We tested starting run lengths less and greater than 16 with \IS{} but they are not worth it;
 those measurements have been omitted from the figures for clarity.
 It should be no surprise, however, that 16 is in sweet spot:
 Fewer elements is obviously detrimental since the longer starting run lengths with \ShS{} fare better.

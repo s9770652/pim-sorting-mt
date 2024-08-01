@@ -12,19 +12,19 @@
 				ymin=20,
 				ymax=60,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32sorted}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32sorted}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32sorted}
@@ -44,19 +44,19 @@
 				ymin=60,
 				ymax=140,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32reverse}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32reverse}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32reverse}
@@ -76,19 +76,19 @@
 				ymin=50,
 				ymax=80,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32almost}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32almost}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32almost}
@@ -118,19 +118,19 @@
 				ymin=60,
 				ymax=90,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32uniform}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
@@ -150,19 +150,19 @@
 				ymin=60,
 				ymax=90,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32zipf}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32zipf}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32zipf}
@@ -182,19 +182,19 @@
 				ymin=60,
 				ymax=90,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32normal}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32normal}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32normal}
@@ -224,19 +224,19 @@
 				ymin=20,
 				ymax=80,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64sorted}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64sorted}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64sorted}
@@ -257,19 +257,19 @@
 				ymax=150,
 				ytick={70,90,...,150},
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64reverse}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64reverse}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64reverse}
@@ -290,19 +290,19 @@
 				ymax=95,
 				ytick={50,65,...,95},
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64almost}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64almost}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64almost}
@@ -332,19 +332,19 @@
 				ymin=70,
 				ymax=110,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64uniform}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64uniform}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64uniform}
@@ -364,19 +364,19 @@
 				ymin=70,
 				ymax=110,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64zipf}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64zipf}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64zipf}
@@ -396,19 +396,19 @@
 				ymin=70,
 				ymax=110,
 			]
-				\nextgroupplot[title={No Write-back\strut}]
+				\nextgroupplot[title/.add={}{No Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64normal}
 				}
 				%
-				\nextgroupplot[title={Write-back\strut}]
+				\nextgroupplot[title/.add={}{Write-back}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64normal}
 				}
 				%
-				\nextgroupplot[title={Half-Space}]
+				\nextgroupplot[title/.add={}{Half-Space}]
 				\clip (0, 0) rectangle (1024, 200);
 				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64normal}

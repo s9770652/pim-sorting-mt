@@ -39,23 +39,23 @@ However, there is still room for improvement as its compilation is suboptimal, e
 				ymin=0,
 				ymax=150,
 			]
-				\nextgroupplot[title=Sorted\strut]
+				\nextgroupplot[title/.add={}{Sorted}]
 				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{} (stable), \MS{} (unstable), \HS{}, \ShS{}}}
 				\allalgos{sorted}
 				%
-				\nextgroupplot[title=Reverse Sorted\strut]
+				\nextgroupplot[title/.add={}{Reverse Sorted}]
 				\allalgos{reverse}
 				%
-				\nextgroupplot[title=Almost Sorted\strut]
+				\nextgroupplot[title/.add={}{Almost Sorted}]
 				\allalgos{almost}
 				%
-				\nextgroupplot[title=Uniform\strut]
+				\nextgroupplot[title/.add={}{Uniform}]
 				\allalgos{uniform}
 				%
-				\nextgroupplot[title=Zipf's\strut]
+				\nextgroupplot[title/.add={}{Zipf's}]
 				\allalgos{zipf}
 				%
-				\nextgroupplot[title=Normal\strut]
+				\nextgroupplot[title/.add={}{Normal}]
 				\allalgos{normal}
 			\end{groupplot}
 		\end{tikzpicture}
@@ -82,22 +82,22 @@ However, there is still room for improvement as its compilation is suboptimal, e
 				ymin=0,
 				ymax=200,
 			]
-				\nextgroupplot[title=Sorted\strut]
+				\nextgroupplot[title/.add={}{Sorted}]
 				\allalgos{sorted}
 				%
-				\nextgroupplot[title=Reverse Sorted\strut]
+				\nextgroupplot[title/.add={}{Reverse Sorted}]
 				\allalgos{reverse}
 				%
-				\nextgroupplot[title=Almost Sorted\strut]
+				\nextgroupplot[title/.add={}{Almost Sorted}]
 				\allalgos{almost}
 				%
-				\nextgroupplot[title=Uniform\strut]
+				\nextgroupplot[title/.add={}{Uniform}]
 				\allalgos{uniform}
 				%
-				\nextgroupplot[title=Zipf's\strut]
+				\nextgroupplot[title/.add={}{Zipf's}]
 				\allalgos{zipf}
 				%
-				\nextgroupplot[title=Normal\strut]
+				\nextgroupplot[title/.add={}{Normal}]
 				\allalgos{normal}
 			\end{groupplot}
 		\end{tikzpicture}
