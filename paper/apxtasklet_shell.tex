@@ -132,6 +132,7 @@
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}
+				\ifnumgreater{#1}{17}{ \pgfplotsset{extra y ticks={17}, minor ytick={8, 10, ..., 16}} }{}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -155,6 +156,7 @@
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}
+				\ifnumgreater{#1}{17}{ \pgfplotsset{extra y ticks={17}, minor ytick={8, 10, ..., 16}} }{}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -178,6 +180,7 @@
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}
+				\ifnumgreater{#1}{17}{ \pgfplotsset{extra y ticks={17}, minor ytick={8, 10, ..., 16}} }{}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -201,6 +204,7 @@
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}
+				\ifnumgreater{#1}{17}{ \pgfplotsset{extra y ticks={17}, minor ytick={8, 10, ..., 16}} }{}
 			}
 		\end{groupplot}
 	\end{tikzpicture}

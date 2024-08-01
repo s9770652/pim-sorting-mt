@@ -8,10 +8,11 @@
 	\pgfplotstablereadnamed{data/shell/h1=#1/uint32/uniform.txt}{tableShell#1_32uniform}
 }
 
-Let us first focus on short input arrays where only two passes with step sizes~\(\stepsizes_1\) and \(1\) suffice.
-The previous results on \IS{} suggest that the fastest \ShS{} should make use of~\(\stepsizes_1\) sentinel values.
+Let us first focus on short inputs where only two passes with step sizes~\(\stepsizes_1\) and \(1\) suffice.
+The previous results on \IS{} suggest that a fast \ShS{} should make use of~\(\stepsizes_1\) sentinel values.
 \Cref{fig:shell:two-tier,fig:shell:two-tier_uint32,fig:shell:two-tier_uint64} show that, with the exception of the \ShS{} with step size \(\stepsizes_1 = 2\), the additional passes start to pay off at around 16 elements for both 32-bit and 64-bit values with the fully random input distributions, reaching a speed-up of around 15\% at around 24 elements.
 In case of the reverse sorted input, the speed-up is practically always positive even for very short inputs, reaching between 50\% and 110\% at around 24 elements.
+On sorted and almost sorted inputs, \ShS{} exhibits a slow-down in the tested range of input lengths.
 
 \begin{figure}
 	\tikzsetnextfilename{shell_two-tier}
@@ -39,7 +40,7 @@ In case of the reverse sorted input, the speed-up is practically always positive
 
 	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
 	\caption{
-		Comparison of \IS{} (1) and various two-tier \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are indicated by the labels.
+		Comparison of \IS{} (1) and various two-tier \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are given in the legend.
 		The speed-ups are with respect to the \IS{}.
 	}
 	\label{fig:shell:two-tier}
@@ -66,22 +67,23 @@ In case of the reverse sorted input, the speed-up is practically always positive
 		\addplotnamedtable[select row={#1}][x=µ_#2, y expr={16}, forget plot]{tableShell16_#3};
 		\addplotnamedtable[select row={#1}][x=µ_#2, y expr={17}]{tableShell17_#3};
 	}{
-		\addplotnamedtable[select row={#1},opacity=0][x=µ_#2, y expr={17}]{tableShell15_#3};
+		\addplotnamedtable[select row={#1}, opacity=0][x=µ_#2, y expr={17}]{tableShell15_#3};
 	}
 }
 
 \pgfplotsset{
 	shell scatter plot/.style={
 		adaptive group=3 by 2,
-		groupplot xlabel={Mean [\(10^4\) Cycles]},
-		groupplot ylabel={\(\stepsizes_1\)},
+		groupplot xlabel={Runtime [\(10^4\) Cycles]},
+		groupplot ylabel={\(\stepsizes_2\)},
 		scaled x ticks=base 10:-4,
 		xtick scale label code/.code={},  % removes exponent underneath the axis
-		ytick={6, 7, 9, ..., 17},
-		yticklabels={/, \(7\), \(9\), \(...\), \(17\)},
+		ytick={6, 7, 9, ..., 15},
+		yticklabel={\(\pgfmathprintnumber{\tick}\)},
+		minor ytick={8, 10, ..., 13},
 		/tikz/only marks,
 		cycle list shift=2,  % for sharing colours with the previous figure
-		ymajorgrids,
+		xmajorgrids=false,
 		title={Input Length \textit{n} = },
 		legend columns=-1,
 	},
@@ -97,17 +99,18 @@ In case of the reverse sorted input, the speed-up is practically always positive
 				\pgfplotsforeachungrouped\h in {3,...,9}{
 					\shellscatter{#1}{\h}{\type}
 				}
+				\ifnumgreater{#1}{17}{ \pgfplotsset{extra y ticks={17}, minor ytick={8, 10, ..., 16}} }{}
 			}
-			\pgfplotsset{legend to name=leg:shell:three-tier}
-			\legend{\(3\), \(4\), \(5\), \(6\), \(7\), \(8\), \(9\)}
+			\pgfplotsset{legend to name=leg:shell:three-tier, legend entries={\(\stepsizes_1 = 3\), \(\stepsizes_1 = 4\), \(\stepsizes_1 = 5\), \(\stepsizes_1 = 6\), \(\stepsizes_1 = 7\), \(\stepsizes_1 = 8\), \(\stepsizes_1 = 9\)}}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption{
-		Runtimes of \ShS*{} with two passes (/) and three passes (7--17).
-		The coloured symbols encode the step size \(\stepsizes_1\) for two-tier \ShS*{} and the step size~\(\stepsizes_2\) for three-tier \ShS*{}.
-		For the latter, the step size \(\stepsizes_1\) is noted on the y-axes.
+		Mean runtimes of two-tier and three-tier \ShS*{}.
+		The two-tier \ShS*{} are situated on the lowest file, which is labelled \enquote{/}.
+		The three-tier \ShS*{} are situated on the files above, whose \(y\) values indicate the step size \(\stepsizes_2\).
+		The coloured symbols encode the step sizes \(\stepsizes_1\).
 	}
 	\label{fig:shell:three-tier}
 \end{figure}
@@ -116,9 +119,9 @@ When moving to greater input lengths (\cref{fig:shell:three-tier,fig:shell:three
 %especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
 Between 48 and 64 elements, three passes get worthwhile to consider.
 %Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.
-On the one hand, the results are in accordance with \citeauthor{10.1007/3-540-44669-9_12}~\cite{10.1007/3-540-44669-9_12} who, for 128 elements, determined \(\stepsizes = (1, 9)\) to be the optimal pair and \(\stepsizes = (17, 4, 1)\) to be the optimal triplet.
+On the one hand, the results are in accordance with \citeauthor{10.1007/3-540-44669-9_12}~\cite{10.1007/3-540-44669-9_12} who, for 128 elements, determined \(\stepsizes = (1, 9)\) to be the optimal pair and \(\stepsizes = (1, 4, 17)\) to be the optimal triplet.
 On the other hand, the gain from doing three passes is far smaller:
-While \citeauthor{10.1007/3-540-44669-9_12} calculated an average speed-up of 33\% over doing two passes, while it is only 16\% on a DPU.
+\Citeauthor{10.1007/3-540-44669-9_12} calculated an average speed-up of 33\% over doing two passes, while it is only 16\% on a DPU.
 In opposition to his results, this also makes it unlikely that doing four passes would already net any gain at this input length.
 Without access to \citeauthor{10.1007/3-540-44669-9_12}'s original code, giving a satisfactory explanation for the discrepancy is hard, however.
 
