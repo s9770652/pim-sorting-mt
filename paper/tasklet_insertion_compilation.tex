@@ -13,7 +13,7 @@ The same happens if, in \cref{fig:insertion:impl:pred_sec}, one keeps \lstinline
 
 Looking at the compilation reveals the reason:
 In the faster case, the pointer \lstinline|pred| is optimised away and, in its stead, the pointer \lstinline|curr| and an offset of \lstinline|-4| is used.
-In the slower case, the pointer \lstinline|pred| is \emph{sometimes} used with an offset to get the true value of \lstinline|curr|.
+In the slower case, the pointer \lstinline|pred| is used with an offset to get the true value of \lstinline|curr| in some places.
 Two registers are used to store the addresses of \lstinline|curr| and \lstinline|pred| at different points in time, resulting in one additional instruction at the start of each round, nullifying any gain from starting with the second element.
 This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into the additionally used register.
 

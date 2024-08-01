@@ -11,7 +11,7 @@
 The runtimes of the explicit and implicit \IS*{} can be compared in the \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
 For most input distributions, the implicit \IS{} is logically a bit slower, effectively adding one check instruction to each round.
 An outlier, however, are the reverse sorted inputs.
-For 32-bit numbers (\cref{fig:insertion:against_others_uint32}), the implicit version is up to 45\% slower than the explicit one.
+For 32-bit numbers (\cref{fig:insertion:against_others,fig:insertion:against_others_uint32}), the implicit version is up to 45\% slower than the explicit one.
 This comes as a surprise since both versions effectively execute the same loop body while shifting everything one index backwards, with only the loop condition being different.
 Due to the uni-cost model, a value check on whether the preceding element is smaller (explicit) and an address check on whether the preceding position is the start of the array (implicit) should take the same amount of time.
 Yet, even the \IS{} not relying on sentinel values surpasses the implicit \IS{}, although doing both value checks and address checks!
@@ -54,8 +54,3 @@ Nonetheless, the two \IS*{} tie.
 	}
 	\label{fig:insertion:against_others}
 \end{figure}
-
-\begin{note}
-	Other known simple sorting algorithm with a runtime complexity similar to \IS{} are \SelS{} and \BS{}.
-	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred (see \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}).
-\end{note}

@@ -1,10 +1,10 @@
 \section{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{sec:tasklet:insertion}
 
-This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements at the indices \(0\) to \(i - 1\) are already sorted.
-Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, where each of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
+This stable sorting algorithm works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements with indices \(0\) to \(i - 1\) are already sorted.
+Its asymptotic runtime is bad, reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, since any of the \(\binom{n}{2}\) pairs of input elements is in wrong order and will be swapped at some point in the execution with probability 50\%.
 Nonetheless, \IS{} does have some saving graces:
-\begin{enumerate*}
+\begin{enumerate}
 	\item
 	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigoh{n}\).
 
@@ -12,12 +12,28 @@ Nonetheless, \IS{} does have some saving graces:
 	It works in-place, needing only \(\bigoh{1}\) additional space.
 
 	\item
-	Its program code is short, lending itself to inlining.
+	The sorting is stable.
+
+	\item
+	Its implementation is short, lending itself to inlining.
 
 	\item
 	The overhead is small.
-\end{enumerate*}
+\end{enumerate}
 Especially the last two points make \IS{} a good fall-back algorithm for asymptotically better sorting algorithms to use on short subarrays.
+
+\begin{note}
+	Other known simple sorting algorithm are \SelS{} and \BS{}.
+	\emph{\SelS{}} assumes like \IS{} that the elements with indices \(0\) to \(i\) are already sorted in round~\(i\).
+	It scans the elements with indices \(i + 1\) to \(n\) and finds their minimum.
+	Then, it swaps the minimum element with the element at index \(i\).
+	\emph{\BS{}} scans the elements with indices \(0\) to \(n - i\) and swaps each pair of neighbouring elements if they are in the wrong order.
+	An easy extension is adaptive \BS{} which stops if no swaps were done during a round.
+
+	The average runtime complexity of \SelS{} and \BS{} is the same as that of \IS{}.
+	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred, as seen soon in the upcoming section \enquote{\nameref{sec:tasklet:insertion:performance}}.
+	Consequently, they will not be expanded on further.
+\end{note}
 
 \paragraph{Sentinel Values}
 When moving an element to the left, two checks are needed:
@@ -29,7 +45,7 @@ Since a DPU has no branch predictor, the slowdown from performing twice as many 
 Setting such an \emph{explicit} sentinel value can be omitted by using \emph{implicit} sentinel values.
 At the start of each round, one can check if the element at index \(0\) is at least as small as the element at index~\(i\).
 If yes, the former is a sufficient sentinel value, and \IS{} can proceed as normal.
-If not, the latter must be the minimum of the first \(i + 1\) elements and, therefore, can be moved immediately to the front.
+If not, the latter must be the minimum of the first \(i + 1\) elements and, therefore, can be moved immediately to the front after shifting the other \(i\) leading elements one position to the right.
 
 \input{tasklet_insertion_performance.tex}
 
