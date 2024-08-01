@@ -75,7 +75,9 @@
 
 \captionsetup{format=plain}
 \makeatletter
-\@ifclassloaded{scrbook}{}{
+\@ifclassloaded{scrbook}{
+	\captionsetup{labelsep=space}
+}{
 	\KOMAoptions{
 		abstract,  % heading for abstract
 		titlepage,  % dedicated titlepage without abstract
