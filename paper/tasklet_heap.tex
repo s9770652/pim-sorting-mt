@@ -15,7 +15,7 @@ Since the heap has shrunken by one key, the key of the removed root can be store
 \paragraph{Sifting Direction}
 After the heap is built, the \emph{top-down} \HS{} proceeds as follows:
 At the start of each round, the root and the rightmost leaf (\enquote{last leaf}) in the bottom layer swap places.
-The root is now in the right position, but the formerly last leaf may violate the heap order, that is, the root may have a lesser key than one or both of its sons.
+The root is now in the right position, but the formerly last leaf may violate the heap order, that is, the root may have a less key than one or both of its sons.
 The greater of the two sons is determined, and the root and the greater son swap places.
 This downwards-sifting of the former leaf continues iteratively until the heap order is restored.
 
@@ -28,9 +28,9 @@ If so, it needs to be sifted upwards by iteratively swapping positions with its 
 At last, the original root key can be put where the formerly last leaf used to be.
 
 The motivation behind these variants is at follows:
-In each step where the top-down \HS{} sifts the formerly last leaf downwards, two value checks (Which son is greater? Is the father lesser than the greater son?) need to be done.
+In each step where the top-down \HS{} sifts the formerly last leaf downwards, two value checks (Which son is greater? Is the father less than the greater son?) need to be done.
 The leaves of a heap tend to be small so the downwards-sifting lasts awhile.
-As opposed to this, each step of the bottom-up \HS{} needs only one value check (Is the father lesser than the greater son?).
+As opposed to this, each step of the bottom-up \HS{} needs only one value check (Is the father less than the greater son?).
 Both \HS*{} sift downwards similarly long so many checks can be saved.
 Since the last leaf effectively takes the place of another leaf and since both are likely small, the upwards-sifting should be short-lived and, hopefully, not eat the gain up.
 
@@ -60,7 +60,7 @@ the rightmost leaf in the bottom layer.
 Instead of adding some check on whether the right brother exists, one can rather add the missing leaf and give it the smallest possible key each time the heap reaches an even size.
 Thus, if it has been confirmed that a left son exists, a right one does also exist, and if two brothers contain the same key, the left one should be considered greater.
 
-Likewise, whenever \HS{} sifts upwards and considers the father \(i/2\) of a vertex \(i\), it will only proceed if the father is lesser.
+Likewise, whenever \HS{} sifts upwards and considers the father \(i/2\) of a vertex \(i\), it will only proceed if the father is less.
 Since the fatherless root has index \(1\) and the result of an integer division is truncated towards \(0\) in C, the formula yields \(0\), so it makes sense to set the element at index \(0\) to the greatest possible key to stop any upwards-sifting.
 The savings from these approaches were around the 13\% mark.
 

@@ -6,7 +6,7 @@
 	\pgfplotstablereadnamed{data/shell/ciura/uint64/#1.txt}{tableShellCiura_64#1}
 }
 
-This subsection offers a summary the algorithms presented so far and the findings on them.
+This section offers a summary the algorithms presented so far and the findings on them.
 \Cref{fig:tasklet:summary} serves as succinct overview of their runtimes on all tested input distributions and data types.
 
 For small inputs with up to 16 elements, \IS{} is arguably the best sorting algorithm as it offers the best performance on the tested input distributions and, additionally, sorts stably and in-place.
@@ -109,7 +109,7 @@ However, there is still room for improvement as its compilation is suboptimal, e
 
 	\hfil\pgfplotslegendfromname{leg:tasklet:summary}\hfil
 	\caption{
-		Comparison of the average runtimes of the main algorithms presented in this section.
+		Comparison of the average runtimes of the main algorithms presented in this chapter.
 		The coloured areas denote the three-sigma intervals, that is, the 99.7\% confidence intervals.
 	}
 	\label{fig:tasklet:summary}
