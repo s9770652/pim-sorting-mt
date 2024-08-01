@@ -122,17 +122,25 @@ Doing so makes the runtime drop from 4166 cycles down to 4101 cycles.
 Recall how in the faster version (\cref{fig:insertion:impl:pred_first}), the pointer \lstinline|pred| is always deduced from the pointer \lstinline|curr|.
 This is manually enforced in \cref{fig:insertion:impl:offset_first,fig:insertion:impl:offset_sec}, where \lstinline|pred| is replaced with \lstinline|curr - 1|.
 As a consequence, the code of \cref{fig:insertion:impl:offset_first} compiles the very same as the one of \cref{fig:insertion:impl:pred_first}, while \cref{fig:insertion:impl:offset_sec} yields the same compilation as the wrapper functions.
-This workaround is clearly the best of the three and, hence, the one used in the whole code base.
+This workaround is clearly the best of the three and, hence, the one used in the rest of this thesis.
 
 Alas, the struggle with the compiler endeth not herewith.
 A deeper look into the compilation reveals the following three instructions:
-\lstinline|move r3, r0;| \lstinline|jleu r4, r2,| \lstinline|.LBB; move r3, r0|.
-Without delving further into their meaning \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it and, apparently, it does also not set any flags.
+\begin{center}
+	\begin{tabular}{ll}
+		\lstinline|move r3, r0| & // copy content of register \lstinline|r0| to \lstinline|r3|
+		\\ \lstinline|jleu r4, r2, .LBL| & // jump to \lstinline|.LBL| if \lstinline|r4| \(\le\) \lstinline|r2|
+		\\ \lstinline|move r3, r0| &
+	\end{tabular}
+\end{center}
+Without delving further into their significance \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it nor to return via \lstinline|jleu| and, apparently, \lstinline|move| does not set any flags.
 Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime down to just 3961 cycles while still sorting correctly;
 the gain is even greater for input distributions other than the uniform one.
 New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.
 
 At this point, it should have become apparent that the poor performance of the implicit \IS{} is also due to bad compilation.
-We refrain from going into details because we failed to find an easy fix and because the implicit \IS{} is not used in the rest of the code base.
+We refrain from going into details because we failed to find an easy fix and because the implicit \IS{} is not used in the rest of the thesis.
 Thence, a sole \enquote{\IS{}} refers to the version relying on explicit sentinel values henceforth.
-Still, the idea of implicit sentinel values will be of use in the following subsection for \ShS{}.
+Still, the idea of implicit sentinel values will be of use in the following subsection on \ShS{}.
+
+\raggedbottom

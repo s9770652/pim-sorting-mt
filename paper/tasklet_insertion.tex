@@ -24,10 +24,10 @@ Especially the last two points make \IS{} a good fall-back algorithm for asympto
 
 \begin{note}
 	Other known simple sorting algorithm are \SelS{} and \BS{}.
-	\emph{\SelS{}} assumes like \IS{} that the elements with indices \(0\) to \(i\) are already sorted in round~\(i\).
-	It scans the elements with indices \(i + 1\) to \(n\) and finds their minimum.
+	\emph{\SelS{}} assumes like \IS{} that the elements with indices \(0\) to \(i - 1\) are already sorted in round~\(i\).
+	It scans the elements with indices \(i\) to \(n\) and finds their minimum.
 	Then, it swaps the minimum element with the element at index \(i\).
-	\emph{\BS{}} scans the elements with indices \(0\) to \(n - i\) and swaps each pair of neighbouring elements if they are in the wrong order.
+	\emph{\BS{}} scans the elements with indices \(0\) to \(n - i + 1\) and swaps each pair of neighbouring elements if they are in the wrong order.
 	An easy extension is adaptive \BS{} which stops if no swaps were done during a round.
 
 	The average runtime complexity of \SelS{} and \BS{} is the same as that of \IS{}.
