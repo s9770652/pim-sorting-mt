@@ -5,7 +5,7 @@
 	year={1959},
 	volume={2},
 	pages={30--32},
-	url={https://api.semanticscholar.org/CorpusID:28572656}
+	url={https://api.semanticscholar.org/CorpusID:28572656},
 }
 
 @misc{skean2023optimization,
@@ -14,7 +14,7 @@
 	date={2023-01-01},
 	eprint={2301.00316v1},
 	archivePrefix={arXiv},
-	primaryClass={cs.DS}
+	primaryClass={cs.DS},
 }
 
 @InProceedings{10.1007/3-540-44669-9_12,
@@ -30,7 +30,7 @@
 	isbn={978-3-540-44669-9},
 	doi={10.1007/3-540-44669-9_12},
 %	url={https://web.archive.org/web/20180923235211/http://sun.aei.polsl.pl/~mciura/publikacje/shellsort.pdf},
-%	urldate={2024-05-24}
+%	urldate={2024-05-24},
 }
 
 @misc{lee2021empirically,
@@ -39,7 +39,7 @@
 	date={2021-12-21},
 	eprint={2112.11112v1},
 	archivePrefix={arXiv},
-	primaryClass={cs.DS}
+	primaryClass={cs.DS},
 }
 
 @report{lukas_geis,
@@ -75,7 +75,7 @@
 	doi={10.1016/0304-3975(93)90364-Y},
 %	doi={https://doi.org/10.1016/0304-3975(93)90364-Y},
 %	url={https://www.sciencedirect.com/science/article/pii/030439759390364Y},
-	abstract={A variant of HEAPSORT, called BOTTOM-UP-HEAPSORT, is presented. It is based on a new reheap procedure. This sequential sorting algorithm is easy to implement and beats, on an average, QUICKSORT if n⩾400 and a clever version of QUICKSORT (where the split object is the median of 3 randomly chosen objects) if n⩾16000. The worst-case number of comparisons is bounded by 1.5n log n+O(n). Moreover, the new reheap procedure improves the delete procedure for the heap data structure for all n.}
+	abstract={A variant of HEAPSORT, called BOTTOM-UP-HEAPSORT, is presented. It is based on a new reheap procedure. This sequential sorting algorithm is easy to implement and beats, on an average, QUICKSORT if n⩾400 and a clever version of QUICKSORT (where the split object is the median of 3 randomly chosen objects) if n⩾16000. The worst-case number of comparisons is bounded by 1.5n log n+O(n). Moreover, the new reheap procedure improves the delete procedure for the heap data structure for all n.},
 }
 
 @article{hoare1962quicksort,
@@ -128,8 +128,23 @@
 	number={4},
 	pages={448--461},
 	date={1973-08},
+	editor={Arnold Leonard Rosenberg},
 	issn={0022-0000},
 	doi={https://doi.org/10.1016/S0022-0000(73)80033-9},
 %	url={https://www.sciencedirect.com/science/article/pii/S0022000073800339},
-	abstract={The number of comparisons required to select the i-th smallest of n numbers is shown to be at most a linear function of n by analysis of a new selection algorithm—PICK. Specifically, no more than 5.4305 n comparisons are ever required. This bound is improved for extreme values of i, and a new lower bound on the requisite number of comparisons is also proved.}
+	abstract={The number of comparisons required to select the i-th smallest of n numbers is shown to be at most a linear function of n by analysis of a new selection algorithm—PICK. Specifically, no more than 5.4305 n comparisons are ever required. This bound is improved for extreme values of i, and a new lower bound on the requisite number of comparisons is also proved.},
+}
+
+@InProceedings{katajainen1997meticulous,
+	author={Jyrki Katajainen and Jesper Larsson Tr{\"a}ff},
+	editor={Giancarlo Bongiovanni and Daniel Pierre Bovet and Giuseppe Di Battista},
+	title={A meticulous analysis of mergesort programs},
+	booktitle={Algorithms and Complexity},
+	date={1997-03-12},
+	publisher={Springer Berlin Heidelberg},
+	address={Berlin, Heidelberg},
+	pages={217--228},
+	abstract={The efficiency of mergesort programs is analysed under a simple unit-cost model. In our analysis the time performance of the sorting programs includes the costs of key comparisons, element moves and address calculations. The goal is to establish the best possible time-bound relative to the model when sorting n integers. By the well-known information-theoretic argument n log2n−O(n) is a lower bound for the integer-sorting problem in our framework. New implementations for two-way and four-way bottom-up mergesort are given, the worst-case complexities of which are shown to be bounded by 5.5n log2n+O(n) and 3.25n log2n+O(n), respectively. The theoretical findings are backed up with a series of experiments which show the practical relevance of our analysis when implementing library routines for internal-memory computations.},
+	isbn={978-3-540-68323-0},
+	doi={10.1007/3-540-62592-5_74},
 }

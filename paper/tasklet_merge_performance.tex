@@ -46,14 +46,14 @@
 			ymax=90,
 			ytick distance=5,
 		]
-			\nextgroupplot[title/.add={}{No Write-back}, legend to name=leg:merge:starting_runs]
+			\nextgroupplot[title/.add={}{Without Write-Backs}, legend to name=leg:merge:starting_runs]
 			\expandafter\legend\expandafter{\mergealgos}
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32uniform}
 			}
 			%
-			\nextgroupplot[title/.add={}{Write-back}]
+			\nextgroupplot[title/.add={}{With Write-Backs}]
 			\clip (0, 0) rectangle (1024, 200);
 			\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
 				\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
@@ -69,7 +69,7 @@
 
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
-		Comparison of the average runtimes of the \MS*{}, which need an auxiliary array of length either \(n\) (\enquote{No Write-back} / \enquote{Write-back}) or \(n/2\) (\enquote{Half-Space}), for different lengths of the starting runs.
+		Average runtimes of the full-space \MS*{} with and without write-backs and the half-space \MS{}, for different lengths of the starting runs.
 	}
 	\label{fig:merge:starting_runs}
 \end{figure}
@@ -81,7 +81,7 @@ Please note that the plots are smoothed:
 Whenever the number of rounds increments, the runtimes hike, making the zigzagging plots cross each other unswervingly and, thereby, hard to read.
 Thence, the figures contain marks for select measurements only in such a way that the resulting plots act as an upper bound on the runtime.
 
-The measurements show that the \MS*{} guarantee a runtime of \(\bigoh{n \lb n}\) as expected.
+The measurements show that the \MS*{} guarantee a runtime of \(\bigoh{n \log n}\) as expected.
 The differences in runtime between the different input distributions are small compared to \QS{} and are ascribable to \ShS{} and to the differing suitability of the unrolling;
 cases where the usage of \ShS{} worsened the runtime are unbeknown.
 
