@@ -24,8 +24,8 @@ Since the leftmost partitions have no neighbour to the left, one explicit sentin
 The downside to this approach is that elements equal to the pivot are also swapped.
 
 \paragraph{Base Cases}
-
-\begin{figure}
+When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
+\begin{figure}[!hb]
 	\pgfplotstableset{
 		create on use/n/.style={create col/copy column from table={data/quick/fallback/uint32/16.txt}{n}},
 	}
@@ -70,14 +70,12 @@ The downside to this approach is that elements equal to the pivot are also swapp
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
-	\caption{
+		\caption{
 		Speed-ups of \QS*{} with different thresholds (15--20) for when to fall back to \IS{} over a threshold of 18 elements (32-bit) and 17 elements (64-bit).
 		Using \ShS{} was not beneficial overall, likely because many partitions fall below the thresholds.
 	}
 	\label{fig:quick:fallback}
 \end{figure}
-
-When only a few elements remain in a partition, \QS{}'s overhead predominates such that \IS{} lends itself as fallback algorithm.
 As seen in \cref{fig:quick:fallback}, the optimal threshold for switching the sorting algorithm is 18 elements for 32-bit integers on uniform inputs and likely similar on inputs following Zipf's or normal distributions.
 For 64-bit integers, the optimal threshold is 17 elements, but we set 18 elements to be the default threshold for both data types to simplify matters since the impact is minuscule.
 Up to 40\% of the runtime is saved compared to a \QS{} never falling back.
