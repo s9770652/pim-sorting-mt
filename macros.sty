@@ -40,12 +40,12 @@
 % A column n must be present. Applies custom options #1.
 \NewDocumentCommand{\plotpernlognwitherrors}{O{} m m}{
 	\addplotnamedtable
-	[name path=top, no marks, forget plot, opacity=0.75, #1]
+	[name path=top, no marks, forget plot, opacity=0.75, thin, #1]
 	[x=n, y expr={(\thisrow{µ_#2} + 3 * \thisrow{σ_#2}) / (\thisrow{n} * log2(\thisrow{n}))}]
 	{#3};
 	%
 	\addplotnamedtable
-	[name path=bottom, no marks, forget plot, opacity=0.75, #1]
+	[name path=bottom, no marks, forget plot, opacity=0.75, thin, #1]
 	[x=n, y expr={(\thisrow{µ_#2} - 3 * \thisrow{σ_#2}) / (\thisrow{n} * log2(\thisrow{n}))}]
 	{#3};
 	%
