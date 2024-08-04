@@ -13,32 +13,32 @@
 		]
 			\nextgroupplot[title/.add={}{Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32sorted}
+				\plotpernlognwitherrors{#1}{tableHeap_32sorted}
 			}
 			%
 			\nextgroupplot[title/.add={}{Reverse Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32reverse}
+				\plotpernlognwitherrors{#1}{tableHeap_32reverse}
 			}
 			%
 			\nextgroupplot[title/.add={}{Almost Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32almost}
+				\plotpernlognwitherrors{#1}{tableHeap_32almost}
 			}
 			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32uniform}
+				\plotpernlognwitherrors{#1}{tableHeap_32uniform}
 			}
 			%
 			\nextgroupplot[title/.add={}{Zipf's}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32zipf}
+				\plotpernlognwitherrors{#1}{tableHeap_32zipf}
 			}
 			%
 			\nextgroupplot[title/.add={}{Normal}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_32normal}
+				\plotpernlognwitherrors{#1}{tableHeap_32normal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -46,7 +46,7 @@
 	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
-		The data type is 32-bit unsigned integers.
+		The date size is 32 bit.
 	}
 	\label{fig:heap:runtime_uint32}
 \end{figure}
@@ -62,32 +62,32 @@
 		]
 			\nextgroupplot[title/.add={}{Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64sorted}
+				\plotpernlognwitherrors{#1}{tableHeap_64sorted}
 			}
 			%
 			\nextgroupplot[title/.add={}{Reverse Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64reverse}
+				\plotpernlognwitherrors{#1}{tableHeap_64reverse}
 			}
 			%
 			\nextgroupplot[title/.add={}{Almost Sorted}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64almost}
+				\plotpernlognwitherrors{#1}{tableHeap_64almost}
 			}
 			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64uniform}
+				\plotpernlognwitherrors{#1}{tableHeap_64uniform}
 			}
 			%
 			\nextgroupplot[title/.add={}{Zipf's}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64zipf}
+				\plotpernlognwitherrors{#1}{tableHeap_64zipf}
 			}
 			%
 			\nextgroupplot[title/.add={}{Normal}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlogn{#1}{tableHeap_64normal}
+				\plotpernlognwitherrors{#1}{tableHeap_64normal}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -95,7 +95,7 @@
 	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
-		The data type is 64-bit unsigned integers.
+		The date size is 64 bit.
 	}
 	\label{fig:heap:runtime_uint64}
 \end{figure}
