@@ -6,15 +6,15 @@ The following is a collocation of some of the issues found while engineering \MS
 They will not be discussed in detail here but still provide a point of reference for future work:
 \begin{itemize}
 	\item
-	As already mentioned, sorting the starting runs via \ShS{} requires the placement and later removal of temporary sentinel values.
+	As already mentioned, sorting the starting runs via \IS{} or \ShS{} requires the placement and later removal of temporary sentinel values.
 	For the very first starting run, one can omit storing and restoring the overwritten elements by using permanent sentinel values;
 	this optimisation was in use when measuring runtimes.
-	On the downside, this leads to a bigger compilation as \ShS{} is inlined twice.
+	On the downside, this leads to a bigger compilation as \IS{} or \ShS{} is inlined twice.
 	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
 	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slow-down is in the thousands.
 
 	\item
-	If the input is so short that it fits entirely within the first starting run, one can immediately end the execution after \ShS{} is done.
+	If the input is so short that it fits entirely within the first starting run, one can immediately end the execution after \IS{} or \ShS{} is done.
 	Several implementations were tested, with unsatisfactory results:
 	Some increased the runtime for longer inputs, others decreased it but also increased it for shorter inputs.
 	The settled-on implementation is of the former variety since the increases hit shorter inputs harder relatively and a more thorough solution would not further the purpose of this section.

@@ -1,430 +1,258 @@
 \section{\texorpdfstring{\MS{}}{MergeSort}}
 \label{apx:tasklet:merge}
 
-\pgfplotsset{merge/.append style={height=3.5cm}}
+\def\mergealgos{Merge,MergeWriteBack,MergeHalfSpace}
+
+\pgfplotsset{
+	merge/.append style={
+		height=2.725cm,
+		adaptive group=6 by 3,
+		vertical sep for yticks,
+	},
+	with dist name/.style={
+		ylabel=#1,
+		ylabel style={at={(1, 0.5)}, below, font=\maybesffamily\bfseries, yshift=-1mm},
+	},
+}
+
+\NewDocumentCommand{\addmergeplot}{m m m}{
+	\nextgroupplot[#2]
+	\clip (0, 0) rectangle (1024, 200);
+
+	\pgfplotsset{update limits=false}
+	\plotpernlognwitherrors{#3}{tableMerge_#1#2}
+	\pgfplotsset{update limits=true}
+
+	\addplot +[opacity=0] coordinates {(16, 50)  (1024, 50)};  % needed for all x ticks to appear
+	\addplot +[opacity=0] coordinates {(16, 80)  (1024, 80)};
+	\addplot +[opacity=0] coordinates {(16, 100) (1024, 100)};
+}
+
+% #1: data type; #2: dist name; #3: dist label
+\NewDocumentCommand{\addmergerow}{m m m}{
+	\addmergeplot{#1}{#2}{Merge}
+	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{Without Write-Backs}} }{}
+	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+
+	\addmergeplot{#1}{#2}{MergeWriteBack}
+	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{With Write-Backs} }}{}
+	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+
+	\addmergeplot{#1}{#2}{MergeHalfSpace}
+	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{Half-Space} }}{}
+	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+	\pgfplotsset{with dist name={#3}}
+}
 
 \begin{figure}[!ht]
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32sorted}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=20,
-				ymax=60,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32sorted}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32sorted}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32sorted}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Sorted
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32reverse}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=60,
-				ymax=140,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32reverse}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32reverse}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32reverse}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Reverse Sorted
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32almost}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=50,
-				ymax=80,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32almost}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32almost}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32almost}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Almost Sorted
-		}
-		\bigskip
-	\end{subfigure}
+	\tikzsetnextfilename{merge_runtime_uint32}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=20, ymax=60},
+			reverse/.style={ymin=80, ymax=140},
+			almost/.style={ymin=40, ymax=80},
+			uniform/.style={ymin=50, ymax=100, extra y ticks={50}},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{32}{sorted}{Sorted}
+			\addmergerow{32}{reverse}{Reverse S.}
+			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{uniform}{Uniform}
+			\addmergerow{32}{zipf}{Zipf's}
+			\addmergerow{32}{normal}{Normal}
+		\end{groupplot}
+	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
-		An extension to \cref{fig:merge:starting_runs}.
-		The data type is 32-bit unsigned integers.
+		An extension to \cref{fig:merge:runtime}.
+		The date size is 32 bit.
 	}
-	\label{fig:merge:starting_runs_uint32sorted}
+	\label{fig:merge:runtime_uint32}
 \end{figure}
 
 \begin{figure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32uniform}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=60,
-				ymax=90,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32uniform}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32uniform}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32uniform}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Uniform
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32zipf}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=60,
-				ymax=90,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32zipf}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32zipf}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32zipf}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Zipf's
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint32normal}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=60,
-				ymax=90,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_32normal}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_32normal}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_32normal}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Normal
-		}
-		\bigskip
-	\end{subfigure}
+	\tikzsetnextfilename{merge_runtime_uint64}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=20, ymax=70, extra y ticks={70}},
+			reverse/.style={ymin=100, ymax=175, extra y ticks={175}},
+			almost/.style={ymin=40, ymax=110, extra y ticks={110}},
+			uniform/.style={ymin=60, ymax=140},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{64}{sorted}{Sorted}
+			\addmergerow{64}{reverse}{Reverse S.}
+			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{uniform}{Uniform}
+			\addmergerow{64}{zipf}{Zipf's}
+			\addmergerow{64}{normal}{Normal}
+		\end{groupplot}
+	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
 	\caption{
-		An extension to \cref{fig:merge:starting_runs}.
-		The data type is 32-bit unsigned integers.
+		An extension to \cref{fig:merge:runtime}.
+		The date size is 64 bit.
 	}
-	\label{fig:merge:starting_runs_uint32uniform}
+	\label{fig:merge:runtime_uint64}
+\end{figure}
+
+\RenewDocumentCommand{\addmergeplot}{m m m}{
+	\nextgroupplot[#2]
+	\clip (0, 0) rectangle (1024, 200);
+
+	\pgfplotsset{update limits=false}
+	\plotpernlogn[merge filter=14]{#3}{tableMergeStart14_#1#2}
+	\plotpernlogn[merge filter=15]{#3}{tableMergeStart15_#1#2}
+	\plotpernlogn[merge filter=16]{#3}{tableMergeStart16_#1#2}
+	\plotpernlogn[merge filter=17]{#3}{tableMergeStart17_#1#2}
+	\plotpernlogn[merge filter=18]{#3}{tableMergeStart18_#1#2}
+	\pgfplotsset{update limits=true}
+
+	\addplot +[opacity=0] coordinates {(16, 55)  (1024, 55)};  % needed for all x ticks to appear
+	\addplot +[opacity=0] coordinates {(16, 80)  (1024, 80)};
+	\addplot +[opacity=0] coordinates {(16, 100) (1024, 100)};
+}
+
+\begin{figure}
+	\tikzsetnextfilename{merge_starting_runs_is_uint32}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=35, ymax=60, extra y ticks={35}},
+			reverse/.style={ymin=80, ymax=120},
+			almost/.style={ymin=55, ymax=75},
+			uniform/.style={ymin=75, ymax=90},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{32}{sorted}{Sorted}
+			\addmergerow{32}{reverse}{Reverse S.}
+			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{uniform}{Uniform}
+			\addmergerow{32}{zipf}{Zipf's}
+			\addmergerow{32}{normal}{Normal}
+			\pgfplotsset{legend to name=leg:merge:starting_runs_is, legend entries={14,...,18}}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
+	\caption{
+		\MS{} with different starting run lengths.
+		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 4\) were tested.
+		The date size is 32 bit.
+	}
+	\label{fig:merge:starting_runs_is_uint32}
 \end{figure}
 
 \begin{figure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64sorted}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=20,
-				ymax=80,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64sorted}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64sorted}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64sorted}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Sorted
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64reverse}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=70,
-				ymax=150,
-				ytick={70,90,...,150},
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64reverse}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64reverse}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64reverse}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Reverse Sorted
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64almost}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=50,
-				ymax=95,
-				ytick={50,65,...,95},
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64almost}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64almost}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64almost}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Almost Sorted
-		}
-		\bigskip
-	\end{subfigure}
+	\tikzsetnextfilename{merge_starting_runs_is_uint64}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=45, ymax=70, extra y ticks={45}},
+			reverse/.style={ymin=100, ymax=160},
+			almost/.style={ymin=70, ymax=90},
+			uniform/.style={ymin=90, ymax=115, extra y ticks={115}},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{64}{sorted}{Sorted}
+			\addmergerow{64}{reverse}{Reverse S.}
+			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{uniform}{Uniform}
+			\addmergerow{64}{zipf}{Zipf's}
+			\addmergerow{64}{normal}{Normal}
+		\end{groupplot}
+	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
 	\caption{
-		An extension to \cref{fig:merge:starting_runs}.
-		The data type is 64-bit unsigned integers.
+		\MS{} with different starting run lengths.
+		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 4\) were tested.
+		The date size is 64 bit.
 	}
-	\label{fig:merge:starting_runs_uint64sorted}
+	\label{fig:merge:starting_runs_is_uint64}
+\end{figure}
+
+\RenewDocumentCommand{\addmergeplot}{m m m}{
+	\nextgroupplot[#2]
+	\clip (0, 0) rectangle (1024, 200);
+
+	\pgfplotsset{update limits=false}
+	\plotpernlogn[merge filter=16]{#3}{tableMergeStart16_#1#2}
+	\plotpernlogn[merge filter=24]{#3}{tableMergeStart24_#1#2}
+	\plotpernlogn[merge filter=32]{#3}{tableMergeStart32_#1#2}
+	\plotpernlogn[merge filter=48]{#3}{tableMergeStart48_#1#2}
+	\plotpernlogn[merge filter=64]{#3}{tableMergeStart64_#1#2}
+	\plotpernlogn[merge filter=96]{#3}{tableMergeStart96_#1#2}
+	\pgfplotsset{update limits=true}
+
+	\addplot +[opacity=0] coordinates {(16, 50)  (1024, 50)};  % needed for all x ticks to appear
+	\addplot +[opacity=0] coordinates {(16, 80)  (1024, 80)};
+	\addplot +[opacity=0] coordinates {(16, 100) (1024, 100)};
+}
+
+\begin{figure}
+	\tikzsetnextfilename{merge_starting_runs_shs_uint32}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=40, ymax=60},
+			reverse/.style={ymin=65, ymax=100},
+			almost/.style={ymin=60, ymax=80},
+			uniform/.style={ymin=75, ymax=90},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{32}{sorted}{Sorted}
+			\addmergerow{32}{reverse}{Reverse S.}
+			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{uniform}{Uniform}
+			\addmergerow{32}{zipf}{Zipf's}
+			\addmergerow{32}{normal}{Normal}
+			\pgfplotsset{legend to name=leg:merge:starting_runs_shs, legend entries={16,24,32,48,64,96}}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
+	\caption{
+		\MS{} with different starting run lengths.
+		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 3\) were tested.
+		The date size is 32 bit.
+	}
+	\label{fig:merge:starting_runs_shs_uint32}
 \end{figure}
 
 \begin{figure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64uniform}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=70,
-				ymax=110,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64uniform}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64uniform}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64uniform}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Uniform
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64zipf}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=70,
-				ymax=110,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64zipf}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64zipf}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64zipf}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Zipf's
-		}
-		\medskip
-	\end{subfigure}
-	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_starting_runs_uint64normal}
-		\begin{tikzpicture}[plot]
-			\begin{groupplot}[
-				merge,
-				ymin=70,
-				ymax=110,
-			]
-				\nextgroupplot[title/.add={}{Without Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{Merge}{tableMergeStart#1_64normal}
-				}
-				%
-				\nextgroupplot[title/.add={}{With Write-Backs}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeWriteBack}{tableMergeStart#1_64normal}
-				}
-				%
-				\nextgroupplot[title/.add={}{Half-Space}]
-				\clip (0, 0) rectangle (1024, 200);
-				\expandafter\pgfplotsinvokeforeach\expandafter{\mergealgos}{
-					\plotpernlogn[merge filter #1]{MergeHalfSpace}{tableMergeStart#1_64normal}
-				}
-			\end{groupplot}
-		\end{tikzpicture}
-		\caption{
-			Normal
-		}
-		\bigskip
-	\end{subfigure}
+	\tikzsetnextfilename{merge_starting_runs_shs_uint64}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			merge,
+			sorted/.style={ymin=50, ymax=70},
+			reverse/.style={ymin=75, ymax=130, ytick={70, 90, ..., 130}},
+			almost/.style={ymin=70, ymax=90},
+			uniform/.style={ymin=90, ymax=110},
+			zipf/.style={uniform},
+			normal/.style={uniform},
+		]
+			\addmergerow{64}{sorted}{Sorted}
+			\addmergerow{64}{reverse}{Reverse S.}
+			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{uniform}{Uniform}
+			\addmergerow{64}{zipf}{Zipf's}
+			\addmergerow{64}{normal}{Normal}
+		\end{groupplot}
+	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs}\hfil
+	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
 	\caption{
-		An extension to \cref{fig:merge:starting_runs}.
-		The data type is 64-bit unsigned integers.
+		\MS{} with different starting run lengths.
+		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 3\) were tested.
+		The date size is 64 bit.
 	}
-	\label{fig:merge:starting_runs_uint64uniform}
+	\label{fig:merge:starting_runs_shs_uint64}
 \end{figure}

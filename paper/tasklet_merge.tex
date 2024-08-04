@@ -10,23 +10,26 @@ Besides \IS{}, \MS{} is the only stable sorting algorithm presented in this chap
 Instead of starting by merging runs of length 1, that is individual elements, it is beneficial to first subdivide the input and use either \IS{} or \ShS{} on the individual subdivisions.
 A substantial downside to \ShS{} is that whilst it does allow to sort bigger starting runs quicker, it is not stable unlike \IS{}.
 If \MS{} is supposed to sort stably, then \IS{} has to be used.
+For simplicity, all subdivisions have the same, predefined length with possible exception of the last one.
 
-Unlike \QS{}, where each partition naturally acted as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
-The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1, 6)\) for lengths up to 48 elements, and \(\stepsizes = (1, 5, 12)\) for everything above \Dash have been chosen based on the results in \cref{sec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for the reverse sorted inputs.
+Unlike \QS{}, where each partition naturally acts as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the original values of the preceding run.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = (1)\) for up to 16 elements, \(\stepsizes = (1, 6)\) for up to 48 elements, and \(\stepsizes = (1, 5, 12)\) for any more \Dash have been chosen based on the results in \cref{sec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for reverse sorted inputs.
 Spot-check inspection suggest no deterioration of \IS{}'s and \ShS{}'s compilation due to inlining.
 
 
 \paragraph{Memory Footprint}
-A simple but fast implementation of \MS{} writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements (\enquote{full-space}).
+A simple but fast implementation of \MS{} (denoted by \emph{full-space}) writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements.
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed for some input lengths.
 
-A slightly more sophisticated implementation needs space for only \(n/2\) additional elements (\enquote{half-space}):
-When two adjacent runs are to be merged, the first one can be copied to an auxiliary array.
+A slightly more sophisticated implementation (denoted by \emph{half-space}) needs space for only \(n/2\) additional elements:
+When two adjacent runs are to be merged, the first one is copied to an auxiliary array.
 Then, the copy and the second run are merged to the start of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
-%As a consequence, flushes will only be performed on at most half of the runs.
-Further optimised, \MS{} would not need to copy the first runs immediately.
+Strictly speaking, the auxiliary array holds~\(n-1\) elements in the worst-case, for example, if the starting run length is \(n-1\), there would be two runs of length \(n - 1\) and \(1\), respectively, and the first one would be copied away.
+However, the maximum number of elements to sort and the starting run length are controlled by the developer, so the memory footprint can indeed be halved compared to the full-space \MS{}.
+
+Further optimised, half-space \MS{} would not need to copy the first runs immediately.
 It suffices to search for the foremost element of the first run which is greater than the first element of the second element.
 All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
 This optimisation, although examined during development, was not in use when measuring runtimes since it unfortunately complicates another optimisation, namely unrolling.
@@ -59,7 +62,7 @@ Due to time reasons, we refrained from doing automatic and extensive tests and r
 When the full-space \MS{} performs a write-back or when the half-space \MS{} copies the first run, \(x\) is set to the starting run length.
 In all other cases, \(x\) is set to 24.
 This strategy, albeit not optimal, makes the \MS*{} significantly faster:
-Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30\%, whereas sorting more random inputs still sees speed-ups for the most part and slow-downs into low single-digits at worst, depending on the starting run length.
+Sorting sorted, reverse sorted, and almost sorted inputs sees speed-ups up to 30\%, while sorting more random inputs still sees speed-ups for the most part and slow-downs into low single-digits at worst, depending on the starting run length.
 
 \input{tasklet_merge_compilation}
 
