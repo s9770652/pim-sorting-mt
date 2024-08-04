@@ -28,36 +28,36 @@
 		]
 			\nextgroupplot[title/.add={}{Sorted}]
 			\pgfplotsset{legend to name=leg:quick:runtime_32, legend entries={Deterministic Median,Random Median}}
-			\plotpernlogn{TrivialBC}{tableQuickDet_32sorted}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32sorted}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32sorted}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32sorted}
 			%
 			\nextgroupplot[title/.add={}{Reverse Sorted}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_32reverse}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32reverse}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32reverse}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32reverse}
 			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_32sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
 			%
 			\nextgroupplot[title/.add={}{Almost Sorted}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_32almost}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32almost}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32almost}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32almost}
 			%
 			\nextgroupplot[title/.add={}{Uniform}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_32uniform}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32uniform}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32uniform}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32uniform}
 			%
 			\nextgroupplot[title/.add={}{Zipf's}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_32zipf}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32zipf}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32zipf}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32zipf}
 			%
 			\nextgroupplot[title/.add={}{Normal}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_32normal}
-			\plotpernlogn{TrivialBC}{tableQuickRand_32normal}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32normal}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
 	\caption{
 		An extension to \cref{fig:quick:runtime} with two different pivot choices.
-		The data type is 32-bit unsigned integers.
+		The date size is 32 bit.
 	}
 	\label{fig:quick:runtime_uint32}
 \end{figure}
@@ -73,36 +73,36 @@
 			ymax=100,
 		]
 			\nextgroupplot[title/.add={}{Sorted}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64sorted}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64sorted}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64sorted}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64sorted}
 			%
 			\nextgroupplot[title/.add={}{Reverse Sorted}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64reverse}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64reverse}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64reverse}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64reverse}
 			\plotpernlogn[opacity=0]{TrivialBC}{tableQuickDet_64sorted}  % needed because the points for 16 are outside so the ticks would be messed up otherwise
 			%
 			\nextgroupplot[title/.add={}{Almost Sorted}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64almost}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64almost}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64almost}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64almost}
 			%
 			\nextgroupplot[title/.add={}{Uniform}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64uniform}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64uniform}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64uniform}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64uniform}
 			%
 			\nextgroupplot[title/.add={}{Zipf's}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64zipf}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64zipf}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64zipf}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64zipf}
 			%
 			\nextgroupplot[title/.add={}{Normal}]
-			\plotpernlogn{TrivialBC}{tableQuickDet_64normal}
-			\plotpernlogn{TrivialBC}{tableQuickRand_64normal}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64normal}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
 	\caption{
 		An extension to \cref{fig:quick:runtime} with two different pivot choices.
-		The data type is 64-bit unsigned integers.
+		The date size is 64 bit.
 	}
 	\label{fig:quick:runtime_uint64}
 \end{figure}
@@ -235,7 +235,7 @@
 	\tikzexternalenable
 	\caption{
 		A repetition of \cref{fig:quick:implementations}.
-		The data type is 32-bit unsigned integers.
+		The date size is 32 bit.
 	}
 	\label{fig:quick:implementations_32}
 \end{figure}
@@ -370,7 +370,7 @@
 	\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:quick:implementations}.
-		The data type is 64-bit unsigned integers.
+		The date size is 64 bit.
 	}
 	\label{fig:quick:implementations_64}
 \end{figure}
