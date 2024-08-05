@@ -11,7 +11,12 @@
 	},
 	with dist name/.style={
 		ylabel=#1,
-		ylabel style={at={(1, 0.5)}, below, font=\maybesffamily\bfseries, yshift=-1mm},
+		ylabel style={
+			at={(1, 0.5)},
+			below,
+			font=\maybesffamily\bfseries,
+			yshift=-1mm,
+		},
 	},
 }
 
@@ -72,7 +77,10 @@
 	\label{fig:merge:runtime_uint32}
 \end{figure}
 
-\begin{figure}
+\clearpage
+\section*{\phantom{\MS{}}}  % needed for aligning figures across pages
+
+\begin{figure}[!ht]
 	\tikzsetnextfilename{merge_runtime_uint64}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
