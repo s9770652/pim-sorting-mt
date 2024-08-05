@@ -1,5 +1,6 @@
 \subsection*{Evaluation of the Performance}
 \label{sec:tasklet:merge:performance}
+\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:merge:performance}}
 
 \pgfplotsinvokeforeach{14,15,16,17,18,24,32,48,64,96}{
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
@@ -27,9 +28,6 @@
 		adaptive group=1 by 3,
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		x from 16 to 1024 minor,
-		xmax=1024,
-		enlarge x limits={abs=3mm, true},
-		every legend image post={mark=none},
 	},
 	merge filter/.style={x filter/.expression={(\thisrow{n} > #1) ? \pgfmathresult : nan}},
 }

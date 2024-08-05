@@ -1,5 +1,6 @@
 \subsection*{Evaluation of the Performance}
 \label{sec:tasklet:quick:performance}
+\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:quick:performance}}
 
 \pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
 	\pgfplotstablereadnamed{data/quick/matrix/iterative/Median_of_random/right/uint32/#1.txt}{tableQuickRand_32#1}
@@ -16,7 +17,7 @@
 			ytick distance=10,
 		]
 			\nextgroupplot[title/.add={}{32-bit}, ymin=30, ymax=80]
-			\pgfplotsset{legend to name=leg:quick:runtime, legend entries={Sorted,Reverse Sorted,Almost Sorted,Uniform,Zipf's,Normal}}
+			\pgfplotsset{legend to name=leg:quick:runtime, legend entries={Sorted, Reverse S., Almost S., Uniform, Zipf's, Normal}}
 			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
 				\plotpernlogn{TrivialBC}{tableQuickRand_32#1}
 			}

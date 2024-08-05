@@ -1,5 +1,6 @@
 \subsection*{Investigation of the Compilation}
 \label{sec:tasklet:heap:compilation}
+\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:heap:compilation}}
 
 While engineering, some strange observations were made.
 For example, the runtime difference between stopping \HS{} when only one element remains in the heap and stopping \HS{} when only three elements remain (which then get sorted by \IS{}) can be in the tens of thousands of cycles in both directions, depending on the sifting direction and the input distribution.

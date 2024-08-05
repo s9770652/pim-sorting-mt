@@ -1,5 +1,6 @@
 \subsection*{Evaluation of the Performance}
 \label{sec:tasklet:shell:performance}
+\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:shell:performance}}
 
 \pgfplotstablereadnamed{data/shell/two-tier/uint32/reverse.txt}{tableShellTwo_32reverse}
 \pgfplotstablereadnamed{data/shell/two-tier/uint32/uniform.txt}{tableShellTwo_32uniform}
@@ -25,8 +26,8 @@ On sorted and almost sorted inputs, \ShS{} exhibits a slow-down in the tested ra
 			minor xtick=data,
 			title={},
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=50, ytick distance=10, legend to name=leg:shell:two-tier]
-			\legend{\(1\), \(...\), \(9\)}
+			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=50, ytick distance=10]
+			\pgfplotsset{legend to name=leg:shell:two-tier, legend entries={\(1\), \(...\), \(9\)}}
 			\pgfplotsinvokeforeach{1,...,9}{
 				\plotpernn[x filter/.expression={x > #1 ? x : nan}]{#1}{tableSmallSorts_32uniform}
 			}
