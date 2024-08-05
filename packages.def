@@ -51,4 +51,5 @@
 \RequirePackage{marginnote}  % benötigt, um \todo in Gleitobjekten benutzen zu können
 \renewcommand{\marginpar}{\marginnote}
 }
+\@ifclassloaded{scrartcl}{}{\RequirePackage{scrhack}}
 \makeatother
