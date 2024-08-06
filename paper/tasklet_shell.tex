@@ -2,11 +2,15 @@
 \label{sec:tasklet:shell}
 
 \IS{} suffers from small elements at the end of the input, since those have to be brought to the front through \(\bigtheta{n}\) comparisons and swaps.
-\ShS{}~\cite{Shell1959AHS} gets around this by doing \(k\) passes of \IS{} with decreasing step sizes:
-In pass~\(p = 1, \dots, k\) with step size \(\stepsizes_{k - p}\), the input array is divided into \(\stepsizes_{k - p}\) subarrays of elements so that the \(i\)th subarray contains the elements with indices \((i, i + \stepsizes_{k - p}, i + 2 \stepsizes_{k - p}, \dots)\), for \(i = 0, \dots, \stepsizes_{k - p} - 1\).
+\ShS{}~\cites{Shell1959AHS}[Chapter~2.2.4]{wirth1975algorithmen} gets around this by doing \(k\) passes of \IS{} with decreasing step sizes:
+In pass~\(p = 1, \dots, k\) with step size \(\stepsizes_{k - p}\), the input array is divided into \(\stepsizes_{k - p}\) subarrays so that the \(i\)th subarray contains the elements with indices \(\paren{i, i + \stepsizes_{k - p}, i + 2 \stepsizes_{k - p}, \dots}\), for \(i = 0, \dots, \stepsizes_{k - p} - 1\).
 These subarrays then get sorted individually through \IS{}.
 The final step size is \(\stepsizes_0 = 1\) such that a regular \IS{} is performed.
-Intuitively, the individual \IS*{} are fast since elements which need to travel long distances do big jumps.
+Intuitively, the individual \IS*{} are fast since elements do big jumps in earlier passes and are almost sorted in later ones.
+Like regular \IS{}, \ShS{} also works in-place but loses the stability property.
+
 Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research to this day \cite{skean2023optimization,lee2021empirically} and depends on the cost of the operation types (comparing, swapping, looping).
+Traditionally, step sizes were constructed mathematically, allowing to determine \ShS{}'s runtime to be, for example, \(\bigoh[\big]{n^{1.2}}\)~\cite[106]{wirth1975algorithmen} or \(\bigoh[\big]{n \log^2 n}\)~\cite[Section 2]{skean2023optimization}, that is better than \IS{}.
+Nowadays, well-performing step sizes are identified empirically~\cite{10.1007/3-540-44669-9_12,skean2023optimization,lee2021empirically}, making a generalisation and, thus, asymptotic analysis far harder.
 
 \input{tasklet_shell_performance}
