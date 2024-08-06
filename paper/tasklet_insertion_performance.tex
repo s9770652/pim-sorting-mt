@@ -12,13 +12,13 @@
 The runtimes of the three \IS*{} can be compared in the \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
 The sentinel-less \IS{} is consistently worse than the explicit one.
 For most input distributions, the implicit \IS{} is also a bit slower, as it effectively performs one check more for each element.
-Of course, the gap becomes less significant with increasing input lengths as the loops dominate the runtime.
+Of course, the gap becomes less significant with increasing input lengths as the other parts of the loops dominate the runtime.
 
 An outlier, however, are the reverse sorted inputs.
 For 32-bit numbers (\cref{fig:insertion:against_others}), the implicit \IS{} is up to 45\% slower than the explicit one.
 This comes as a surprise since both versions effectively execute the same loop body while shifting everything one position backwards, with only the loop condition being different.
 Due to the uni-cost model, a value check on whether the preceding element is smaller (explicit) and an address check on whether the preceding position is the start of the array (implicit) should take the same amount of time.
-Yet, even the \IS{} not relying on sentinel values surpasses the implicit \IS{}, although doing both value checks and address checks!
+Yet, even the sentinel-less \IS{} surpasses the implicit \IS{}, although doing both value checks and address checks!
 For 64-bit numbers (\cref{fig:insertion:against_others_uint64}), the implicit \IS{} would be expected to perform better than the explicit one, considering that a value check now takes two instructions and an address check still only one.
 Nonetheless, the two \IS*{} tie.
 This constitutes another case of bad compilation.
@@ -53,19 +53,18 @@ The explicit \IS{} is, therefore, used in the rest of this thesis and referred t
 
 	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
 	\caption{
-		Average runtimes of sorting algorithms with a runtime in \(\bigoh{n^2}\) on 32-bit integers.
-		The speed-ups are with respect to the \IS{} relying on explicit sentinel values.
+		Mean runtimes of sorting algorithms with a runtime in \(\bigoh*{n^2}\) on 32-bit integers.
 	}
 	\label{fig:insertion:against_others}
 \end{figure}
 
 \begin{note}
 	Other known simple sorting algorithm are \SelS{} and \BS{}.
-	\emph{\SelS{}} assumes like \IS{} that the elements with indices \(0\) to \(i - 1\) are already sorted in round~\(i\).
+	\emph{\SelS{}}~\cites[83]{maurer1974datenstrukturen}[Chapter~2.2.2]{wirth1975algorithmen} assumes like \IS{} that the elements with indices \(0\) to \(i - 1\) are already sorted in round~\(i\).
 	It scans the elements with indices \(i\) to \(n\) and finds their minimum.
 	Then, it swaps a minimum element with the element with index \(i\).
-	\emph{\BS{}} scans the elements with indices \(0\) to \(n - i + 1\) and swaps each pair of neighbouring elements if they are in the wrong order.
-	An easy extension is adaptive \BS{} which stops if no swaps were done during a round.
+	\emph{\BS{}}~\cite[Chapter~2.2.3]{wirth1975algorithmen} scans the elements with indices \(0\) to \(n - i + 1\) and swaps each pair of neighbouring elements if they are in the wrong order.
+	An easy extension is adaptive \BS{} which sorts only up to the position of the last swap.
 
 	The average runtime complexity of \SelS{} and \BS{} is the same as that of \IS{}.
 	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred, as seen in \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
