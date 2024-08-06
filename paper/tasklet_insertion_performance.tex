@@ -9,50 +9,65 @@
 	\pgfplotstablereadnamed{data/small sorts/uint64/#1.txt}{tableSmallSorts_64#1}
 }
 
-The runtimes of the explicit and implicit \IS*{} can be compared in the \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
-For most input distributions, the implicit \IS{} is logically a bit slower, effectively adding one check instruction to each round.
+The runtimes of the three \IS*{} can be compared in the \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
+The sentinel-less \IS{} is consistently worse than the explicit one.
+For most input distributions, the implicit \IS{} is also a bit slower, as it effectively performs one check more for each element.
+Of course, the gap becomes less significant with increasing input lengths as the loops dominate the runtime.
+
 An outlier, however, are the reverse sorted inputs.
-For 32-bit numbers (\cref{fig:insertion:against_others,fig:insertion:against_others_uint32}), the implicit version is up to 45\% slower than the explicit one.
-This comes as a surprise since both versions effectively execute the same loop body while shifting everything one index backwards, with only the loop condition being different.
+For 32-bit numbers (\cref{fig:insertion:against_others}), the implicit \IS{} is up to 45\% slower than the explicit one.
+This comes as a surprise since both versions effectively execute the same loop body while shifting everything one position backwards, with only the loop condition being different.
 Due to the uni-cost model, a value check on whether the preceding element is smaller (explicit) and an address check on whether the preceding position is the start of the array (implicit) should take the same amount of time.
 Yet, even the \IS{} not relying on sentinel values surpasses the implicit \IS{}, although doing both value checks and address checks!
 For 64-bit numbers (\cref{fig:insertion:against_others_uint64}), the implicit \IS{} would be expected to perform better than the explicit one, considering that a value check now takes two instructions and an address check still only one.
 Nonetheless, the two \IS*{} tie.
+This constitutes another case of bad compilation.
+We did not bother with troubleshooting, as the explicit \IS{} would still be expected to offer superior performance in most cases.
+The explicit \IS{} is, therefore, used in the rest of this thesis and referred to as plain \enquote{\IS{}} henceforth.
 
 \begin{figure}
 	\tikzsetnextfilename{insertion_against_others}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			horizontal sep for labels,
 			adaptive group=1 by 2,
 			groupplot xlabel={Input Length \(n\)},
+			groupplot ylabel={Cycles / \(n^2\)},
 			xtick distance=3,
 			minor xtick=data,
+			ymin=0,
+			ymax=60,
 			legend columns=3,
-			title={},
 		]
-			\nextgroupplot[ylabel=Cycles / \(n^2\), ymin=0, ymax=60]
-			\pgfplotsset{legend to name=leg:insertion:against_others, legend entries={\IS{} (no sentinel), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}}
+			\nextgroupplot[title/.add={}{Reverse Sorted}]
+			\pgfplotsset{legend to name=leg:insertion:against_others, legend entries={\IS{} (sentinel-less), \IS{} (explicit), \IS{} (implicit), \BS{} (not adaptive), \BS{} (adaptive), \SelS{}}}
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
-				\plotpernn{#1}{tableSmallSorts_32uniform}
+				\plotpernn{#1}{tableSmallSorts_32reverse}
 			}
 			%
-			\nextgroupplot[ylabel=Speed-up, ymin=0.2, ymax=1, yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill}]
+			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
-				\ifstrequal{#1}{1}{
-					\pgfplotsset{cycle list shift=1}
-				}{
-					\plotspeedup{#1}{1}{tableSmallSorts_32uniform}
-				}
+				\plotpernn{#1}{tableSmallSorts_32uniform}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
 	\caption{
-		Comparison of sorting algorithms with a runtime in \(\bigoh{n^2}\).
-		The adaptive \BS{} terminates prematurely if no changes were made to the input array during an iteration.
+		Average runtimes of sorting algorithms with a runtime in \(\bigoh{n^2}\) on 32-bit integers.
 		The speed-ups are with respect to the \IS{} relying on explicit sentinel values.
 	}
 	\label{fig:insertion:against_others}
 \end{figure}
+
+\begin{note}
+	Other known simple sorting algorithm are \SelS{} and \BS{}.
+	\emph{\SelS{}} assumes like \IS{} that the elements with indices \(0\) to \(i - 1\) are already sorted in round~\(i\).
+	It scans the elements with indices \(i\) to \(n\) and finds their minimum.
+	Then, it swaps a minimum element with the element with index \(i\).
+	\emph{\BS{}} scans the elements with indices \(0\) to \(n - i + 1\) and swaps each pair of neighbouring elements if they are in the wrong order.
+	An easy extension is adaptive \BS{} which stops if no swaps were done during a round.
+
+	The average runtime complexity of \SelS{} and \BS{} is the same as that of \IS{}.
+	The asymptoticity, however, hides much higher constant factors such that \IS{} should always be preferred, as seen in \cref{fig:insertion:against_others,fig:insertion:against_others_uint32,fig:insertion:against_others_uint64}.
+	Consequently, they will not be expanded on further in this thesis.
+\end{note}
