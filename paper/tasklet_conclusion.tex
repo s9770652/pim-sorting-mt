@@ -19,14 +19,12 @@ However, there is still room for improvement as its compilation is suboptimal, e
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		x from 16 to 1024 minor,
 		/tikz/mark repeat=2,
-		legend columns=3,
 	}
 
 	\NewDocumentCommand{\allalgos}{m}{
 		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart16_32#1}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_32#1}
+		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMerge_32#1}
 		\pgfplotsset{update limits=true}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_32#1}
 		\pgfplotsset{update limits=false}
@@ -40,7 +38,7 @@ However, there is still room for improvement as its compilation is suboptimal, e
 				ymax=150,
 			]
 				\nextgroupplot[title/.add={}{Sorted}]
-				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{} (stable), \MS{} (unstable), \HS{}, \ShS{}}}
+				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{}, \HS{}, \ShS{}}}
 				\allalgos{sorted}
 				%
 				\nextgroupplot[title/.add={}{Reverse Sorted}]
@@ -68,8 +66,7 @@ However, there is still room for improvement as its compilation is suboptimal, e
 	\RenewDocumentCommand{\allalgos}{m}{
 		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart16_64#1}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMergeStart32_64#1}
+		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMerge_64#1}
 		\pgfplotsset{update limits=true}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_64#1}
 		\pgfplotsset{update limits=false}
@@ -110,7 +107,7 @@ However, there is still room for improvement as its compilation is suboptimal, e
 	\hfil\pgfplotslegendfromname{leg:tasklet:summary}\hfil
 	\caption{
 		Comparison of the average runtimes of the main algorithms presented in this chapter.
-		The coloured areas denote the three-sigma intervals, that is, the 99.7\% confidence intervals.
+		The coloured areas denote the three-sigma range, that is, the 99.7\% confidence intervals.
 	}
 	\label{fig:tasklet:summary}
 \end{figure}
