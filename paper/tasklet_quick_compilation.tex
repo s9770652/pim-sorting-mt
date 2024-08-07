@@ -14,16 +14,18 @@
 }
 \def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 
-The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots! \Dash one implementation variant may see a reduction of 25\% from another one where none should be.
-There are small details influencing the runtime, like storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changing the runtime by a few percentage points in both directions, depending on the rest of implementation.
+The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots! \Dash one implementation variant may see a reduction of 25\% from another one where none should logically be.
+There are small details influencing the runtime.
+By way of example, storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changes the runtime by a few percentage points in both directions, depending on the rest of implementation.
 But as hinted at in the preceding part of this section, there are four major parameters to examine:
 handling of the base cases, recursion/iteration, pivot choice, and partition prioritisation.
 Before the findings are discussed, the first parameter shall be explained in more depth.
 
 Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
-Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such short partitions are rare and \IS{} would terminate after a few instructions anyway.
-Nonetheless, its inclusion or exclusion can have significant impacts as does the position at which the checks for the base cases happen.
+Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such tiny partitions are rare, and \IS{} would terminate after a few instructions anyway.
+Nonetheless, its inclusion or exclusion can have significant impacts as does the position at which the checks for the two base cases happen.
 The following handlings were tested:
+
 \begin{enumerate}[label=(\liningnums{\arabic*})]
 	\item\label[implementation]{imp:normal}
 	If the length is trivial, terminate immediately.
@@ -57,7 +59,7 @@ The following handlings were tested:
 	\begin{itemize}
 		\item
 		This handling is nonsensical from a logical point of view, since if the threshold is not undercut, the length cannot be trivial.
-		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately.
+		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately, eliminating a conjectured cause for the compiler's difficulties.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
@@ -237,37 +239,40 @@ The measurements were done on uniform input distributions so the deterministic p
 	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
 	\tikzexternalenable
 	\caption{
-		Average runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot choices.
+		Mean runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot choices.
 		Left-hand partitions are prio\-ri\-tised in the first rows, right-hand ones in the second rows, and shorter ones in the third~rows.
 	}
 	\label{fig:quick:implementations}
 \end{figure}
 
-Even when ignoring the differences between specific handlings, the high fluctuations between the plots leap to the eye.
+Even when ignoring the differences between specific handlings for now, the high fluctuations between the plots leap to the eye.
 Plots within the same column share the same method to chose pivots, plots within the same row share the same prioritisation of partitions.
 In general, it would be expected that plots within the same column are fairly similar, yet prioritising the shorter partition is almost universally associated with an increase in runtime.
-When focussing on the top-performing implementations, the increase can reach more than 15\%.
+When focussing on the top-performing handlings, the increase can reach more than 15\%.
 There is no clear trend between the consistent prioritisations of either side, although the difference can be huge in individual cases as well.
 However, recursion is more susceptible to the partition prioritisation than iteration.
 
 The correlation of recursive and iterative performance is weak.
 On one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
 On the other hand, there is \cref{imp:one_insertion} with deterministic medians and prioritisation of right-hand partitions where recursion is slower by more than a third.
-All in all, iterative implementations usually perform better, though, especially when focussing on the top-performing implementations of each pivot choice.
+All in all, iterative implementations usually perform better, though, especially when focussing on the top-performers of each pivot choice.
 
 The ranking of the different handlings is rather incoherent.
 \Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all handlings, being amongst the top performers across all tested implementations.
 \Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call}, which call \QS{} even less often than \cref{imp:triviality_before_call}, are the polar opposite and bring up the rear of the ranking every single time.
 Recursive implementations of \cref{imp:triviality_within_threshold}, where triviality is checked for only if the threshold is undercut, are often worse than recursive implementations of \cref{imp:normal}, where triviality is always checked for, whilst it is the other way around for iterative implementations.
-Interestingly, for all investigated implementations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the function start, regardless of whether these were properly tail recursive or not.
+Interestingly, for all investigated implementations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the beginning of their respective function, regardless of whether these were properly tail recursive or not.
 
 These observations, however, only apply to 32-bit integers.
 \Cref{fig:quick:implementations_64} shows the same measurements for 64-bit integers.
-Whilst the general trend for pivots, partition prioritisation and recursion/iteration hold true, the rankings are vastly different.
+Whilst the general trend for pivots, partition prioritisation, and recursion/iteration hold true, the rankings are vastly different.
 \Cref{imp:triviality_before_call} is not undisputedly the best anymore.
 \Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call} switch back and forth between being the worst and the best handlings.
-Most notably, the two top-performing implementations using deterministic and random medians as pivots, respectively, are actually recursive.
-Luckily, both use \cref{imp:triviality_before_call} so the only difference between the default configurations of 32-bit and 64-bit \QS{} is the usage of recursion/iteration.
+Even the nonsensical \cref{imp:threshold_then_triviality} manages to take the lead sometimes!
+Most notably, the two top-performing implementations using deterministic and random medians, respectively, are actually recursive.
+Luckily, both use \cref{imp:triviality_before_call} so we decided to make the only difference between the default configurations of 32-bit and 64-bit \QS{} be the usage of recursion (64-bit) and iteration (32-bit).
+
+\medbreak
 
 What is causing these huge disparities?
 There is a great variety in the compilations but some of the common occurrences are \dots{}
@@ -284,12 +289,7 @@ There is a great variety in the compilations but some of the common occurrences 
 	\item
 	\dots{} more stores and loads when entering and leaving the function.
 \end{itemize}
-This focus on the left pointer \lstinline|i| is partially explainable by it being used to calculate the final position of the pivot \lstinline|p| and, thus, the inner boundaries of both new partitions:
-When the left pointer \lstinline|i| stops, it holds \lstinline|*i >= p|.
-Also, the left pointer either passed over the preceding element if \lstinline|*(i - 1) < p|, or it stopped there if \lstinline|*(i - 1) >= p|.
-However, the right pointer \lstinline|j| stopped on some value fulfilling \lstinline|*j <= p|, so it holds \lstinline|*(i - 1) <= p| after swapping.
-Either way, it holds \lstinline|*(i - 1) <= p|.
-If the right pointer \lstinline|j| meets the left pointer \lstinline|i|, it either stops there immediately if \lstinline|*i = p|, or it stops at address \lstinline|i - 1| because of \lstinline|*(i - 1) <= p|.
-In all cases, the pivot, which was moved to the right of the partition at the start, can now swap with pointer \lstinline|i|, and the addresses \lstinline|i - 1| and \lstinline|i + 1| form the end of the left-hand partition and the start of the right-hand partition, respectively.
+This focus on the left pointer is partially explainable by it being used to calculate the final position of the pivot and, thus, the inner boundaries of both new partitions.
 We spot-checked implementations to see whether using the right pointer alone or both of them to calculate the boundaries could alleviate the problems but the results were mixed:
 from betterment over indifference to worsening, everything was observable.
+The same was true for using explicit sentinels instead of repurposing the pivot for that role by swapping it to the end.
