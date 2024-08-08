@@ -7,7 +7,7 @@
 	\pgfplotstablereadnamed{data/quick/matrix/recursive/Median_of_random/right/uint64/#1.txt}{tableQuickRand_64#1}
 }
 
-Before turning to the performance of \QS{} on specific input distributions, the ratio between costs and benefits of the pivot choices shall be evaluated.
+Before turning to the performance of \QS{} on specific input distributions, the ratio between costs and benefits of the pivot selection methods shall be evaluated.
 Looking again at \cref{fig:quick:implementations,fig:heap:runtime_uint64} shows that a median gets more beneficial, the longer the input becomes, achieving small pay-offs for the longest ones.
 Moreover, the standard deviations of the runtimes, although not shown in the figures for reasons of clarity, are cut roughly in half.
 Randomisation slows down noticeably, so random pivots are disadvantageous if the input is known to be fairly random.
@@ -53,7 +53,7 @@ This distributions generates many duplicates, which are put into the same partit
 One might expect \QS{} to perform even better on sorted and reverse sorted input, since everything is either already in the correct position or because the two pointers quickly invert large swaths of the inputs.
 However, a side effect of swapping the pivot twice can be that many elements are displaced by one position from where they should be in the sorted input.
 Take reverse sorted inputs and the deterministic median as an example:
-The element \(n/2\) is chosen as pivot out of the elements \(n\), \(n/2\), and \(0\) and then gets swapped with the last element, that is, with \(0\).
+The element \(n/2\) is selected as pivot out of the elements \(n\), \(n/2\), and \(0\) and then gets swapped with the last element, that is, with \(0\).
 Thereupon, the pointers invert the rest of the input such that the start of the input looks something like \(1, 2, \dots, n/2-1, 0, n/2, \dots\) after the first partitioning step.
 Indeed, this pattern makes \QS{} with deterministic medians degrade and eventually overflow the call stack, which is why the respective plots in \cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} leave the charts.
 An implementation without swapping the pivot promises better performance for such cases, but in exploratory ones, the performance on more random input distributions suffered drastically.

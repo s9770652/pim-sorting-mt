@@ -18,7 +18,7 @@ The quality of the compilation of \QS{} is highly erratic to such an extent that
 There are small details influencing the runtime.
 By way of example, storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changes the runtime by a few percentage points in both directions, depending on the rest of implementation.
 But as hinted at in the preceding part of this section, there are four major parameters to examine:
-handling of the base cases, recursion/iteration, pivot choice, and partition prioritisation.
+handling of the base cases, recursion/iteration, pivot selection, and partition prioritisation.
 Before the findings are discussed, the first parameter shall be explained in more depth.
 
 Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
@@ -239,14 +239,14 @@ The measurements were done on uniform input distributions so the deterministic p
 	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
 	\tikzexternalenable
 	\caption{
-		Mean runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot choices.
+		Mean runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot selection methods.
 		Left-hand partitions are prio\-ri\-tised in the first rows, right-hand ones in the second rows, and shorter ones in the third~rows.
 	}
 	\label{fig:quick:implementations}
 \end{figure}
 
 Even when ignoring the differences between specific handlings for now, the high fluctuations between the plots leap to the eye.
-Plots within the same column share the same method to chose pivots, plots within the same row share the same prioritisation of partitions.
+Plots within the same column share the same method to select pivots, plots within the same row share the same prioritisation of partitions.
 In general, it would be expected that plots within the same column are fairly similar, yet prioritising the shorter partition is almost universally associated with an increase in runtime.
 When focussing on the top-performing handlings, the increase can reach more than 15\%.
 There is no clear trend between the consistent prioritisations of either side, although the difference can be huge in individual cases as well.
@@ -255,7 +255,7 @@ However, recursion is more susceptible to the partition prioritisation than iter
 The correlation of recursive and iterative performance is weak.
 On one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
 On the other hand, there is \cref{imp:one_insertion} with deterministic medians and prioritisation of right-hand partitions where recursion is slower by more than a third.
-All in all, iterative implementations usually perform better, though, especially when focussing on the top-performers of each pivot choice.
+All in all, iterative implementations usually perform better, though, especially when focussing on the top-performers of each pivot selection method.
 
 The ranking of the different handlings is rather incoherent.
 \Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all handlings, being amongst the top performers across all tested implementations.
