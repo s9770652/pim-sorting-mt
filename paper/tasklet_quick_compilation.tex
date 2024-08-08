@@ -59,7 +59,7 @@ The following handlings were tested:
 	\begin{itemize}
 		\item
 		This handling is nonsensical from a logical point of view, since if the threshold is not undercut, the length cannot be trivial.
-		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately, eliminating a conjectured cause for the compiler's difficulties.
+		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately, eliminating a possible cause for the compiler's behaviour.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
@@ -289,7 +289,8 @@ There is a great variety in the compilations but some of the common occurrences 
 	\item
 	\dots{} more stores and loads when entering and leaving the function.
 \end{itemize}
-This focus on the left pointer is partially explainable by it being used to calculate the final position of the pivot and, thus, the inner boundaries of both new partitions.
-We spot-checked implementations to see whether using the right pointer alone or both of them to calculate the boundaries could alleviate the problems but the results were mixed:
+This focus on the left pointer \lstinline|i| is partially explainable by it being used to calculate the final position of the pivot and, thus, the inner boundaries of both new partitions.
+As explained earlier in \enquote{\nameref{sec:tasklet:quick:imp:sentinels}}, the right pointer \lstinline|j| halts ultimately either on the left pointer directly (\lstinline|j == i|) or on the element behind it (\lstinline|j == (i - 1)|).
+Since the pivot is moved to address \lstinline|i|, the inner boundaries of the partitions are \lstinline|i - 1| and \lstinline|i + 1|.
+Implementations using the right pointer alone or both of them to calculate the boundaries were spot-checked to see whether it alleviates the problems but the results were mixed:
 from betterment over indifference to worsening, everything was observable.
-The same was true for using explicit sentinels instead of repurposing the pivot for that role by swapping it to the end.
