@@ -60,14 +60,15 @@
 
 	\hfil\pgfplotslegendfromname{leg:merge:runtime}\hfil
 	\caption{
-		Average runtimes of the full-space \MS*{} with and without write-backs and the half-space \MS{} on 32-bit integers, for \(n = 2^i\) and \(n = 2^i + 1\) with \(i = 1, \dots, 10\).
+		Mean runtimes of the full-space \MS*{} with and without write-backs and the half-space \MS{} on 32-bit integers, for \(n = 2^i\) and \(n = 2^i + 1\) with \(i = 1, \dots, 10\).
 	}
 	\label{fig:merge:runtime}
 \end{figure}
 
-Three implementations, using \IS{} on starting runs of length 16, have been tested:
+Three implementations using \IS{} on starting runs of length 16 have been tested:
 full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
 The results are shown in \cref{fig:merge:runtime,fig:merge:runtime_uint32,fig:merge:runtime_uint64}.
+Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard deviations of the measurements.
 Note that the tested input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
 The merging process can be visualised as binary tree, with the starting runs as leaves and two vertices being brothers if the corresponding runs get merged together;
 the root contains the final sorted run.
@@ -77,7 +78,7 @@ For \(n = 2^i + 1\) input elements, the root has a leaf with one element as son,
 
 The measurements show that \MS{} guarantees a runtime of \(\bigtheta{n \log n}\) for the tested input distributions as expected.
 The differences in runtime between the different input distributions get smaller with increasing input length and are ascribable to \IS{} and to the differing suitability of the unrolling.
-Especially due to \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
+Especially because of \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
 cases where the usage of \IS{} worsened the runtime are unbeknown.
 The differences across the input distributions become smaller with increasing input length but remain large even for \(n \approx 1000\) elements.
 For the full-space \MS*{}, reverse sorted inputs get sorted 60\%--80\% slower than sorted inputs with 32-bit integers and 80\%--100\% slower with 64-bit integers.
@@ -86,15 +87,13 @@ For the half-space \MS{}, these ranges climb to 80\%--110\% and 110\%--150\%.
 The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
 With sorted inputs, it takes the lead over the full-space \MS*{}, since the second runs need not be flushed and the additional copying of the first runs is unrolled.
 For other inputs, the half-space \MS{} takes just about 10\% longer than the full-space \MS{} without write-backs for both 32-bit and 64-bit integers.
-The leeway to the half-space \MS{} with write-backs is even smaller.
+The leeway to the full-space \MS{} with write-backs is even smaller.
 The slow-down is likely because of most elements of the second runs being moved forwards anyway and the elements of the first runs being both copied and moved.
 
 \Cref{apx:tasklet:merge} contains further measurements on \MS{}, showing why a starting run length of 16 is a good choice.
 \Cref{fig:merge:starting_runs_is_uint32,fig:merge:starting_runs_is_uint64} show the average runtimes of starting runs of lengths 14 to 18, all sorted with \IS{}.
-Overall, the differences are small, yet 16 elements lead to top performance for all input distributions but the reverse sorted one, where the disadvantage is not grave, though.
-\Cref{fig:merge:starting_runs_shs_uint32,fig:merge:starting_runs_shs_uint64} include larger starting run lengths between 24 and 96 elements in order to see whether giving up stability by using \ShS{} can yield substantial gains.
+Overall, the differences are small, yet 16 elements lead to top performance for all input distributions but the reverse sorted one.
+The disadvantage there is not grave, though.
+\Cref{fig:merge:starting_runs_shs_uint32,fig:merge:starting_runs_shs_uint64} include longer starting runs of lengths between 24 and 96 elements in order to see whether giving up stability by using \ShS{} can yield substantial gains.
 The disparities between the runtimes of the different starting run lengths are strikingly small despite the wide range tested.
-By and large, however, the savings are not big enough to warrant consideration of two different \MS{} configurations in this thesis.
-
-In summary, a proper implementation of half-space \MS{} with deferred copying and fine-tuned unrolling would require some work but has the potential to be the overall best stable sorting algorithm with a guaranteed runtime of \(\bigoh{n \log n}\).
-If, however, stability is not wished for but rather a much lower memory footprint, then one might want to turn to \HS{}.
+By and large, however, the savings are not big enough to warrant consideration of two different \MS{} configurations \Dash stable and unstable \Dash in this thesis.
