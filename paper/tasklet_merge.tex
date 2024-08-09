@@ -1,14 +1,17 @@
 \section{\texorpdfstring{\MS{}}{MergeSort}}
 \label{sec:tasklet:merge}
 
-Two-way bottom-up \MS{}~\cites{katajainen1997meticulous}[85\psq]{maurer1974datenstrukturen}[Chapter~2.3.1]{wirth1975algorithmen} repeatedly compares pairs sorted subarrays (so-called \emph{runs}) and merges them into a longer run in a guaranteed runtime in \(\bigtheta{n \log n}\).
-Besides \IS{}, \MS{} is the only stable sorting algorithm presented in this chapter.
-The biggest drawback is that additional space of size \(\bigtheta{n}\) is needed.
+Two-way bottom-up \MS{}~\cites{katajainen1997meticulous}[85\psq]{maurer1974datenstrukturen}[Chapter~2.3.1]{wirth1975algorithmen} repeatedly compares two elements and \emph{merges} them to form sorted pairs.
+Once only pairs (and perhaps one single element) remain, the pairs are merged into quadruplets, the quadruples into octuplets and so on until a single sorted sequence remains.
+Sorted sequences are also referred to as \emph{runs}.
+\MS{} has a guaranteed runtime of \(\bigoh{n \log n}\) and is the only stable sorting algorithm with subquadratic runtime presented in this chapter.
+Its biggest drawback is that additional space of size \(\bigtheta{n}\) is needed.
 
 
 \paragraph{Starting Runs}
 Instead of starting by merging runs of length 1, that is individual elements, it is beneficial to first subdivide the input and use either \IS{} or \ShS{} on the individual subdivisions.
-For simplicity, all subdivisions have the same, predefined length with possible exception of the last one, which can be shorter.
+These larger \emph{starting runs} allow to skip a few of the early rounds of merging.
+For simplicity, all starting runs have the same, predefined length with possible exception of the last one which can be shorter.
 A substantial downside to \ShS{} is that whilst it does allow to sort bigger starting runs quicker, it is not stable unlike \IS{}.
 If \MS{} is supposed to sort stably, then \IS{} has to be used.
 
@@ -19,12 +22,12 @@ Spot-check inspection suggest no deterioration of \IS{}'s and \ShS{}'s compilati
 
 \paragraph{Memory Footprint}
 A simple implementation of \MS{} (denoted by \emph{full-space}) writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements.
-After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging starts anew.
+After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging begins anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed if the number of rounds is odd.
 
 A slightly more sophisticated implementation (denoted by \emph{half-space}) needs space for only \(n/2\) additional elements:
 When two adjacent runs are to be merged, the first one is copied to an auxiliary array.
-Then, the copy and the second run are merged to the start of the first run.
+Then, the copy and the second run are merged to the beginning of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
 Strictly speaking, the auxiliary array holds~\(n-1\) elements in the worst-case.
 By way of example, if the starting run length is \(n - 1\), there would be two runs of lengths \(n - 1\) and \(1\), respectively, and the first one would be copied away.
@@ -33,7 +36,8 @@ However, both the maximum number of elements to sort and the starting run length
 Further optimised, half-space \MS{} would not need to copy the first runs immediately.
 It suffices to search for the foremost element of the first run which is greater than the first element of the second element.
 All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
-This optimisation, although examined during development, was not active when measuring runtimes since it unfortunately complicates the following optimisation.
+This \emph{deferred} copying, although examined during development, was not in use when measuring runtimes since it unfortunately complicates the following optimisation.
+
 
 \paragraph{Unrolling}
 There are four common reasons for \emph{flushing}, that is, writing \Dash many oftwhiles \Dash consecutive elements:

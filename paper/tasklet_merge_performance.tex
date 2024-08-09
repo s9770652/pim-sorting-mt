@@ -22,6 +22,17 @@
 	\pgfplotstablereadnamed{data/merge/uint64/#1.txt}{tableMerge_64#1}
 }
 
+Three implementations using \IS{} on starting runs of length 16 have been tested:
+full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
+The results are shown in \cref{fig:merge:runtime,fig:merge:runtime_uint32,fig:merge:runtime_uint64}.
+Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard deviations of the measurements.
+Note that the tested input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
+The merging process can be visualised as binary tree, with the starting runs as leaves and two vertices being brothers if the corresponding runs get merged together;
+the root contains the final sorted run.
+This way, the height of the tree is equal to the number of rounds of merging.
+For \(n = 2^i\) input elements, the tree is complete, and the normalised runtime is locally minimal.
+For \(n = 2^i + 1\) input elements, the root has a leaf with one element as son, and the normlised runtime is locally maximal, as the number of rounds increased to accommodate for just one element.
+
 \pgfplotsset{
 	merge/.style={
 		horizontal sep for ticks,
@@ -65,24 +76,13 @@
 	\label{fig:merge:runtime}
 \end{figure}
 
-Three implementations using \IS{} on starting runs of length 16 have been tested:
-full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
-The results are shown in \cref{fig:merge:runtime,fig:merge:runtime_uint32,fig:merge:runtime_uint64}.
-Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard deviations of the measurements.
-Note that the tested input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
-The merging process can be visualised as binary tree, with the starting runs as leaves and two vertices being brothers if the corresponding runs get merged together;
-the root contains the final sorted run.
-This way, the height of the tree is equal to the number of rounds of merging.
-For \(n = 2^i\) input elements, the tree is complete, and the normalised runtime is locally minimal.
-For \(n = 2^i + 1\) input elements, the root has a leaf with one element as son, and the normlised runtime is locally maximal, as the number of rounds increased to accommodate for just one element.
-
 The measurements show that \MS{} guarantees a runtime of \(\bigtheta{n \log n}\) for the tested input distributions as expected.
 The differences in runtime between the different input distributions get smaller with increasing input length and are ascribable to \IS{} and to the differing suitability of the unrolling.
 Especially because of \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
 cases where the usage of \IS{} worsened the runtime are unbeknown.
 The differences across the input distributions become smaller with increasing input length but remain large even for \(n \approx 1000\) elements.
 For the full-space \MS*{}, reverse sorted inputs get sorted 60\%--80\% slower than sorted inputs with 32-bit integers and 80\%--100\% slower with 64-bit integers.
-For the half-space \MS{}, these ranges climb to 80\%--110\% and 110\%--150\%.
+For the half-space \MS{}, these ranges climb to 80\%--110\% and 110\%--150\%, respectively.
 
 The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
 With sorted inputs, it takes the lead over the full-space \MS*{}, since the second runs need not be flushed and the additional copying of the first runs is unrolled.

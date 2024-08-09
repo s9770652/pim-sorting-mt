@@ -22,17 +22,41 @@ They will not be discussed in detail here but still provide a point of reference
 
 	\item
 	Concerning the half-space \MS{}:
-	Treating the copied run logically as the second run and the uncopied run as the first one nets a noticeable decrease in runtime compared to an implementation with flipped logic.
-	Even worse, only with the former does unrolling improve the speed, being an impairment with the latter!
+	Passing the copied run as second argument and the uncopied run as the first one to the merger function nets a noticeably decrease in runtime compared to an implementation with flipped arguments and, of course, flipped logic.
+	Even worse, only with the former order does unrolling improve the speed, being an impairment with the latter!
 	This behaviour occurs with both immediate and deferred copying of the first runs.
-	An inspection of the issue unearthed marvels like code of the form
-	\begin{center}
-		\vspace{-\baselineskip}
-		\texttt{*i++ = *j; a = b - i;}% c = i; i = d;}
-	\end{center}
-	leading to 5\% longer runtimes compared to
-	\begin{center}
-		\texttt{*i = *j; a = b - (i + 1); c = i + 1;}% i = d;}
-	\end{center}
-	even though executed at most once per merger, but we could sadly not pinpoint the fundamental cause for the behaviour.
+	An inspection of the issue unearthed marvels like 5\% longer runtimes with code of the form
+	{  % The following is a construction straight from hell.
+		\par
+		\centering
+		\begin{minipage}{10cm}
+			\centering
+			\begin{minipage}{ \widthof{\ttfamily a = b - i;} }
+				\ttfamily
+				*i++ = *j;
+
+				a = b - i;
+
+				c = i;
+
+				i = d;
+			\end{minipage}
+			\begin{minipage}{ \widthof{\quad compared to\quad} }
+				\quad compared to\quad
+			\end{minipage}
+			\begin{minipage}{ \widthof{\ttfamily a = b - (i + 1);} }
+				\ttfamily
+				*i = *j;
+
+				a = b - (i + 1);
+
+				c = i + 1;
+
+				i = d;
+			\end{minipage}
+		\end{minipage}
+		\vspace{\baselineskip}
+		\par
+	}
+	although executed at most once per merger, but we could sadly not pinpoint the fundamental cause for the behaviour.
 \end{itemize}
