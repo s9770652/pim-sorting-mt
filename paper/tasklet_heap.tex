@@ -1,77 +1,79 @@
 \section{\texorpdfstring{\HS{}}{HeapSort}}
 \label{sec:tasklet:heap}
 
-This algorithm guarantees a runtime of \(\bigoh{n \log n}\), too, and also sorts in-place at the cost of being unstable.
-A \emph{max-heap} (or, simpler, \emph{heap}) is a binary tree of logarithmic depth whose layers are fully filled, possibly with the exception of the last layer, which must be filled from left to right.
-Each vertex contains a key, and the key of each father must be at least as great as those of his sons.
-As a consequence of this \emph{heap order}, the root contains the greatest key.
+This algorithm~\cites{floyd1964treesort}{williams1964heapsort}[Chapter~2.2.5]{wirth1975algorithmen} makes use of a so-called \emph{heap}, which is a priority queue allowing to retrieve and remove the maximum element stored in time \(\bigoh{\log n}\).
+Repeated retrieval and removal of the maximum allows to sort in-place in time \(\bigoh{n \log n}\), although the sorting is not stable.
 
-A heap with \(n\) keys can be represented as an array of length \(n\) using a bijective mapping between the vertex positions and the array indices (see later).
+A heap (or, more specifically, a \emph{binary max-heap}) is a binary tree of logarithmic depth whose layers are fully filled, that is, the layer of depth \(i\) contains \(2^i\) vertices.
+The only exception may be the last layer, which may contain less vertices but must be filled from left to right.
+In the context of \HS{}, the vertices are identified with the elements to sort.
+The \emph{heap order} dictates that each father must be at least as great as his sons.
+Consequently, the root is a greatest element.
+A heap with \(n\) vertices can be represented as an array of length \(n\) using a bijective mapping between the vertices and the array indices:
+If the root is stored at position \(1\), the sons of the vertex with index \(i\) have the indices \(2 i\) and \(2 i + 1\), whilst its father has index \(\floor{i / 2}\).
+
 After the heap has been built in-place from the input array in time \(\bigoh{n}\), the sorting works as follows:
-At the start of round~\(r = 1, \dots, n\), the first \(n - (r - 1)\) elements of the array represent the heap and the last \(r - 1\) elements the end of the sorted output.
-Upon removal of the root, which contains the \(r\)th greatest element of the input, the heap structure must be restored in time \(\bigoh{\log n}\).
-Since the heap has shrunken by one key, the key of the removed root can be stored at the freed-up position directly behind the end of the heap.
+At the start of round~\(r = 1, \dots, n\), the first \(n - (r - 1)\) elements of the array represent the heap and the last~\(r - 1\) elements the end of the sorted output.
+The root, which is the \(r\)th greatest element of the input, gets removed and, since the heap cannot contain holes, a reparation procedure is performed.
+Since the heap has shrunken by one vertex, the removed root can be stored at index \(n - (r - 1)\), that is the freed-up position directly behind the end of the heap.
 
-\paragraph{Indexing}
-With a zero-based indexing, the sons of a vertex \(i\) can be calculated with the well-known formulas \(2i + 1\) and \(2n + 2\).
-With a one-based indexing, the formulas turn into \(2i\) and \(2i + 1\).
-The compiler automatically turns the multiplication by two into a left-shift by one.
-Since DPUs possess an instruction called \lstinline|lsl_add| which first shifts leftwards and then adds an offset (useful \eg{} for array indexing), the formulas \(2i + 1\) and \(2i\) take the same amount of time to compute.
-
-Nevertheless, the zero-based indexing is about 7\% slower despite \lstinline|lsl_add| being indeed in use.
-The reason is that only the number of bits to shift can be passed as immediate value, that is as plain number, but not the offset, which must be passed via a register.
-While DPUs have a read-only register storing the number \(1\) at disposal, read-only registers can only ever be the first register argument, not the second one, which, for \lstinline|lsl_add|, would be the offset.
-As a consequence, the compiler moves the number \(1\) to a register whenever \(2i + 1\) is to be computed, only to immediately overwrite the \(1\) with the result from \lstinline|lsl_add|.
-Hence, the calculation of \(2i + 1\) does take one instruction more than \(2n\) after all.
 
 \paragraph{Sifting Direction}
 Once the heap is built, the \emph{top-down} \HS{} proceeds as follows:
-At the start of each round, the root and the rightmost leaf (\enquote{last leaf}) in the bottom layer swap places.
-The root is now in the right position, but the formerly last leaf may violate the heap order, that is, the root may have a less key than one or both of its sons.
+At the start of each round, the root and the rightmost leaf in the bottom layer (\enquote{last leaf}) swap places.
+The root is now in the right position, but the former last leaf may violate the heap order, that is, the root may be less than one or both of its sons.
 The greater of the two sons is determined, and the root and the greater son swap places.
-This downwards-sifting of the former leaf continues iteratively until the heap order is restored.
+This downwards-sifting of the former last leaf continues iteratively until the heap order is restored.
 
-In contrast, the \emph{bottom-up} \HS{} \cite{wegener1993heapsort} works as follows:
-At the start of each round, the key of the root is removed so that a hole is now at the top of the heap.
-Then, the greater of the two sons of the hole is determined, and they swap places.
+In contrast, the \emph{bottom-up} \HS{}~\cite{wegener1993heapsort} works as follows:
+At the start of each round, the root is removed so that a hole sits now at the top of the heap.
+Then, the hole and the greater of its two sons swap places.
 This downwards-sifting of the hole continues iteratively until it becomes a leaf.
 Now, the last leaf is moved to the position of the hole.
-Should the moved leaf be greater than its father, then the heap order is now violated.
+Should the former last leaf be greater than its new father, then the heap order is now violated.
 If so, it needs to be sifted upwards by iteratively swapping positions with its respective father until the heap order is restored.
-At last, the original root key can be put where the formerly last leaf used to be.
+At last, the original root element can be put where the former last leaf used to be.
 
 The motivation behind these variants is at follows:
-In each step where the top-down \HS{} sifts the formerly last leaf downwards, two value checks (Which son is greater? Is the father less than the greater son?) need to be done.
-The leaves of a heap tend to be small so the downwards-sifting lasts awhile.
-As opposed to this, each step of the bottom-up \HS{} needs only one value check (Is the father less than the greater son?).
+In each step where the top-down \HS{} sifts a former last leaf downwards, two value checks (Which son is greater? Is the father less than the greater son?) need to be done.
+The leaves of a heap tend to be little so the downwards-sifting lasts awhile.
+As opposed to this, each step of the bottom-up \HS{} needs only one value check (Which son is greater?).
 Both \HS*{} sift downwards similarly long so many checks can be saved.
-Since the last leaf effectively takes the place of another leaf and since both are likely small, the upwards-sifting should be short-lived and, hopefully, not eat the gain up.
+Since the last leaf effectively takes the place of another leaf and since both are likely little, the upwards-sifting should be short-lived and not eat the gain up.
 
 The upwards-sifting reverts some of the changes done by the downwards-sifting.
 The bottom-up \HS{} can be brought to swap parity with the top-down \HS{} by the following change:
-The downwards-sifting is traced but the keys are not actually moved.
-Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost key which is at least as great as the last leaf.
-The backtracking is easily implemented as the father \(\floor{i/2}\) of a vertex \(i\) can be computed through one bitwise right-shift.
-The position found is where the last leaf would end up after the upwards-sifting, so all keys below can stay put and all keys above move to their fathers' positions, that is, thither the swaps from the downwards-sifting would have put them.
-This implementation variant makes the downwards-sifting even cheaper but the upwards-sifting must now go all the way up to the root.
+The downwards-sifting is traced but the vertices are not actually moved.
+Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost vertex which is at least as great as the last leaf.
+The position found is where the last leaf would end up after the upwards-sifting, so all vertices below can stay put and all vertices above move to their fathers' positions, that is, thither the swaps from the downwards-sifting would have put them.
+This implementation variant makes the downwards-sifting even cheaper, but the upwards-sifting must now go all the way up to the root.
+
 
 \paragraph{Sentinel Values}
 When \HS{} sifts a vertex downwards, it needs to determine the greater of its two sons before deciding whether and whither to move.
 If and only if the heap has an even number of vertices, there is a left son without a right brother:
 the rightmost leaf in the bottom layer.
-Instead of adding some check on whether the right brother exists, one can rather add the missing leaf and give it the smallest possible key each time the heap reaches an even size.
-Thus, if it has been confirmed that a left son exists, a right one does also exist, and if two brothers contain the same key, the left one should be considered greater.
+Instead of adding some check on whether the right brother exists, one can rather add the missing leaf and set it to the smallest possible value each time the heap reaches an even size.
+Thus, if it has been confirmed that a left son exists, a right one does also exist.
+It is necessary now that if two brothers are equal, the left one should be considered greater.
 Bounds checks on whether a left son exists are still required lest \HS{} loses its in-place property, since there are about \(n/2\) leaves which all would need sentinel sons.
 
-Likewise, whenever \HS{} sifts upwards and considers the father \(\floor{i/2}\) of a vertex \(i\), it will only proceed if the father is less.
-Since the fatherless root has index \(1\) and the result of a right-shift is truncated towards \(0\), the formula \(\floor{i/2}\) yields \(0\), so it makes sense to set the element at index \(0\) to the greatest possible key to stop any upwards-sifting.
-The savings from these approaches were around the 13\% mark.
+Likewise, whenever \HS{} sifts upwards and considers the father \(\floor{i / 2}\) of a vertex \(i\), it will only proceed if the father is less.
+Since the fatherless root has index \(1\), the formula \(\floor{i / 2}\) yields~\(0\), so it makes sense to set the element with index \(0\) to the greatest possible value to stop any upwards-sifting.
+The savings from using sentinel values are around the 13\% mark.
+
 
 \paragraph{Code Duplication}
-A strategy particularly useful for \HS{}, although also employed in \MS{}, is code duplication.
+A strategy particularly useful for \HS{}, although also employed in other sorting algorithms, is code duplication.
 Handling the greater of two sons is the fastest if the logic is written twice, once for either son, and then executed conditionally;
-logic written once for a generalised variable holding the greater son is compiled considerably worse.
+logic written once for a generalised variable holding the index of the greater son is compiled considerably worse.
 The savings from this approach were around the 7\% mark.
+
+
+\paragraph{Base Cases}
+Once 15 elements or less remain in the \HS{}, \IS{} is used to sort them.
+The impact of this one-time use is rather forgettable, and \ShS{} would not make much of a difference.
+%However, it serves as reminder to the fragility of the quality of the compilation, as shown in the following part.
 
 \input{tasklet_heap_compilation}
 

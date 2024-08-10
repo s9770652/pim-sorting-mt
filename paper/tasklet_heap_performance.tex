@@ -42,20 +42,17 @@
 \end{figure}
 
 The measurements are visualised in \cref{fig:heap:runtime,fig:heap:runtime_uint32,fig:heap:runtime_uint64}.
-In general, the performance of \HS{} is even less volatile than that of \MS{} with respect to the input distribution.
-Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is short, whereas sorted inputs are sorted the slowest since they are min-heaps so the heap-building phase is long.
+In general, the performance of \HS{} is hardly volatile and barely depends on the input distribution.
+Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is brief, whereas sorted inputs are sorted the slowest since they are min-heaps essentially needing inversion.
 Nonetheless, the reverse sorted inputs get sorted at most 10\% faster the sorted ones.
-This low volatility cannot hide the fact that the total runtime is abysmal across the board:
-Compared to \QS{} and \MS{}, the runtimes are between 50\% to 250\% higher, depending on the input distribution and the data type (see also \cref{sec:tasklet:conclusion})!
 
-The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas those of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends.
+The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas that of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends.
 The exception are reverse sorted inputs, where bottom-up \HS{} also shows an upwards trend, albeit even slighter.
 Interesting are their rankings relative to each other:
-Value checks on 64-bit integers take two instructions, so that the savings of the bottom-up \HS{} with swap disparity allow it to outperform the top-down \HS{} even for short inputs;
-the advantage grows with the input length.
-This makes sense as roughly 50\% of the vertices are leaves and 25\% are fathers of leaves, no matter the total size.
-Therefore, the percentage of formerly last leaves sifting down to the bottom remains steady but the travelled distance increases.
-Value checks on 32-bit integers, on the other hand, take only one instruction, so that their reduction is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting, whence the lead of the top-down \HS{}.
+Value checks on 64-bit integers take two instructions, so that the savings of the bottom-up \HS{} with swap disparity allow it to outperform the top-down \HS{} even for short inputs.
+Its advantage grows with the input length which makes sense as roughly 50\% of the vertices are leaves and 25\% are fathers of leaves, no matter the total size.
+Therefore, the percentage of former last leaves sifting down from the top to the bottom remains steady but the travelled distance increases.
+Value checks on 32-bit integers, on the other hand, take only one instruction, so that the reduction of these is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting, whence the lead of the top-down \HS{}.
 Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead stays narrow even at 6000 elements.
 However, these long inputs are uninteresting due to the limited WRAM and the multiple tasklets used in most applications.
 
