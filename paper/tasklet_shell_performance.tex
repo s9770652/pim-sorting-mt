@@ -43,7 +43,7 @@ On sorted and almost sorted inputs, \ShS{} exhibits a slow-down in the tested ra
 
 	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
 	\caption{
-		Comparison of \IS{} (1) and various two-tier \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are indicated by their labels.
+		Comparison of \IS{} (\(1\)) and various two-tier \ShS*{} (\(2\)--\(9\)), whose step sizes \(\stepsizes_1\) are indicated by their labels, on uniformly distributed 32-bit integers.
 		The speed-ups are with respect to the \IS{}.
 	}
 	\label{fig:shell:two-tier}
@@ -110,7 +110,7 @@ On sorted and almost sorted inputs, \ShS{} exhibits a slow-down in the tested ra
 
 	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
 	\caption{
-		Mean runtimes of two-tier and three-tier \ShS*{}.
+		Mean runtimes of two-tier and three-tier \ShS*{} on uniformly distributed 32-bit integers.
 		The two-tier \ShS*{} are situated on the lowest file, which is labelled \enquote{/}.
 		The three-tier \ShS*{} are situated on the files above, whose \(y\) values indicate the step size \(\stepsizes_2\).
 		The coloured symbols encode the step sizes \(\stepsizes_1\).
@@ -132,7 +132,7 @@ But would pushing the limits of \ShS{} even be rewarding?
 Greater input lengths require greater steps \Dash probably well into the three digits for \(n \approx 1000\) \cite{skean2023optimization,10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
 Implicit sentinel values could provide relief since the slow-down from implicitness should trend to zero for longer inputs, as was the case for \IS{}.
 Still, finding the best step sizes for longer inputs requires a lot more work because the length and, thus, the number of reasonable combinations of step sizes become larger.
-Unfortunately, longer optimal tuples cannot be constructed straightforwardly from shorter optimal ones, as seen in this section.
+Unfortunately, longer optimal tuples cannot be constructed straightforwardly from shorter optimal ones, as seen in this \lcnamecref{sec:tasklet:shell:performance}.
 
 Its application, on the other hand, would likely be niche.
 \ShS{} is outperformed by other algorithms presented hereafter, and those have no use for a \ShS{} adjusted to longer inputs.

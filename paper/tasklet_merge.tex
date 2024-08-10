@@ -4,7 +4,7 @@
 Two-way bottom-up \MS{}~\cites{katajainen1997meticulous}[85\psq]{maurer1974datenstrukturen}[Chapter~2.3.1]{wirth1975algorithmen} repeatedly compares two elements and \emph{merges} them to form sorted pairs.
 Once only pairs (and perhaps one single element) remain, the pairs are merged into quadruplets, the quadruples into octuplets and so on until a single sorted sequence remains.
 Sorted sequences are also referred to as \emph{runs}.
-\MS{} has a guaranteed runtime of \(\bigoh{n \log n}\) and is the only stable sorting algorithm with subquadratic runtime presented in this chapter.
+\MS{} has a guaranteed runtime of \(\bigoh{n \log n}\) and is the only stable sorting algorithm with subquadratic runtime presented in this \lcnamecref{sec:tasklet}.
 Its biggest drawback is that additional space of size \(\bigtheta{n}\) is needed.
 
 
