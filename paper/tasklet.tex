@@ -1,35 +1,42 @@
 \chapter{Sorting with One Tasklet}
 \label{sec:tasklet}
 
-This chapter covers the very first phase where each tasklet sorts on its own, \ie{} sequentially.
-Every measurement in this chapter was repeated a thousand times on a uniform input distribution with 32-bit integers, and the default configurations of the sorting algorithms were as follows:
+This \lcnamecref{sec:tasklet} is concerned with the very first phase where each tasklet sorts on its own, that is sequentially.
+\Cref{sec:tasklet:insertion} discusses \IS{} which is a component of all algorithms presented thereafter as it is lightweight and performant on short inputs.
+\Cref{sec:tasklet:shell} covers \ShS{} which is a generalisation of \IS{}.
+\hyperref[sec:tasklet:heap]{\nameCrefs{sec:tasklet:heap} }\labelcref{sec:tasklet:heap}, \labelcref{sec:tasklet:quick}, and \labelcref{sec:tasklet:merge} deal with \HS{}, \QS{}, and \MS{}, respectively, which are more elaborate algorithms suitable for long inputs.
+These \lcnamecrefs{sec:tasklet:insertion} give a short presentation of their respective algorithm at the beginning, ensued by a discussion of key parameters in their designs.
+There follows usually an insight into non-algorithmic challenges faced during development caused by the compiler.
+Finally, an evaluation of the performance of the respective algorithm completes each \lcnamecref{sec:tasklet:insertion}.
+\Cref{sec:tasklet:conclusion} summarises the findings on the presented algorithms and gives a brief outlook on future improvements.
+
+\Cref{apx:tasklet} contains a comprehensive collection of measurements but the ones essential for following the content of this \lcnamecref{sec:tasklet} are also presented in figures herein.
+Every measurement was repeated a thousand times with the sorting algorithms in their default configuration unless explicitly noted otherwise.
+The meaning behind and reasoning for the individual parameters in the configurations are subject in \crefrange{sec:tasklet:insertion}{sec:tasklet:merge} but shall be mentioned here already for easy look-up:
 \begin{description}
 	\item[\IS{}]
-	using one explicit sentinel value
+	explicit sentinel value
 
 	\item[\ShS{}]
-	using explicit sentinel values;
-	step sizes \(\stepsizes = (6, 1)\) for inputs with at most 64 elements and \(\stepsizes = (17, 4, 1)\) for longer ones
-
-	\item[\QS{}]
-	fallback threshold of 18 elements;
-	random median as pivot;
-	prioritising the right-hand partition over the left-hand partition;
-	iterative for 32-bit integers;
-	recursive for 64-bit integers;
-	\Cref{imp:triviality_before_call}
-
-	\item[\MS{}]
-	half-space;
-	starting run length of 16 elements
+	explicit sentinel values;
+	step sizes \(\stepsizes = (1, 6)\) for inputs with at most 64 elements and \(\stepsizes = (1, 4, 17)\) for longer ones
 
 	\item[\HS{}]
 	top-down for 32-bit integers;
 	bottom-up with swap disparity for 64-bit integers
+
+	\item[\QS{}]
+	fallback threshold of 18 elements;
+	random medians as pivots;
+	prioritisation of right-hand partitions over left-hand partitions;
+	iterative for 32-bit integers;
+	recursive for 64-bit integers;
+	\Cref*{imp:triviality_before_call}
+
+	\item[\MS{}]
+	half-space;
+	starting run length of 16 elements
 \end{description}
-The meaning behind and reasoning for the individual parameters are subject of this chapter.
-Any deviation from these configurations will be specifically mentioned.
-Further measurements can be found in \cref{apx:tasklet}.
 
 \clearpage
 \input{tasklet_insertion}
@@ -38,13 +45,13 @@ Further measurements can be found in \cref{apx:tasklet}.
 \input{tasklet_shell}
 
 \clearpage
+\input{tasklet_heap}
+
+\clearpage
 \input{tasklet_quick}
 
 \clearpage
 \input{tasklet_merge}
-
-\clearpage
-\input{tasklet_heap}
 
 \clearpage
 \input{tasklet_conclusion}
