@@ -44,19 +44,19 @@
 The measurements are visualised in \cref{fig:heap:runtime,fig:heap:runtime_uint32,fig:heap:runtime_uint64}.
 In general, the performance of \HS{} is hardly volatile and barely depends on the input distribution.
 Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is brief, whereas sorted inputs are sorted the slowest since they are min-heaps essentially needing inversion.
-Nonetheless, the reverse sorted inputs get sorted at most 10\% faster the sorted ones.
+Nonetheless, the reverse sorted inputs get sorted at most 10\% faster than the sorted ones.
 
 The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas that of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends.
-The exception are reverse sorted inputs, where bottom-up \HS{} also shows an upwards trend, albeit even slighter.
-Interesting are their rankings relative to each other:
+The exception are reverse sorted inputs, where bottom-up \HS{} also shows a slight upwards trend.
+Of interest is their ranking:
 Value checks on 64-bit integers take two instructions, so that the savings of the bottom-up \HS{} with swap disparity allow it to outperform the top-down \HS{} even for short inputs.
 Its advantage grows with the input length which makes sense as roughly 50\% of the vertices are leaves and 25\% are fathers of leaves, no matter the total size.
-Therefore, the percentage of former last leaves sifting down from the top to the bottom remains steady but the travelled distance increases.
+Therefore, the percentage of former last leaves being sifted down from the top to the bottom remains steady but the travelled distance increases.
 Value checks on 32-bit integers, on the other hand, take only one instruction, so that the reduction of these is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting, whence the lead of the top-down \HS{}.
-Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead stays narrow even at 6000 elements.
+Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead stays meagre even at 6000 elements.
 However, these long inputs are uninteresting due to the limited WRAM and the multiple tasklets used in most applications.
 
 The bottom-up \HS{} with swap parity consistently trails behind.
 This comes as no surprise since the overhead of its considerably prolonged upwards-sifting bears no proportion to the few swaps saved.
-This holds true even for 64-bit integers as moves still cost only one instruction.
-Unrolling the upwards-sifting proved to be unhelpful.
+This holds true even for 64-bit integers as moves still cost only one instruction so the savings do not increase.
+Unrolling the upwards-sifting (cf.\ \cref{sec:tasklet:merge}) proved to be unhelpful.
