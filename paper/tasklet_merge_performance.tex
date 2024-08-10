@@ -25,7 +25,7 @@
 Three implementations using \IS{} on starting runs of length 16 have been tested:
 full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
 The results are shown in \cref{fig:merge:runtime,fig:merge:runtime_uint32,fig:merge:runtime_uint64}.
-Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard deviations of the measurements.
+Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard error of the measurements.
 Note that the tested input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
 The merging process can be visualised as binary tree, with the starting runs as leaves and two vertices being brothers if the corresponding runs get merged together;
 the root contains the final sorted run.

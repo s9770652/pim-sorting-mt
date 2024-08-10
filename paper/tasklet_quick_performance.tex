@@ -44,7 +44,7 @@ For this reason, the random median is used as default method throughout this the
 \end{figure}
 
 \Cref{fig:quick:runtime} shows the runtime of \QS{} in it default configuration, that is, with random medians.
-\Cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} additionally contain the runtimes with deterministic medians as well as the standard deviations of the measurements.
+\Cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} additionally contain the runtimes with deterministic medians as well as the standard errors of the measurements.
 The mean runtimes are rather close across all input distributions, a consequence of using random medians and of considering elements equal to the pivot as different.
 In fact, it is \IS{} that primarily causes the discrepancies, as setting the threshold to one element proves.
 This also explains why \QS{} performs so well on large inputs with Zipf's distribution:
