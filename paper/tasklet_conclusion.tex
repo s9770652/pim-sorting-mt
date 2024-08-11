@@ -1,4 +1,4 @@
-\section{Interim Conclusion}
+\section{Interim Summary and Discussion}
 \label{sec:tasklet:conclusion}
 
 \pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
@@ -6,11 +6,58 @@
 	\pgfplotstablereadnamed{data/shell/ciura/uint64/#1.txt}{tableShellCiura_64#1}
 }
 
-This section offers a summary the algorithms presented so far and the findings on them.
-\Cref{fig:tasklet:summary} serves as succinct overview of their runtimes on all tested input distributions and data types.
+This \lcnamecref{sec:tasklet:conclusion} offers a summary of the algorithms presented in this \lcnamecref{sec:tasklet} and the findings on them.
+It also gives an outlook on future improvements.
+\Cref{fig:tasklet:conclusion:runtime} serves as succinct overview of their runtimes on all tested input distributions and data types.
 
-For small inputs with up to 16 elements, \IS{} is arguably the best sorting algorithm as it offers the best performance on the tested input distributions and, additionally, sorts stably and in-place.
+
+\paragraph{\IS{}}
+This algorithm is arguably the best for small inputs with up to 16 elements as it offers the best performance on the tested input distributions and, additionally, sorts stable and in-place.
+Using sentinel values enabled significant speed-ups \Dash a theme shared with most sorting algorithms.
 However, there is still room for improvement as its compilation is suboptimal, especially in case of the \IS{} with implicit sentinel values.
+
+Last but not least, a strong contender to \IS{} shall be mentioned, namely sorting networks~\cite{codish2017sortingnetworks}.
+These algorithms work for a fixed input length and swap elements according to a series of predefined comparisons.
+Testing various code snippets~\cites[9]{codish2017sortingnetworks}{m2015fastestway}{paulr2010fastestsort} suggest large potential for further savings.
+
+
+\paragraph{\ShS{}}
+This  algorithm offers a significant speed-up over \IS{} as long as the input is fairly distant from being sorted.
+Optimising it for longer inputs longer than 128 elements will require some work, though.
+
+
+\paragraph{\HS{}}
+This algorithm works in-place but is not stable.
+The runtime is guaranteed to be in \(\bigoh{n \log n}\) and also proved to be rather indifferent to the tested input distributions.
+Nevertheless, it is utterly outpaced by \QS{} and \MS{}, as becomes quite clear in \cref{fig:tasklet:conclusion:runtime}.
+Unless the runtime guarantee is absolutely needed, \HS{} should not be used.
+Its implementation is complicated by the optimal sifting direction being dependent on the data type.
+Eyebrow-raising observations during development suggest that its compilation can still be improved.
+
+All implemented \HS*{} use a binary heap so an obvious endeavour would be to switch to tertiary heaps.
+Exploratory implementations, however, show that the performance suffers from this change.
+
+
+\paragraph{\QS{}}
+This algorithm neither works in-place nor is it stable.
+Its runtime is in \(\bigoh{n \log n}\) only in expectation, but the worst-case runtime of \(\bigoh{n^2}\) is, thanks to random medians being selected as pivots, highly unlikely.
+\QS{} generally delivers top performance which could be even better with deterministic medians as pivots if the input is known to be random enough.
+There is serious work needed to be done, however, as there is no prioritisation of shorter partitions yet, which is needed to prevent an overflow of the call stack, due to problems in the compilation.
+These problems currently also make both recursion and iteration necessary, depending on the data type, and we cannot rule out other impairments hidden in the compilation.
+
+Besides fixing these issues, future work could revolve around different partitioning patterns similar to those of dual-pivot~\cite{wild2012averagecase} or patter-defeating \QS{}~\cite{peters2021patterndefeatingquicksort}.
+The latter makes use of \HS{} as fallback algorithm in worst cases.
+Since the maximum input length is limited on DPUs, perhaps a carefully tuned \ShS{} may be used instead.
+For this reason, \cref{fig:tasklet:conclusion:runtime} includes also a \ShS{}, which starkly contrast \HS{} despite its yet unsuited step sizes.
+
+\paragraph{\MS{}}
+This algorithm is stable but does not work in-place.
+The runtime is guaranteed to be in \(\bigoh{n \log n}\) although it fluctuates somewhat, depending on the input distribution and input length.
+Having said that, the leeway to \QS{} is not too big most of the time, marking it unlikely that a stabilised \QS{} with likewise increased memory footprint would be much of a benefit.
+Deferred copying of runs and fine-tuned unrolling could make the runtime drop even further.
+
+As shown, some allowance on the starting run lengths does not affect the average runtime too much, so the zigzagging could be dampened by dynamically adjusting the starting run length.
+A feature worthwhile to implement should be the detection of natural runs~\cite[Chapter~2.3.2]{wirth1975algorithmen}, that is sorted runs already present in the input.
 
 \begin{figure}[p]
 	\pgfplotsset{
@@ -38,7 +85,7 @@ However, there is still room for improvement as its compilation is suboptimal, e
 				ymax=150,
 			]
 				\nextgroupplot[title/.add={}{Sorted}]
-				\pgfplotsset{legend to name=leg:tasklet:summary, legend entries={\QS{}, \MS{}, \HS{}, \ShS{}}}
+				\pgfplotsset{legend to name=leg:tasklet:conclusion:runtime, legend entries={\QS{}, \MS{}, \HS{}, \ShS{}}}
 				\allalgos{sorted}
 				%
 				\nextgroupplot[title/.add={}{Reverse Sorted}]
@@ -104,10 +151,10 @@ However, there is still room for improvement as its compilation is suboptimal, e
 		\bigskip
 	\end{subfigure}
 
-	\hfil\pgfplotslegendfromname{leg:tasklet:summary}\hfil
+	\hfil\pgfplotslegendfromname{leg:tasklet:conclusion:runtime}\hfil
 	\caption{
-		Comparison of the average runtimes of the main algorithms presented in this chapter.
-		The coloured areas denote the three-sigma range, that is, the 99.7\% confidence intervals.
+		Mean runtimes of the main algorithms presented in this \lcnamecref{sec:tasklet}.
+		The tinted areas denote the three-sigma range, that is the 99.7\% confidence intervals.
 	}
-	\label{fig:tasklet:summary}
+	\label{fig:tasklet:conclusion:runtime}
 \end{figure}

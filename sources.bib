@@ -186,6 +186,61 @@
 	doi={10.1145/355588.365103},
 }
 
+@article{codish2017sortingnetworks,
+	author={Michael Codish and Luis Cruz-Filipe and Markus Nebel and Peter Shcneider-Kamp},
+	title={Optimizing Sorting Algorithms by Using Sorting Networks},
+	journaltitle={Formal Aspects of Computing},
+	date={2017-05-01},
+	editor={Moreno Falaschi and Augusto Sampaio},
+	volume={29},
+	issue={3},
+	pages={559-579},
+	abstract={In this paper, we show how the theory of sorting networks can be applied to synthesize optimized general-purpose sorting libraries. Standard sorting libraries are often based on combinations of the classic Quicksort algorithm, with insertion sort applied as base case for small, fixed, numbers of inputs. Unrolling the code for the base case by ignoring loop conditions eliminates branching, resulting in code equivalent to a sorting network. By replacing it with faster sorting networks, we can improve the performance of these algorithms. We show that by considering the number of comparisons and swaps alone we are not able to predict any real advantage of this approach. However, significant speed-ups are obtained when taking advantage of instruction level parallelism and non-branching conditional assignment instructions, both of which are common in modern CPU architectures. Furthermore, a close control of how often registers have to be spilled to memory gives us a complete explanation of the performance of different sorting networks, allowing us to choose an optimal one for each particular architecture. Our experimental results show that using code synthesized from these efficient sorting networks as the base case for Quicksort libraries results in significant real-world speed-ups.},
+	doi={10.1007/s00165-016-0401-3},
+}
+
+@online{m2015fastestway,
+	author={{m69 ''snarky and unwelcoming'' [sic!].}},
+	title={Fastest way to sort 10 numbers? (numbers are 32 bit)},
+	date={2015-08-24},
+	url={https://stackoverflow.com/a/32173153},
+	organization={Stack Overflow},
+	urldate={2024-08-11},
+}
+
+@online{paulr2010fastestsort,
+	author={Paul R},
+	title={Fastest sort of fixed length 6 int array},
+	date={2010-05-07},
+	url={https://stackoverflow.com/a/2786959},
+	organization={Stack Overflow},
+	urldate={2024-08-11},
+}
+
+@misc{peters2021patterndefeatingquicksort,
+	title={Pattern-defeating Quicksort},
+	author={Orson Raphael Lennard Peters},
+	date={2021-06-09},
+	eprint={2106.05123},
+	archivePrefix={arXiv},
+	primaryClass={cs.DS},
+	url={https://arxiv.org/abs/2106.05123},
+}
+
+@InProceedings{wild2012averagecase,
+	author={Sebastian Wild and Markus E. Nebel},
+	editor={Leah Epstein and Paolo Ferragina},
+	title={Average Case Analysis of Java 7's Dual Pivot Quicksort},
+	booktitle={Algorithms -- ESA 2012},
+	date={2012-09-10},
+	publisher={Springer Berlin Heidelberg},
+	address={Berlin, Heidelberg},
+	pages={825-836},
+	abstract={Recently, a new Quicksort variant due to Yaroslavskiy was chosen as standard sorting method for Oracle's Java 7 runtime library. The decision for the change was based on empirical studies showing that on average, the new algorithm is faster than the formerly used classic Quicksort. Surprisingly, the improvement was achieved by using a dual pivot approach, an idea that was considered not promising by several theoretical studies in the past. In this paper, we identify the reason for this unexpected success. Moreover, we present the first precise average case analysis of the new algorithm showing e.g. that a random permutation of length n is sorted using {\$}1.9n{\backslash}ln n-2.46n+{\backslash}mathcal{\{}O{\}}({\backslash}ln n){\$}key comparisons and {\$}0.6n{\backslash}ln n+0.08n+{\backslash}mathcal{\{}O{\}}({\backslash}ln n){\$}swaps.},
+	isbn={978-3-642-33090-2},
+	doi={10.1007/978-3-642-33090-2_71},
+}
+
 @book{maurer1974datenstrukturen,
 	author={Hermann Maurer and Hans-Werner Six},
 	title={Datenstrukturen und Programmierverfahren},
