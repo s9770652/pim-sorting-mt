@@ -2,8 +2,8 @@
 \label{sec:tasklet:heap:compilation}
 \addcontentsline{toc}{subsection}{\nameref{sec:tasklet:heap:compilation}}
 
-Under zero-based indexing, the indices of the sons of a vertex with index \(i\) are \(2 i + 1\) and \(2 i + 2\), whilst the one of its father is \((i - 1) \div 2\).
-Under one-based indexing, the indices of the sons of a vertex with index \(i\) are \(2 i\) and \(2 i + 1\), whilst the one of its father is \(i \div 2\).
+Under zero-based indexing, the indices of the sons of a vertex with index \(i\) are \(\twoi + 1\) and \(\twoi + 2\), whilst the one of its father is \((i - 1) \div 2\).
+Under one-based indexing, the indices of the sons of a vertex with index \(i\) are \(\twoi\) and \(\twoi + 1\), whilst the one of its father is \(i \div 2\).
 The formula \(i \div 2\) is computable through a bitwise shift one place to the right, whereas \((i - 1) \div 2\) requires a subtraction before the bitwise shift.
 Since the bottom-up \HS*{} rely heavily on finding fathers during backtracking, one-based indexing is clearly superior.
 
@@ -12,15 +12,15 @@ However, the first \HS{} implemented was the top-down \HS{}, which only ever sif
 The picture is not so clear if focussing only on that version of \HS{}.
 The compiler automatically turns multiplications by \(2\) into a bitwise shift by one place to the left.
 Next to a regular \lstinline|lsl| instruction for such bitwise shifts to the left, DPUs also possess an instruction called \lstinline|lsl_add| which first shifts to the left and then adds a number.
-This way, the formulas \(2i + 1\) and \(2i\) take the same amount of time to compute.
+This way, the formulas \(\twoi + 1\) and \(\twoi\) take the same amount of time to compute.
 
 Notwithstanding \lstinline|lsl_add| being indeed employed in the compilation, the zero-based indexing is about 7\% slower than one-based indexing.
 The reason is that \lstinline|lsl_add| takes four arguments:
 the target register, the addend, the number to shift, the number of places to shift.
 The reason is that only the number of places to shift can be passed as immediate value, that is, as plain number, whereas all other arguments have to be passed through a register, including the addend.
 Whilst DPUs have a read-only register permanently storing the number~\(1\) at disposal, read-only registers can only ever be the first register to be passed, not the second one.
-As a consequence, the compiler moves the number \(1\) to a register whenever \(2i + 1\) is to be computed, only to immediately overwrite it with the result from \lstinline|lsl_add|.
-Hence, the calculation of \(2i + 1\) does take twice as long as \(2 i\) after all.
+As a consequence, the compiler moves the number \(1\) to a register whenever \(\twoi + 1\) is to be computed, only to immediately overwrite it with the result from \lstinline|lsl_add|.
+Hence, the calculation of \(\twoi + 1\) does take twice as long as \(\twoi\) after all.
 
 There are plenty of other curious observations.
 For example, the runtime difference between stopping \HS{} when one element remains in the heap and stopping \HS{} when only three elements remain (which then get sorted by \IS{}) reduces the runtime by tens of thousand of cycles.

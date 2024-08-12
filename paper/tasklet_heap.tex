@@ -1,16 +1,19 @@
 \section{\texorpdfstring{\HS{}}{HeapSort}}
 \label{sec:tasklet:heap}
 
+\NewDocumentCommand{\twoi}{}{2 \mspace{1mu} i}
+\NewDocumentCommand{\twotoi}{}{2\mspace{1mu}^i}
+
 This algorithm~\cites{floyd1964treesort}{williams1964heapsort}[Chapter~2.2.5]{wirth1975algorithmen} makes use of a so-called \emph{heap}, which is a priority queue allowing to retrieve and remove the maximum element stored in time \(\bigoh{\log n}\).
 Repeated retrieval and removal of the maximum allows to sort in-place in time \(\bigoh{n \log n}\), although the sorting is not stable.
 
-A heap (or, more specifically, a \emph{binary max-heap}) is a binary tree of logarithmic depth whose layers are fully filled, that is, the layer of depth \(i\) contains \(2^i\) vertices.
+A heap (or, more specifically, a \emph{binary max-heap}) is a binary tree of logarithmic depth whose layers are fully filled, that is, the layer of depth \(i\) contains \(\twotoi\) vertices.
 The only exception is the last layer, which may contain less vertices but must be filled from left to right.
 In the context of \HS{}, the vertices are identified with the elements to sort.
 The \emph{heap order} dictates that each father must be at least as great as his sons.
 Consequently, the root is a greatest element.
 A heap with \(n\) vertices can be represented as an array of length \(n\) using a bijective mapping between the vertices and the array indices:
-If the root is stored at position \(1\), the sons of the vertex with index \(i\) have the indices \(2 i\) and \(2 i + 1\), whilst its father has index \(i \div 2\), where the obelus (\(\div\)) denotes an integer division.
+If the root is stored at position \(1\), the sons of the vertex with index \(i\) have the indices \(\twoi\) and \(\twoi + 1\), whilst its father has index \(i \div 2\), where the obelus (\(\div\)) denotes an integer division.
 
 After the heap has been built in-place from the input array in time \(\bigoh{n}\), the sorting works as follows:
 At the start of round~\(r = 1, \dots, n\), the first \(n - (r - 1)\) elements of the array represent the heap and the last~\(r - 1\) elements the end of the sorted output.
