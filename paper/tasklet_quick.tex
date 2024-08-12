@@ -1,7 +1,7 @@
 \section{\texorpdfstring{\QS{}}{QuickSort}}
 \label{sec:tasklet:quick}
 
-\QS{} \cites{hoare1962quicksort}[88-91]{maurer1974datenstrukturen}[Chapter~2.2.6]{wirth1975algorithmen} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh{n^2}\):
+\QS{} \cites{hoare1962quicksort}[88-91]{maurer1974datenstrukturen}[Chapter~2.2.6]{wirth1975algorithmen} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh*{n^2}\):
 A so-called \emph{pivot} element is selected from the input array according to some method, then the whole input array gets scanned and elements greater or less than the pivot are moved to the right-hand or left-hand side of the array, that is the \emph{partitions}, respectively;
 elements equal to the pivot are allowed to be in either partition.
 Finally, \QS{} is used on the left-hand and right-hand partition.
