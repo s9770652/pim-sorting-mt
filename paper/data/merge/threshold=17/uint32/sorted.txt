@@ -1,8 +1,7 @@
 # reps=1000, dist name=sorted, dist param=0, TYPE=UINT32, BLOCK_SIZE=50000, SEQREAD_CACHE_SIZE=1024, NR_TASKLETS=1, CALL_OVERHEAD=128
 # QUICK_THRESHOLD=18, PIVOT=MEDIAN_OF_RANDOM, PARTITION_PRIO=RIGHT, RECURSIVE=false, MERGE_THRESHOLD=17
 n	µ_Merge σ_Merge	µ_MergeWriteBack σ_MergeWriteBack	µ_MergeHalfSpace σ_MergeHalfSpace
-17  	   1584     2	   1700     7	   1520     2
-18  	   2961     4	   3656     8	   2967     9
-69  	  22257    18	  24239    19	  20527    18
-273 	 118778    43	 125922    44	 110999    40
-1089	 584384    96	 612156   100	 555866    91
+18  	   2960     4	   3656     8	   2165     8
+69  	  22257    18	  24238    18	  14409    15
+273 	 118778    41	 125918    43	  83548    34
+1089	 584372    93	 612148    95	 442577    78

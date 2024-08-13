@@ -1,6 +1,22 @@
 \section{\texorpdfstring{\MS{}}{MergeSort}}
 \label{apx:tasklet:merge}
 
+\pgfplotsinvokeforeach{12,13,14,15,16,17,18,24,32,48,64,96}{
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/almost.txt}{tableMergeStart#1_32almost}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/uniform.txt}{tableMergeStart#1_32uniform}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/zipf.txt}{tableMergeStart#1_32zipf}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/normal.txt}{tableMergeStart#1_32normal}
+
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/sorted.txt}{tableMergeStart#1_64sorted}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/reverse.txt}{tableMergeStart#1_64reverse}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/almost.txt}{tableMergeStart#1_64almost}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/uniform.txt}{tableMergeStart#1_64uniform}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/zipf.txt}{tableMergeStart#1_64zipf}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
+}
+
 \def\mergealgos{Merge,MergeWriteBack,MergeHalfSpace}
 
 \pgfplotsset{
@@ -56,7 +72,7 @@
 			merge,
 			sorted/.style={ymin=20, ymax=60},
 			reverse/.style={ymin=80, ymax=140},
-			almost/.style={ymin=40, ymax=80},
+			almost/.style={ymin=30, ymax=80, extra y ticks={30}},
 			uniform/.style={ymin=50, ymax=100, extra y ticks={50}},
 			zipf/.style={uniform},
 			normal/.style={uniform},
@@ -87,7 +103,7 @@
 			merge,
 			sorted/.style={ymin=20, ymax=70, extra y ticks={70}},
 			reverse/.style={ymin=100, ymax=175, extra y ticks={175}},
-			almost/.style={ymin=40, ymax=110, extra y ticks={110}},
+			almost/.style={ymin=30, ymax=110, ytick={30,50,...,110}},
 			uniform/.style={ymin=60, ymax=140},
 			zipf/.style={uniform},
 			normal/.style={uniform},
@@ -113,11 +129,11 @@
 	\clip (0, 0) rectangle (1024, 200);
 
 	\pgfplotsset{update limits=false}
-	\plotpernlogn[merge filter=14]{#3}{tableMergeStart14_#1#2}
-	\plotpernlogn[merge filter=15]{#3}{tableMergeStart15_#1#2}
-	\plotpernlogn[merge filter=16]{#3}{tableMergeStart16_#1#2}
-	\plotpernlogn[merge filter=17]{#3}{tableMergeStart17_#1#2}
-	\plotpernlogn[merge filter=18]{#3}{tableMergeStart18_#1#2}
+	\plotpernlogn{#3}{tableMergeStart12_#1#2}
+	\plotpernlogn{#3}{tableMergeStart13_#1#2}
+	\plotpernlogn{#3}{tableMergeStart14_#1#2}
+	\plotpernlogn{#3}{tableMergeStart15_#1#2}
+	\plotpernlogn{#3}{tableMergeStart16_#1#2}
 	\pgfplotsset{update limits=true}
 
 	\addplot +[opacity=0] coordinates {(16, 55)  (1024, 55)};  % needed for all x ticks to appear
@@ -130,10 +146,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=35, ymax=60, extra y ticks={35}},
+			sorted/.style={ymin=30, ymax=60},
 			reverse/.style={ymin=80, ymax=120},
-			almost/.style={ymin=55, ymax=75},
-			uniform/.style={ymin=75, ymax=90},
+			almost/.style={ymin=50, ymax=75, extra y ticks={75}},
+			uniform/.style={ymin=76, ymax=85, ytick={76,79,...,85}},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -143,7 +159,7 @@
 			\addmergerow{32}{uniform}{Uniform}
 			\addmergerow{32}{zipf}{Zipf's}
 			\addmergerow{32}{normal}{Normal}
-			\pgfplotsset{legend to name=leg:merge:starting_runs_is, legend entries={14,...,18}}
+			\pgfplotsset{legend to name=leg:merge:starting_runs_is, legend entries={12,...,16}}
 		\end{groupplot}
 	\end{tikzpicture}
 
@@ -161,10 +177,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=45, ymax=70, extra y ticks={45}},
+			sorted/.style={ymin=35, ymax=70, extra y ticks={35}},
 			reverse/.style={ymin=100, ymax=160},
-			almost/.style={ymin=70, ymax=90},
-			uniform/.style={ymin=90, ymax=115, extra y ticks={115}},
+			almost/.style={ymin=60, ymax=90},
+			uniform/.style={ymin=90, ymax=110},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -191,12 +207,12 @@
 	\clip (0, 0) rectangle (1024, 200);
 
 	\pgfplotsset{update limits=false}
-	\plotpernlogn[merge filter=16]{#3}{tableMergeStart16_#1#2}
-	\plotpernlogn[merge filter=24]{#3}{tableMergeStart24_#1#2}
-	\plotpernlogn[merge filter=32]{#3}{tableMergeStart32_#1#2}
-	\plotpernlogn[merge filter=48]{#3}{tableMergeStart48_#1#2}
-	\plotpernlogn[merge filter=64]{#3}{tableMergeStart64_#1#2}
-	\plotpernlogn[merge filter=96]{#3}{tableMergeStart96_#1#2}
+	\plotpernlogn{#3}{tableMergeStart16_#1#2}
+	\plotpernlogn{#3}{tableMergeStart24_#1#2}
+	\plotpernlogn{#3}{tableMergeStart32_#1#2}
+	\plotpernlogn{#3}{tableMergeStart48_#1#2}
+	\plotpernlogn{#3}{tableMergeStart64_#1#2}
+	\plotpernlogn{#3}{tableMergeStart96_#1#2}
 	\pgfplotsset{update limits=true}
 
 	\addplot +[opacity=0] coordinates {(16, 50)  (1024, 50)};  % needed for all x ticks to appear
@@ -209,9 +225,9 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=40, ymax=60},
-			reverse/.style={ymin=65, ymax=100},
-			almost/.style={ymin=60, ymax=80},
+			sorted/.style={ymin=30, ymax=60},
+			reverse/.style={ymin=65, ymax=105, ytick={65,75,...,105}},
+			almost/.style={ymin=50, ymax=80},
 			uniform/.style={ymin=75, ymax=90},
 			zipf/.style={uniform},
 			normal/.style={uniform},
@@ -240,9 +256,9 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=50, ymax=70},
-			reverse/.style={ymin=75, ymax=130, ytick={70, 90, ..., 130}},
-			almost/.style={ymin=70, ymax=90},
+			sorted/.style={ymin=40, ymax=70},
+			reverse/.style={ymin=75, ymax=135, ytick distance=15},
+			almost/.style={ymin=60, ymax=90},
 			uniform/.style={ymin=90, ymax=110},
 			zipf/.style={uniform},
 			normal/.style={uniform},

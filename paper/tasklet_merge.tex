@@ -1,8 +1,8 @@
 \section{\texorpdfstring{\MS{}}{MergeSort}}
 \label{sec:tasklet:merge}
 
-Two-way bottom-up \MS{}~\cites{katajainen1997meticulous}[85\psq]{maurer1974datenstrukturen}[Chapter~2.3.1]{wirth1975algorithmen} repeatedly compares two elements and \emph{merges} them to form sorted pairs.
-Once only pairs (and perhaps one single element) remain, the pairs are merged into quadruplets, the quadruples into octuplets and so on until a single sorted sequence remains.
+Two-way bottom-up \MS{}~\cites{katajainen1997meticulous}[85\psq]{maurer1974datenstrukturen}[Chapter~2.3.1]{wirth1975algorithmen} repeatedly compares two elements and \emph{merges} them to form sorted couples.
+Once only couples (and perhaps one single element) remain, the couples are merged into quadruplets, the quadruples into octuplets and so on until a single sorted sequence remains.
 Sorted sequences are also referred to as \emph{runs}.
 \MS{} has a guaranteed runtime of \(\bigoh{n \log n}\) and is the only stable sorting algorithm with subquadratic runtime presented in this \lcnamecref{sec:tasklet}.
 Its biggest drawback is that additional space of size \(\bigtheta{n}\) is needed.
@@ -25,13 +25,13 @@ A simple implementation of \MS{} (denoted by \emph{full-space}) writes all merge
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles, and the merging begins anew.
 Are the final sorted elements supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed if the number of rounds is odd.
 
-A slightly more sophisticated implementation (denoted by \emph{half-space}) needs space for only \(n/2\) additional elements:
+A slightly more sophisticated implementation (denoted by \emph{half-space}) needs space for only \(n/2\) additional elements~\cite[Chapter~2.5]{lang2009algorithmen}:
 When two adjacent runs are to be merged, the first one is copied to an auxiliary array.
 Then, the copy and the second run are merged to the beginning of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
-Strictly speaking, the auxiliary array holds~\(n-1\) elements in the worst-case.
-By way of example, if the starting run length is \(n - 1\), there would be two runs of lengths \(n - 1\) and \(1\), respectively, and the first one would be copied away.
-However, both the maximum number of elements to sort and the starting run length are predetermined, so the memory footprint can indeed be halved compared to the full-space \MS{}.
+To guarantee that the auxiliary array does indeed hold only \(n/2\) elements in the worst case, one needs to make sure that the first runs are never longer than the respective second runs.
+For this reason, the starting runs are created from right to left, so that it is the first run that may be smaller than the others.
+Likewise, merging pairs of runs begins at the end of the array and works its way forward to the beginning.
 
 Further optimised, half-space \MS{} would not need to copy the first runs immediately.
 It suffices to search for the foremost element of the first run which is greater than the first element of the second element.
