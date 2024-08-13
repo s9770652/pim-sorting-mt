@@ -26,7 +26,7 @@ Especially the last two points make \IS{} a good fallback algorithm for asymptot
 \paragraph{Sentinel Values}
 When moving an element to the left, two checks are needed:
 Does the left neighbour exist and is it smaller than the element to move?
-The first check can be omitted through the use of \emph{sentinel values}~\cite[93]{wirth1975algorithmen}:
+The first check can be omitted through the use of \emph{sentinel values}~\cites{penschuck2024personal}[93]{wirth1975algorithmen}:
 If the element with index \(-1\) is permanently set to the smallest possible value of the chosen data type, it is at least as small as any element in the input array, and the leftwards motion stops there at the latest.
 Since a DPU has no branch predictor, the slowdown from performing twice as many checks as needed is quite high and goes up to 30\% for short inputs with 24 uniformly distributed 32-bit elements.
 

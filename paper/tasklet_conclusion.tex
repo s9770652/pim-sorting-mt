@@ -13,16 +13,16 @@ It also gives an outlook on future improvements.
 
 \paragraph{\IS{}}
 This algorithm is arguably the best for small inputs with up to 16 elements as it offers the best performance on the tested input distributions and, additionally, sorts stable and in-place.
-Sentinel values enabled significant speed-ups \Dash a theme shared with most sorting algorithms.
+Sentinel values enabled significant speedups \Dash a theme shared with most sorting algorithms.
 However, there is still room for improvement as its compilation is suboptimal, especially in case of the \IS{} with implicit sentinel values.
 
-Last but not least, a strong contender to \IS{} shall be mentioned, namely sorting networks~\cite{codish2017sortingnetworks}.
+Last but not least, a strong contender to \IS{} shall be mentioned, namely sorting networks~\cites{codish2017sortingnetworks}[Chapter~13]{lang2009algorithmen}.
 These algorithms work for a fixed input length and swap elements according to a series of predefined comparisons.
 Testing various code snippets~\cites[9]{codish2017sortingnetworks}{m2015fastestway}{paulr2010fastestsort} suggests a large potential for further savings.
 
 
 \paragraph{\ShS{}}
-This  algorithm offers a significant speed-up over \IS{} as long as the input is fairly distant from being sorted.
+This  algorithm offers a significant speedup over \IS{} as long as the input is fairly distant from being sorted.
 Optimising it for long inputs will take some effort, though.
 
 
@@ -39,7 +39,7 @@ Exploratory implementations, however, show that the performance suffers from thi
 
 
 \paragraph{\QS{}}
-Neitherh does this algorithm work in-place nor is it stable.
+Neither does this algorithm work in-place nor is it stable.
 Its runtime is in \(\bigoh{n \log n}\) only in expectation, but the worst-case runtime of \(\bigoh*{n^2}\) is, thanks to random medians being selected as pivots, highly unlikely.
 \QS{} generally delivers top performance which could be even better with deterministic medians as pivots if the input is known to be random enough.
 There is serious work needed to be done, however, as there is no prioritisation of shorter partitions yet, which is needed to prevent an overflow of the call stack, due to problems in the compilation.
@@ -58,7 +58,7 @@ Having said that, the leeway to \QS{} is not too big most of the time, making it
 Deferred copying of runs and fine-tuned unrolling could make the runtime drop even further.
 
 As shown, some allowance on the starting run lengths does not affect the average runtime too much, so the zigzagging of the runtime could be dampened by dynamically adjusting the starting run length.
-A feature worthwhile to implement should be the detection of natural runs~\cite[Chapter~2.3.2]{wirth1975algorithmen}, that is sorted runs already present in the input.
+A feature worthwhile to implement should be the detection of natural runs~\cites[Chapter~2.6]{lang2009algorithmen}[Chapter~2.3.2]{wirth1975algorithmen}, that is sorted runs already present in the input.
 
 \begin{figure}[p]
 	\pgfplotsset{

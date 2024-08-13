@@ -56,7 +56,7 @@ There are four common reasons for \emph{flushing}, that is, writing \Dash many o
 	Before each merger of a pair of runs, the half-space \MS{} copies the first run to the auxiliary array.
 \end{enumerate}
 Therefore, flushing accounts for a considerable part of the runtime, and reducing the loop overhead (variable incrementation and bounds checking) is helpful.
-This can be done via \emph{unrolling}:
+This can be done via \emph{unrolling}~\cite{penschuck2024personal}:
 As long as at least, let us say, \(x\) elements still need to be flushed, a loop with step size \(x\) is executed, and in each iteration, \(x\) elements are moved.
 Is \(x\) a compile-time constant, the compiler implements the moving of the elements through \(x\) instruction which use constant, pre-calculated offsets.
 Once less than \(x\) elements remain, an ordinary loop with step size \(1\), which moves elements individually, is used.

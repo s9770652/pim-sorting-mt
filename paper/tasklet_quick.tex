@@ -72,7 +72,7 @@ There are tremendous consequences for the runtime depending on the exact impleme
 		\begin{groupplot}[
 			horizontal sep for labels,
 			adaptive group=1 by 2,
-			groupplot ylabel={Speed-up},
+			groupplot ylabel={Speedup},
 			x from 16 to 1024,
 			ymin=0.994,
 			ymax=1.002,
@@ -93,7 +93,7 @@ There are tremendous consequences for the runtime depending on the exact impleme
 
 	\hfil\pgfplotslegendfromname{leg:quick:fallback}\hfil
 	\caption{
-		Speed-ups of \QS*{} with different thresholds (16--20) for when to fall back to \IS{} over a threshold of 18 elements, on uniformly distributed integers.
+		Speedups of \QS*{} with different thresholds (16--20) for when to fall back to \IS{} over a threshold of 18 elements, on uniformly distributed integers.
 		Using \ShS{} is not beneficial because many partitions undercut the thresholds significantly.
 	}
 	\label{fig:quick:fallback}
