@@ -47,7 +47,7 @@ Since the last leaf effectively takes the place of another leaf and since both a
 The upwards-sifting reverts some of the changes done by the downwards-sifting.
 The bottom-up \HS{} can be brought to swap parity with the top-down \HS{} by the following change:
 The downwards-sifting is traced but the vertices are not actually moved.
-Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost vertex which is at least as great as the last leaf.
+Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost vertex which is greater than the last leaf.
 The position found is where the last leaf would end up after the upwards-sifting, so all vertices below can stay put and all vertices above move to their fathers' positions, that is, thither the swaps from the downwards-sifting would have put them.
 This implementation variant makes the downwards-sifting even cheaper, but the upwards-sifting must now go all the way up to the root.
 
