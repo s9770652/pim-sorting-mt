@@ -39,7 +39,7 @@ All previous elements are already in the correct position so only the following 
 This \emph{deferred} copying, although examined during development, was not in use when measuring runtimes since it unfortunately complicates the following optimisation.
 
 
-\paragraph{Unrolling}
+\paragraph{Unrolled Flushing}
 There are four common reasons for \emph{flushing}, that is, writing \Dash many oftwhiles \Dash consecutive elements:
 \begin{enumerate}
 	\item
@@ -67,6 +67,16 @@ When the full-space \MS{} performs a write-back or when the half-space \MS{} cop
 In all other cases, \(x\) is set to 24.
 This strategy, albeit not optimal, makes the \MS*{} significantly faster:
 Sorting sorted, reverse sorted, and almost sorted inputs gets faster by up to 30\%, while sorting more random inputs still get faster for the most part and slower by low single-digits at worst, depending on the starting run length.
+
+
+\paragraph{Unrolled Merging}
+During a merger, three pointers are sustained:
+two for each run, both pointing to the current element of their respective run, and one pointing to the current output location.
+After each comparison and subsequent write, the output pointer and the pointer of the run with the less element are incremented.
+The frequency of these incrementations can be reduced by, for example, comparing and writing twice consecutively, where the second time uses offset pointers (similarly to how it was done in case of \IS{}).
+Afterwards, the output pointer is incremented by two and either one of the run pointers is incremented by one or both run pointers are incremented by two.
+This unrolling turned out to be detrimental to the quality of the compilation and was, hence, dropped.
+
 
 \input{tasklet_merge_compilation}
 
