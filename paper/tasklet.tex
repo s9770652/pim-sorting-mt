@@ -1,7 +1,7 @@
 \chapter{Sorting with One Tasklet}
 \label{sec:tasklet}
 
-This \lcnamecref{sec:tasklet} is concerned with the very first phase where each tasklet sorts on its own, that is sequentially.
+This \lcnamecref{sec:tasklet} is concerned with the very first phase where each tasklet sorts on its own, that is sequentially, solely in WRAM.
 \Cref{sec:tasklet:insertion} discusses \IS{} which is a component of all algorithms presented thereafter as it is lightweight and performant on short inputs.
 \Cref{sec:tasklet:shell} covers \ShS{} which is a generalisation of \IS{}.
 \hyperref[sec:tasklet:heap]{\nameCrefs{sec:tasklet:heap} }\labelcref{sec:tasklet:heap}, \labelcref{sec:tasklet:quick}, and \labelcref{sec:tasklet:merge} deal with \HS{}, \QS{}, and \MS{}, respectively, which are more elaborate algorithms suitable for long inputs.
@@ -37,6 +37,12 @@ The meaning behind and reasoning for the individual parameters in the configurat
 	half-space;
 	starting run length of 16 elements
 \end{description}
+
+The measurements were confined to at most 1024 elements.
+The reason is that 64 kilobytes of WRAM are available and that the DPU pipeline throughput is saturated at 11 tasklets when ignoring secondary effects through MRAM accesses and synchronisation.
+This alots 5957 bytes, that is space for about 1489 32-bit integers, to each tasklet.
+That number is further reduced by a few hundred of those bytes serving as stack for their respective tasklet.
+On that score, 1024 elements is a reasonable cutoff.
 
 \clearpage
 \input{tasklet_insertion}
