@@ -115,6 +115,12 @@
 	\todo[inline]{Architektur}
 	\todo[inline]{Speicherzugriffe (memcpy, mram\_read \dots)}
 	\todo[inline]{triple buffer}
+	\todo[inline]{Sortiergrundlagen: stable, in-place, \(\bigomega{n \log n}\)}
+	\todo[inline]{Master-Theorem + log-Spezialfall für Analyse des par.\ \MS{}?}
+
+	\begin{problem}[Sorting]
+		Given a sequence \(\left\langle a_1, a_2, \dots, a_n \right\rangle\) of \(n\) numbers, output a permutation \(\left\langle a_1', a_2', \dots, a_n' \right\rangle\) of the input sequence such that \(a_1' \le a_2' \le \dots \le a_n'\) holds.
+	\end{problem}
 
 	We took our cue from \citeauthor{axtmann2020engineering}~\cite{axtmann2020engineering} for the choice of distributions.
 	\begin{description}
@@ -143,6 +149,8 @@
 	\end{description}
 
 	\include{tasklet}
+
+	\include{mram}
 
 	\appendix
 

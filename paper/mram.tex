@@ -1,0 +1,66 @@
+\chapter{Sorting Sequentially in MRAM}
+
+\begin{itemize}
+	\item
+	Sequential Reader
+	\begin{itemize}
+		\item
+		nimmt viel Platz weg aufgrund der Maske
+
+		\item
+		stellt Ausrichtung bei jeder Initialisierung sicher
+
+		\item
+		geht nur vorwärts, nicht rückwärts
+
+		\item
+		sehr teuer zu wissen, wann Schluss
+		\begin{itemize}
+			\item
+			umgehbar, indem ein Zähler verwendet wird
+		\end{itemize}
+
+		\item
+		\lstinline|get| erzeugt einen Funktionsaufruf
+
+		\item
+		Vorgehensweise
+		\begin{itemize}
+			\item
+			allokiert
+		\end{itemize}
+	\end{itemize}
+
+	\item
+	eigener Reader
+	\begin{itemize}
+		\item
+		Ausrichtung nicht sichergestellt. Daher:
+		\begin{itemize}
+			\item
+			Eingabegröße muss durch 8 teilbar sein (Dummyvalue falls nötig)
+
+			\item
+			Aufteilung je Tasklet durch 8 teilbar
+
+			\item
+			starting run lengths durch 8 teilbar
+		\end{itemize}
+	\end{itemize}
+
+	\item
+	Dreifachpuffer
+	\begin{itemize}
+		\item
+		zusammenhängend dank Schranke
+
+		\item
+		\lstinline|TRIPLE_BUFFER_SIZE| = \lstinline|BLOCK_SIZE| + 4 × \lstinline|SEQREAD_CACHE_SIZE|
+
+		\item
+		\lstinline|MAX_TRANSFER_SIZE_TRIPLE| gg. \lstinline|MAX_TRANSFER_SIZE_CACHE|
+	\end{itemize}
+
+	\item
+	Wie wenig einsparbar durch Startingrun MRAM → WRAM statt MRAM → MRAM → WRAM?
+\end{itemize}
