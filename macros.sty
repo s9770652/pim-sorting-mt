@@ -84,6 +84,9 @@
 \NewDocumentCommand{\SelS}{s}{Selection\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\ShS}{s}{Shell\-Sort\IfBooleanT{#1}{s}}
 
+\NewDocumentCommand{\runless}{}{\ensuremath{r_{1}}}
+\NewDocumentCommand{\startingrun}{}{\ensuremath{\ell}}
+
 \makeatletter
 \@ifpackagewith{cleveref}{capitalize}{
 	\crefname{implementation}{Handl.}{Handls.}

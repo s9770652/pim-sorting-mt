@@ -1,7 +1,7 @@
 \section{\texorpdfstring{\MS{}}{MergeSort}}
 \label{apx:tasklet:merge}
 
-\pgfplotsinvokeforeach{12,13,14,15,16,17,18,24,32,48,64,96}{
+\pgfplotsinvokeforeach{12,13,14,15,16,24,32,48,64,96}{
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/almost.txt}{tableMergeStart#1_32almost}
@@ -70,10 +70,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=20, ymax=60},
-			reverse/.style={ymin=80, ymax=140},
-			almost/.style={ymin=30, ymax=80, extra y ticks={30}},
-			uniform/.style={ymin=50, ymax=100, extra y ticks={50}},
+			sorted/.style={ymin=15, ymax=55, ytick={15,25,...,55}},
+			reverse/.style={ymin=60, ymax=140},
+			almost/.style={ymin=25, ymax=85, ytick={25,45,...,85}},
+			uniform/.style={ymin=45, ymax=105, ytick={45,65,...,105}},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -101,10 +101,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=20, ymax=70, extra y ticks={70}},
-			reverse/.style={ymin=100, ymax=175, extra y ticks={175}},
+			sorted/.style={ymin=20, ymax=60},
+			reverse/.style={ymin=75, ymax=180, ytick={75,110,...,180}},
 			almost/.style={ymin=30, ymax=110, ytick={30,50,...,110}},
-			uniform/.style={ymin=60, ymax=140},
+			uniform/.style={ymin=50, ymax=140, ytick={50,80,...,140}},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -137,6 +137,7 @@
 	\pgfplotsset{update limits=true}
 
 	\addplot +[opacity=0] coordinates {(16, 55)  (1024, 55)};  % needed for all x ticks to appear
+	\addplot +[opacity=0] coordinates {(16, 65)  (1024, 65)};
 	\addplot +[opacity=0] coordinates {(16, 80)  (1024, 80)};
 	\addplot +[opacity=0] coordinates {(16, 100) (1024, 100)};
 }
@@ -146,10 +147,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=30, ymax=60},
-			reverse/.style={ymin=80, ymax=120},
-			almost/.style={ymin=50, ymax=75, extra y ticks={75}},
-			uniform/.style={ymin=76, ymax=85, ytick={76,79,...,85}},
+			sorted/.style={ymin=25, ymax=55, ytick={25,35,...,55}},
+			reverse/.style={ymin=65, ymax=110, ytick={65,80,...,110}},
+			almost/.style={ymin=45, ymax=75, extra y ticks={45,75}},
+			uniform/.style={ymin=60, ymax=80},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -166,7 +167,7 @@
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 4\) were tested.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were tested.
 		The date size is 32 bit.
 	}
 	\label{fig:merge:starting_runs_is_uint32}
@@ -177,10 +178,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=35, ymax=70, extra y ticks={35}},
-			reverse/.style={ymin=100, ymax=160},
-			almost/.style={ymin=60, ymax=90},
-			uniform/.style={ymin=90, ymax=110},
+			sorted/.style={ymin=30, ymax=70, extra y ticks={}},
+			reverse/.style={ymin=90, ymax=160},
+			almost/.style={ymin=50, ymax=90},
+			uniform/.style={ymin=75, ymax=100},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -196,7 +197,7 @@
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 4\) were tested.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were tested.
 		The date size is 64 bit.
 	}
 	\label{fig:merge:starting_runs_is_uint64}
@@ -207,7 +208,7 @@
 	\clip (0, 0) rectangle (1024, 200);
 
 	\pgfplotsset{update limits=false}
-	\plotpernlogn{#3}{tableMergeStart16_#1#2}
+	\plotpernlogn{#3}{tableMergeStart14_#1#2}
 	\plotpernlogn{#3}{tableMergeStart24_#1#2}
 	\plotpernlogn{#3}{tableMergeStart32_#1#2}
 	\plotpernlogn{#3}{tableMergeStart48_#1#2}
@@ -225,10 +226,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=30, ymax=60},
-			reverse/.style={ymin=65, ymax=105, ytick={65,75,...,105}},
-			almost/.style={ymin=50, ymax=80},
-			uniform/.style={ymin=75, ymax=90},
+			sorted/.style={ymin=30, ymax=50},
+			reverse/.style={ymin=45, ymax=100, ytick distance=15},
+			almost/.style={ymin=40, ymax=70},
+			uniform/.style={ymin=60, ymax=90},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -238,14 +239,14 @@
 			\addmergerow{32}{uniform}{Uniform}
 			\addmergerow{32}{zipf}{Zipf's}
 			\addmergerow{32}{normal}{Normal}
-			\pgfplotsset{legend to name=leg:merge:starting_runs_shs, legend entries={16,24,32,48,64,96}}
+			\pgfplotsset{legend to name=leg:merge:starting_runs_shs, legend entries={14,24,32,48,64,96}}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 3\) were tested.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were tested.
 		The date size is 32 bit.
 	}
 	\label{fig:merge:starting_runs_shs_uint32}
@@ -256,10 +257,10 @@
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
 			merge,
-			sorted/.style={ymin=40, ymax=70},
+			sorted/.style={ymin=30, ymax=70},
 			reverse/.style={ymin=75, ymax=135, ytick distance=15},
-			almost/.style={ymin=60, ymax=90},
-			uniform/.style={ymin=90, ymax=110},
+			almost/.style={ymin=50, ymax=90},
+			uniform/.style={ymin=75, ymax=110},
 			zipf/.style={uniform},
 			normal/.style={uniform},
 		]
@@ -275,7 +276,7 @@
 	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \(\ell\), the input lengths \(n = 4^i \cdot \ell + 1\) with \(i = 0, \dots, 3\) were tested.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were tested.
 		The date size is 64 bit.
 	}
 	\label{fig:merge:starting_runs_shs_uint64}

@@ -69,10 +69,11 @@ For the full-space \MS*{}, reverse sorted inputs get sorted 60\%--90\% slower th
 For the half-space \MS{}, these ranges climb to 120\%--140\% and 130\%--155\%, respectively.
 
 The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
-On sorted and almost sorted inputs of length \(n \approx 1000\), it takes the lead over the full-space \MS*{}, since the second runs need not be flushed and the additional copying of the first runs is unrolled.
-For other inputs, the half-space \MS{} does not take even 10\% longer than the full-space \MS{} without write-backs for both 32-bit and 64-bit integers.
+On sorted and almost sorted 32-bit inputs of length \(n \approx 1000\), it takes the lead over the full-space \MS*{}, since the second runs need not be flushed and the additional copying of the first runs is unrolled.
+For other inputs, the half-space \MS{} does not take even 10\% longer than the full-space \MS{} without write-backs.
 The leeway to the full-space \MS{} with write-backs is even smaller.
 This slowdown, albeit small, is likely because of most elements of the second runs being moved forwards anyway and the elements of the first runs being both copied and moved.
+With 64-bit inputs, the half-space \MS{} surpasses the full-space \MS*{} on \emph{all} input distributions in the local maxima, and the leeway in local minima is minuscule.
 
 \Cref{apx:tasklet:merge} contains further measurements on \MS{}, showing why a starting run length of 16 is a good choice.
 \Cref{fig:merge:starting_runs_is_uint32,fig:merge:starting_runs_is_uint64} show the average runtimes of starting runs of lengths 12 to 16, all sorted with \IS{}.
