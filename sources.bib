@@ -263,6 +263,19 @@
 	location={Frankfurt},
 }
 
+@article{mutlu2022Benchmarking,
+	author={Juan Gómez-Luna and Izzat El Hajj and Ivan Fernandez and Christina Giannoula and Geraldo Francisco de Oliveira and Onur Mutlu},
+	journal={IEEE Access},
+	title={Benchmarking a New Paradigm: Experimental Analysis and Characterization of a Real Processing-in-Memory System},
+	date={2022-05-10},
+	volume={10},
+	pages={52565-52608},
+	abstract={Many modern workloads, such as neural networks, databases, and graph processing, are fundamentally memory-bound. For such workloads, the data movement between main memory and CPU cores imposes a significant overhead in terms of both latency and energy. A major reason is that this communication happens through a narrow bus with high latency and limited bandwidth, and the low data reuse in memory-bound workloads is insufficient to amortize the cost of main memory access. Fundamentally addressing this data movement bottleneck requires a paradigm where the memory system assumes an active role in computing by integrating processing capabilities. This paradigm is known as processing-in-memory (PIM). Recent research explores different forms of PIM architectures, motivated by the emergence of new 3D-stacked memory technologies that integrate memory with a logic layer where processing elements can be easily placed. Past works evaluate these architectures in simulation or, at best, with simplified hardware prototypes. In contrast, the UPMEM company has designed and manufactured the first publicly-available real-world PIM architecture. The UPMEM PIM architecture combines traditional DRAM memory arrays with general-purpose in- order cores, called DRAM Processing Units (DPUs), integrated in the same chip. This paper provides the first comprehensive analysis of the first publicly-available real-world PIM architecture. We make two key contributions. First, we conduct an experimental characterization of the UPMEM-based PIM system using microbenchmarks to assess various architecture limits such as compute throughput and memory bandwidth, yielding new insights. Second, we present PrIM (Processing-In-Memory benchmarks), a benchmark suite of 16 workloads from different application domains (e.g., dense/sparse linear algebra, databases, data analytics, graph processing, neural networks, bioinformatics, image processing), which we identify as memory-bound. We evaluate the performance and scaling characteristics of PrIM benchmarks on the UPMEM PIM architecture, and compare their performance and energy consumption to their modern CPU and GPU counterparts. Our extensive evaluation conducted on two real UPMEM-based PIM systems with 640 and 2,556 DPUs provides new insights about suitability of different workloads to the PIM system, programming recommendations for software designers, and suggestions and hints for hardware and architecture designers of future PIM systems.},
+	keywords={Computer architecture;Benchmark testing;Random access memory;Graphics processing units;Hardware;Software;Energy consumption;Processing-in-memory;near-data processing;memory systems;data movement bottleneck;DRAM;benchmarking;real-system characterization;workload characterization},
+	doi={10.1109/ACCESS.2022.3174101},
+	ISSN={2169-3536},
+}
+
 @book{maurer1974datenstrukturen,
 	author={Hermann Maurer and Hans-Werner Six},
 	title={Datenstrukturen und Programmierverfahren},

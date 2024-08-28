@@ -24,3 +24,7 @@
 \QS{}#n
 \SelS{}#n
 \ShS{}#n
+
+\langC{}#n
+\runless{}#n
+\startingrun{}#n

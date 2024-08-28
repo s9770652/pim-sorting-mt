@@ -1,5 +1,6 @@
 \RequirePackage{babel}  % Sprache
 \RequirePackage{csquotes}  % Anführungszeichen
+\RequirePackage[mode=match]{siunitx}  % Zahlen und Einheiten
 
 \RequirePackage{amssymb, amsthm}  % mathematische Grundlagen
 \RequirePackage[intlimits]{mathtools}  % stellt u. a. \DeclarePairedDelimiter zur Verfügung + weitere Verbesserungen für amsmath

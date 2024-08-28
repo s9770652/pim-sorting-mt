@@ -1,4 +1,5 @@
 \chapter{Sorting Sequentially in MRAM}
+\label{sec:mram}
 
 \begin{itemize}
 	\item
@@ -6,6 +7,10 @@
 	\begin{itemize}
 		\item
 		nimmt viel Platz weg aufgrund der Maske
+
+		\item
+		Maske sorgt auch für viel unnötig geladenes beim Initialisieren, da half-space \MS{} erster Lauf alles verschieben kann.
+		Insbesondere heißt das, das es sein kann, dass nur \lstinline|SEQREAD_CACHE_SIZE + 1| viel tatsächlich neues nach der Initialiserung im Speicher steht, da das vorherige dem vorherigen Laufe entspricht.
 
 		\item
 		stellt Ausrichtung bei jeder Initialisierung sicher
@@ -22,6 +27,12 @@
 
 		\item
 		\lstinline|get| erzeugt einen Funktionsaufruf
+
+		\item
+		Empirisch festgestellt:
+		Lädt nur neu, wenn \lstinline|ptr| noch im ersten Puffer liegt, \lstinline|ptr + 1| aber nicht mehr.
+		Das bedeutet, wenn man \lstinline|ptr| händisch ohne \lstinline|get| ein paar Felder weiterlaufen lässt und dann \lstinline|get(ptr-1)| zur Synchronisation ausführt, funktioniert es nicht, wenn \lstinline|ptr| nicht an der letzten Stelle des ersten Puffers gelandet ist!
+		Das macht unrollen schwieriger und der zweite Puffer ist für uns wirklich verloren.
 
 		\item
 		Vorgehensweise
@@ -46,6 +57,43 @@
 			\item
 			starting run lengths durch 8 teilbar
 		\end{itemize}
+
+		\item
+		Berechnung der Adresse des letzten Elementes
+		\begin{itemize}
+			\item
+			\lstinline|(T *)buffers[me()].seq_2 + (2 * SEQREAD_CACHE_SIZE / sizeof(T)) - 1|
+			\begin{itemize}
+				\item
+				wird als Offset des Startzeigers aufgefasst
+
+				\item
+				wird bei jeder Verwendung neu berechnet
+			\end{itemize}
+
+			\item
+			\lstinline|(T *)(buffers[me()].seq_2 + 2 * SEQREAD_CACHE_SIZE) - 1|
+			\begin{itemize}
+				\item
+				einmal berechnet
+
+				\item
+				\qty{-5,6}{\percent} Laufzeit
+			\end{itemize}
+		\end{itemize}
+
+		\item
+		Zugewinn nur durch größere Datenübertragung/weniger Wegschmiss bereits Bekanntem: etwa \qty{4}{\percent} bei uniform 32-bit
+
+		\item
+		Frühes Ende mitrechnen
+
+		\item
+		Does reading less if the end is reached improve performance? No!
+
+		\item
+		Statische Definition der Puffer möglich!
+		Führt auch zu weniger Registernutzung.
 	\end{itemize}
 
 	\item
@@ -63,4 +111,14 @@
 
 	\item
 	Wie wenig einsparbar durch Startingrun MRAM → WRAM statt MRAM → MRAM → WRAM?
+
+	\item
+	Bemerkenswert:
+	Aufgrund der Schleifenstreckung ist es besser, den Cache etwas kleiner zu machen.
+
+	\item
+	Kann Flushed durch vollständiges Lesen des Puffers verschnellert werden?
 \end{itemize}
+
+\clearpage
+\input{mram_seq}

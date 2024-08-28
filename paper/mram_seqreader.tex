@@ -1,0 +1,62 @@
+\section{The Sequential Reader}
+\label{sec:mram:seq_reader}
+
+It is technically possible to access data in the MRAM in the same way as data in the WRAM.
+For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
+Such \emph{direct memory accesses} (DMAs) to the MRAM are translated into the the assembler functions \lstinline|ldma| and \lstinline|sdma|, which load and store the respective data.
+However, each DMA comes with an overhead, and accessing MRAM variables like WRAM variables means an execution of \lstinline|ldma| or \lstinline|sdma| on each accesses
+For this reason, the preferred way to load contiguous data from the MRAM is through the function \lstinline|mram_read|.
+This function takes the MRAM address of the first byte to load, the WRAM address of a buffer where the data are to be stored, and the number of consecutive bytes to load.
+Likewise, there is the function \lstinline|mram_write| for writing contiguous WRAM data to the MRAM.
+Internally, these two \langC{} functions make also use of the assembler functions \lstinline|ldma| and \lstinline|sdma| but pass them the number of bytes to load so that the overhead occurs only once and is spread amongst many bytes.
+The effect is so high that, according to \citeauthor{mutlu2022Benchmarking}~\cite[11]{mutlu2022Benchmarking}, using \lstinline|mram_read| and \lstinline|mram_write| remains beneficial even if only an eighth of the transferred data is actually of interest (as is the case, for example, with strided access patterns).
+
+However, the functions \lstinline|mram_read| and \lstinline|mram_write| do come with some constraints.
+Both the target and the source address must be aligned on 8 bytes.
+Also, the number of transferred bytes must be at least 8, at most 2048, and be a multiple of 8.
+Failing to follow these constraints can result in missing or corrupt data.
+Furthermore, programmers are tasked with maintaining the WRAM buffer and transferring data at appropriate times, which is likely frequent as the WRAM is more than a thousand times smaller than the MRAM.
+
+Since reading data consecutively is a common occurrence, UPMEM provides a set of data structures and \langC{} functions which automate the process and, thereby, remove any need to care for the alignment of addresses, the maintenance of the WRAM buffer, or the loading of new data.
+On top of that, UPMEM claims that \textquote{[\dots] this abstraction implementation has been optimized and will provide better performance than a standard \langC{} check of the cache boundaries.}~\cite[Memory management -- Sequential readers]{upmemSDK}
+
+The compile-time constant \lstinline|SEQREAD_CACHE_SIZE| determines the size of the sequential read buffer in bytes and can be set to either 32, 64, 128, 256, 512, or 1024.
+Initialising the buffer must be done once through calling the function \lstinline|seqread_alloc|.
+Several things are noteworthy:
+\begin{itemize}
+	\item
+	The buffer is allocated on the heap, so the initialisation does take some time.
+	Also, heap allocation is atomic, that is, it cannot happen concurrently, meaning that tasklets can be stalled by other tasklets.
+	Last but not least, the addresses of the buffers are not known during compilation, so that they must be passed to assembler functions via registers.
+	This could be a potential cause for a deterioration of the compilation if registers are too few for all required data and many loads and stores ensue.
+
+	\item
+	The allocated buffer has a size of 2 × \lstinline|SEQREAD_CACHE_SIZE| for reasons explained shortly.
+
+	\item
+	Remember that the heap is implemented as a never-decreasing stack.
+	This means that new memory is only ever allocated after the \emph{stack pointer}, which stores the end of the stack.
+	Before the buffers are actually allocated, the stack pointer skips to the next multiple of \lstinline|SEQREAD_CACHE_SIZE| if not already on such a multiple.
+	This is done for address masking purposes, as \lstinline|SEQREAD_CACHE_SIZE| is a power of two.
+	Due to the nature of the stack, this has the drawback that the skipped WRAM memory can never be allocated for something else.
+\end{itemize}
+All in all, the memory footprint of a sequential read buffer is between 2 × \lstinline|SEQREAD_CACHE_SIZE| and 3 × \lstinline|SEQREAD_CACHE_SIZE| many bytes.
+
+The function \lstinline|seqread_init| instructs a sequential reader and its buffer to load data from a specified MRAM address and returns a pointer to the corresponding WRAM address of said MRAM address.
+Loading is done by, first, rounding the MRAM address down to the next multiple of \lstinline|SEQREAD_CACHE_SIZE| and, then, loading 2 × \lstinline|SEQREAD_CACHE_SIZE| many bytes.
+In other words, the MRAM is divided into \emph{pages} of size \lstinline|SEQREAD_CACHE_SIZE| and the buffer holds two subsequent pages.
+This way, data of some long, compound type at the end of the first page is fully loaded even if extending into the other page.
+
+To access the data in the buffer, one can dereference the pointer returned by \lstinline|seqread_init|.
+Calling the function \lstinline|seqread_get| advances this pointer to the current item by a given number of bytes;
+it is permissible to advance by differing numbers of bytes on different calls.
+This way of specifying bytes allows the sequential reader to support arbitrary data types.
+Once the pointer to the current item ends up in the second half of the buffer, it is set \lstinline|SEQREAD_CACHE_SIZE| many bytes back so that it again points to an address in the first half.
+Also, the stored MRAM address is increased by \lstinline|SEQREAD_CACHE_SIZE| many bytes, and the next two subsequent pages are loaded.
+This means that the page which was stored in the second half of the buffer so far is loaded again from the MRAM but stored in the first half this time.
+
+It is unclear how this implementation of sequential readers achieves the acclaimed speedup over regular \langC{} code.
+The bounds checks happen when advancing the pointer to the current item, that is in the function \lstinline|seqread_get|.
+This function, however, does nothing more than calling the obscure and undocumented function \lstinline|__builtin_dpu_seqread_get|.
+It should be noted that the inner workings of sequential readers are poorly documented in the manual.
+The descriptions given here are based on observations and careful studying of the \langC{}~source code of the functions other than \lstinline|seqread_get|.
