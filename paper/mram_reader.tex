@@ -20,7 +20,7 @@ Furthermore, programmers are tasked with maintaining the WRAM buffer and transfe
 Since reading data consecutively is a common occurrence, UPMEM provides a set of data structures and \langC{} functions which automate the process and, thereby, remove any need to care for the alignment of addresses, the maintenance of the WRAM buffer, or the loading of new data.
 On top of that, UPMEM claims that \textquote{[\dots] this abstraction implementation has been optimized and will provide better performance than a standard \langC{} check of the cache boundaries.}~\cite[Memory management -- Sequential readers]{upmemSDK}
 
-The compile-time constant \lstinline|SEQREAD_CACHE_SIZE| determines the size of the sequential read buffer in bytes and can be set to either 32, 64, 128, 256, 512, or 1024.
+The compile-time constant \lstinline|SEQREAD_CACHE_SIZE| determines the size of the sequential-read buffer in bytes and can be set to either 32, 64, 128, 256, 512, or 1024.
 Initialising the buffer must be done once through calling the function \lstinline|seqread_alloc|.
 Several things are noteworthy:
 \begin{itemize}
@@ -40,7 +40,7 @@ Several things are noteworthy:
 	This is done for address masking purposes, as \lstinline|SEQREAD_CACHE_SIZE| is a power of two.
 	Due to the nature of the stack, this has the drawback that the skipped WRAM memory can never be allocated for something else.
 \end{itemize}
-All in all, the memory footprint of a sequential read buffer is between 2 × \lstinline|SEQREAD_CACHE_SIZE| and 3 × \lstinline|SEQREAD_CACHE_SIZE| many bytes.
+All in all, the memory footprint of a sequential-read buffer is between 2 × \lstinline|SEQREAD_CACHE_SIZE| and 3 × \lstinline|SEQREAD_CACHE_SIZE| many bytes.
 
 The function \lstinline|seqread_init| instructs a sequential reader and its buffer to load data from a specified MRAM address and returns a pointer to the corresponding WRAM address of said MRAM address.
 Loading is done by, first, rounding the MRAM address down to the next multiple of \lstinline|SEQREAD_CACHE_SIZE| and, then, loading 2 × \lstinline|SEQREAD_CACHE_SIZE| many bytes.
