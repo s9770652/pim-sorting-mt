@@ -1,0 +1,22 @@
+\section{A First \texorpdfstring{\MS{}}{MergeSort} on MRAM Data}
+\label{sec:mram:merge}
+
+The MRAM \MS{} is based on the half-space WRAM \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations to the two-tier memory hierarchy are discussed.
+
+\paragraph{Starting Runs}
+It is yet again beneficial to form starting runs.
+This is done by loading a section of the MRAM into the WRAM, sorting it through one of the algorithms presented in \cref{sec:tasklet}, and writing the sorted section back to the MRAM.
+As those sorting algorithm rely on the data being present entirely within the WRAM, forming the starting runs does not make use of sequential readers.
+Instead, the functions \lstinline|mram_read| and \lstinline|mram_write| are used directly.
+
+Contrary to the WRAM \MS{} with starting runs of length 14, the starting runs of the MRAM \MS{} are much longer, easily containing a thousand elements and more.
+The reason is that longer starting runs reduce the number of rounds of the MRAM \MS{} and, thus, reduce the DMAs to the MRAM, which are relatively costly compared to accesses to the WRAM.
+According to \citeauthor{mutlu2022Benchmarking}~\cite[8\psq]{mutlu2022Benchmarking}, accessing 64-bit integers in the WRAM is about four and a half times faster than accessing 64-bit integers in the MRAM.
+Since accessing 32-bit integers in the WRAM takes just as long as accessing 64-bit integers and since the performance of DMAs depends only on the total number of bytes, there is still a speedup of roughly 2 of WRAM accesses over MRAM accesses.
+However, again similar to the WRAM \MS{}, it can be beneficial to slightly reduce the starting run length to achieve more balanced and faster rounds.
+Nonetheless, the runtime difference between 1000, 1100, and 1200 elements is in the magnitude of one per mil.
+For this reason, the starting run length is set simply to the maximum number of integers which the WRAM allotted to a tasklet can hold.
+
+This does raise the question what said maximum is.
+As calculated at the start of \cref{sec:tasklet}, each tasklet is allotted no more than \qty{5957}{\byte}.
+Subtracting \qty{768}{\byte} for the stack of the tasklet and the call stack of \QS{} leaves \qty{5189}{\byte} or a little less than 1300 32-bit integers.\todo{Noch einmal später aktualisieren}
