@@ -35,10 +35,15 @@
 		Das macht unrollen schwieriger und der zweite Puffer ist für uns wirklich verloren.
 
 		\item
-		Vorgehensweise
+		Verbesserungspotential
 		\begin{itemize}
 			\item
-			allokiert
+			\lstinline|last_item| auch für den straighten Leser
+
+			\item
+			Daraus folgt auch vielleicht, dass das zweistufige Verschmelzen verbessert werden kann.
+			Bisher wird nach \unrolledcachelength{} Wiederholungen der Cache entleert und geprüft, ob in die zweite Stufe übergegangen werden muss.
+			Unter Umständen kann man billig nach \unrollfactor{} Wiederholungen prüfen, ob der Cache geleert werden muss.
 		\end{itemize}
 	\end{itemize}
 
@@ -122,6 +127,9 @@
 
 \clearpage
 \input{mram_reader}
+
+\clearpage
+\input{mram_triple}
 
 \clearpage
 \input{mram_merge}

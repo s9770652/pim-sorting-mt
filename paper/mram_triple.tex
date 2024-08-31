@@ -1,0 +1,33 @@
+\section{Triple Buffers}
+\label{sec:mram:triple}
+
+It is yet again beneficial to form starting runs.
+This is done by loading a section of the MRAM into the WRAM, sorting it through one of the algorithms presented in \cref{sec:tasklet}, and writing the sorted section back to the MRAM.
+As those sorting algorithm rely on the data being present entirely within the WRAM, sequential readers are not useful until later when merging runs.
+Instead, the functions \lstinline|mram_read| and \lstinline|mram_write| are used directly.
+
+Contrary to the WRAM \MS{} with starting runs of length 14, the starting runs of the MRAM \MS{} are much longer, easily containing a thousand elements and more.
+The reason is that longer starting runs reduce the number of rounds of the MRAM \MS{} and, thus, reduce the DMAs to the MRAM, which are relatively costly compared to accesses to the WRAM.
+According to \citeauthor{mutlu2022Benchmarking}~\cite[8\psq]{mutlu2022Benchmarking}, accessing 64-bit integers in the WRAM is about four and a half times faster than accessing 64-bit integers in the MRAM.
+Since accessing 32-bit integers in the WRAM takes just as long as accessing 64-bit integers and since the performance of DMAs depends only on the total number of bytes, there is still a speedup of roughly 2 of WRAM accesses over MRAM accesses.
+However, again similar to the WRAM \MS{}, it can be beneficial to slightly reduce the starting run length to achieve more balanced and faster rounds.
+Nonetheless, the runtime difference between 1000, 1100, and 1200 elements per starting run is in the magnitude of one per mil.
+For this reason, the starting run length is set simply to the maximum number of integers which the WRAM allotted to a tasklet can hold.
+
+This does raise the question what said maximum is.
+As calculated at the start of \cref{sec:tasklet}, each tasklet is allotted no more than \qty{5957}{\byte}.
+Subtracting \qty{768}{\byte} for the stack of the tasklet and the call stack for the WRAM \QS{} leaves \qty{5189}{\byte} in the heap, that is a little less than 1300 32-bit integers.\todo{Noch einmal später aktualisieren}
+This space must be used for both forming the starting runs (without any sequential-read buffers) and merging the runs (with two sequential-read buffers).
+One possibility would be to allocate one starting run buffer of size \qty{5957}{\byte}, reset the entire heap after the starting runs have been formed and, then, allocate the sequential-read buffers.
+
+Far more flexibility offers the introduction of a \emph{triple buffer} which consists of a general-purpose buffer followed by two consecutive sequential-read buffers.
+If sequential readers are not in use, the triple buffer can be regarded as a single, big buffer.
+To initialise the triple buffer, a tasklet first calls \lstinline|mem_alloc| to allocate \(\text{\lstinline|CACHE_SIZE|} + \min\braces{ 8, \text{\lstinline|sizeof(T)|} }\) many bytes on the heap, where \lstinline|CACHE_SIZE| is a user-defined compile-time constant and \lstinline|T| is the data type of the input.
+This memory, excluding the first \(\min\braces{ 8, \text{\lstinline|sizeof(T)|} }\) many bytes, is referred to as \emph{cache} and will be used later to store merged runs.
+The element right before the beginning of the cache is set to the lowest possible value of \lstinline|T| so that it acts as sentinel value for \IS{}, hence the allocation of at least \lstinline|sizeof(T)| additional bytes.
+In case of integers smaller than 8 bytes, the address of the cache would not be aligned on 8 bytes anymore, hence the allocation of at least 8 additional bytes to simplify DMAs.
+After the initialisation of the cache, the tasklet calls \lstinline|seqread_alloc| twice.
+Due to the stack nature of the heap, the two sequential-read buffers are allocated directly behind the cache.
+To ensure the contiguity of the triple buffer if more than one tasklet is present, a mutex is employed to ensure than only one tasklet initialises its triple buffer at a time.
+The entire triple buffer has the size \(\text{\lstinline|TRIPLE_BUFFER_SIZE|} \coloneqq \text{\lstinline|CACHE_SIZE|} + 4 \times \text{\lstinline|SEQREAD_CACHE_SIZE|}\), which is, for simplicity, the minimum guaranteed number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| skipped some bytes.
+Note that only the first call of \lstinline|seqread_alloc| by each tasklet may skip some memory since the stack pointer is at a multiple of \lstinline|SEQREAD_CACHE_SIZE| after every call of \lstinline|seqread_alloc|.
