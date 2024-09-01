@@ -181,13 +181,20 @@
 \SetAlCapSkip{0.0em}  % skip between caption and body
 \SetAlgoSkip{}  % remove extra skip above and below algorithm floats
 \SetAlCapFnt{\accentcolor\maybesffamily}  % print algorithm label like a caption label
-\SetKwComment{tct}{\raisebox{0.10em}{\scriptsize\(\rhd\)}\,}{}  % triangle as comment symbol
-\SetFuncSty{textrm}  % print function names like usual operators
+\SetKwComment{tct}{\raisebox{0.10em}{\(\triangleright\)}\,}{}  % triangle as comment symbol
+\SetFuncSty{textup}  % print function names like usual operators
 \SetCommentSty{emph}  % print comments as set with \emph
 %\SetKwInOut{KwIn}{\maybesffamily Input}
-%\SetKwInOut{KwOut}{\maybesffamily Output\!}
-\SetKwInOut{KwIn}{Input}  % colon of Input and Output aligned
-\SetKwInOut{KwOut}{Output\!}
+%\SetKwInOut{KwOut}{\maybesffamily Output}
+%\SetKwInOut{KwRequire}{\maybesffamily Require}
+%\SetKwInOut{KwEnsure}{\maybesffamily Ensure}
+\SetKwInOut{KwData}{\maybesffamily Data}
+\SetKwInOut{KwResult}{\maybesffamily Result\!}
+
+% Allowing underscores in names of procedure and function environments.
+% taken from: https://tex.stackexchange.com/a/680985
+\NewCommandCopy{\legacyunderscore}{\_}
+\renewcommand{\_}{\ifincsname_\else\legacyunderscore\fi}
 
 \makeatletter
 % Remove right-hand margin in algorithm

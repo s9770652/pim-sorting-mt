@@ -26,20 +26,168 @@ It is structurally equal to the first tier with one exception, for there is no g
 The check for the depletion now happens whenever an element of the less run is written to the cache.
 When it occurs, the cache and the other run are flushed, and the merger stops.
 
-\begin{algorithm}
-	\KwIn{%
+\NewDocumentCommand{\codeparttitle}{m}{\nonl\textsf{\textbf{\uppercase{#1}}}}
+\SetArgSty{}
+\SetFuncArgSty{}
+\SetKw{KwAnd}{and}
+\SetKw{KwContinue}{continue}
+\SetKw{KwT}{T}
 
+\SetKwArray{Cache}{cache}
+\SetKwArray{Currs}{curr}
+\SetKwArray{Ends}{ends}
+\SetKwArray{Readers}{readers}
+
+\SetKwData{Early}{early\_end}
+\SetKwData{Factor}{\unrollfactor*}
+\SetKwData{Length}{\unrolledcachelength*}
+\SetKwData{Out}{out}
+
+\SetKwFunction{Get}{seqread\_get}
+\SetKwFunction{Read}{mram\_read}
+\SetKwFunction{SizeOf}{sizeof}
+\SetKwFunction{Tell}{seqread\_tell}
+\SetKwFunction{Write}{mram\_write}
+
+\begin{algorithm*}
+	\KwData{%
+		sequential readers \Readers{2},
+		pointers \Currs{2} to current elements,
+		pointers \Ends{2} to tail elements,
+		output location \Out,
+		cache \Cache
 	}
-	\KwOut{%
-
+	\KwResult{%
+		both runs merged together and written to \Out
 	}
 
-	\While{there are least \unrollfactor{} many items left in Run 0}{
-		\If{condition}{then block}
-		\Else{else block}
+	\(i\) ← 0  \tct*{number of elements in cache}
+	\Early ← \Ends{1} – \Factor + 1\;
+	\While(\tct*[f]{first tier}){\Tell{\Currs{1}, \Readers{1}} ≤ \Early}{
+		Merge \Factor many elements \linebreak without checking for depletion (\cref{alg:unrolled merge}).\;
+		\If{\(i\) ≤ \Length}{
+			\KwContinue  \tct*{skips cache flushing}
+		}
+		\Write{\Cache, \Out, \Length × \SizeOf{\KwT}}\;
+		\(i\) ← 0\;
+		\Out ← \Out + \Length
+	}
+	\If{\Tell{\Currs{1}, \Readers{1}} > \Ends[1]}{
+		Flush the cache (\cref{alg:flush cache}).\;
+		Flush the non-depleted Run 0 (\cref{alg:flush run}).\;
+		\Return\;
+	}
+	\While(\tct*[f]{second tier}){true}{
+		Merge \Factor many elements \linebreak with checking for depletion (\cref{alg:unrolled merge}).\;
+		\If{\(i\) ≤ \Length}{
+			\KwContinue  \tct*{skips cache flushing}
+		}
+		\Write{\Cache, \Out, \Length × \SizeOf{\KwT}}\;
+		\(i\) ← 0\;
+		\Out ← \Out + \Length
 	}
 
 	\caption{
+		Two-tier merging of two MRAM runs, where the second one is the less run.
 	}
-	\label{alg}
-\end{algorithm}
+	\label{alg:two-tier merge}
+\end{algorithm*}
+
+\begin{algorithm*}
+	\KwData{%
+		sequential readers \Readers{2},
+		pointers \Currs{2} to current elements,
+		pointers \Ends{2} to tail elements,
+		output location \Out,
+		cache \Cache,
+		number \(i\) of elements in the cache
+	}
+	\KwResult{%
+		\Factor many elements merged to \Cache{\(i\) .. \(i\) + \Factor – 1}
+	}
+
+	\For(\tct*[f]{unrolled loop}){\(k\) ← 1 \KwTo \Factor}{
+		\eIf{*\Currs{0} ≤ *\Currs{1}}{
+			\Cache{\(i\)++} ← *\Currs{0}\;
+			\Currs{0} ← \Get{\Currs{0}, \Readers{0}}\;
+		}{
+			\Cache{\(i\)++} ← *\Currs{1}\;
+			\Currs{1} ← \Get{\Currs{1}, \Readers{1}}\;
+			\If(\tct*[f]{omit in tier 1}){\Tell{\Currs{1}, \Readers{1}} = \Ends{1}}{
+				Flush the cache (\cref{alg:flush cache}).\;
+				Flush the non-depleted Run 0 (\cref{alg:flush run}).\;
+				\Return  \tct*{stops \cref{alg:two-tier merge}}
+			}
+		}
+	}
+
+	\caption{
+		Merging \unrollfactor{} many elements.
+		This algorithm is part of \cref{alg:two-tier merge}, meaning any change to a variable carries over.
+	}
+	\label{alg:unrolled merge}
+\end{algorithm*}
+
+\begin{algorithm*}
+	\KwData{%
+		sequential readers \Readers{2},
+		pointers \Currs{2} to current elements,
+		output location \Out,
+		cache \Cache,
+		number \(i\) of elements in the cache
+	}
+	\KwResult{%
+		all merged elements written to the output
+	}
+
+	\If(\tct*[f]{always false for 64-bit integers}){\SizeOf{\KwT} = 4 \KwAnd \(i\) \(\bmod\) 2 ≠ 0}{
+		\Cache{\(i\)++} ← *\Currs{0}  \tct*{Now, the number of elements in the cache is even.}
+		\Currs{0} ← \Get{\Currs{0}, \Readers{0}}\;
+	}
+	\Write{\Cache, \Out, \(i\) × \SizeOf{\KwT}}  \tct*{The transfer size is always divisible by 8.}
+	\Out ← \Out + \(i\)\;
+
+	\caption{
+		Flushing the cache.
+		This algorithm is part of \cref{alg:two-tier merge,alg:unrolled merge}, meaning any change to a variable carries over.
+	}
+	\label{alg:flush cache}
+\end{algorithm*}
+
+\begin{algorithm*}
+	\SetKwData{From}{from}
+	\SetKwData{MaxTransferS}{MAX\_TRANSFER\_SIZE}
+	\SetKwData{MaxTransferL}{MAX\_TRANSFER\_LENGTH}
+	\SetKwData{Size}{size}
+	\SetKwData{TBS}{\triplebuffersize*}
+
+	\KwData{%
+		sequential readers \Readers{2},
+		pointers \Currs{2} to current elements,
+		pointers \Ends{2} to tail elements,
+		output location \Out,
+		cache \Cache
+	}
+	\KwResult{%
+		every non-merged element of Run 0 written behind the merged elements in the output
+	}
+
+	\MaxTransferS ← \(\min\{ \TBS, 2048 \}\)\;
+	\MaxTransferL ← \MaxTransferS \,/ \SizeOf{\KwT}\;
+	\Size ← \MaxTransferS  \tct*{size of current transfer}
+	\From ← \Tell{\Currs{0}, \Readers{0}}  \tct*{first byte to transfer}
+	\While{\From ≤ \Ends{0}}{
+		\If{\From + \MaxTransferL – 1 > \Ends{0}}{
+			\Size ← (\Ends{0} – \From + 1) × \SizeOf{\KwT}  \tct*{smaller size on last transfer}
+		}
+		\Read{\From, \Cache, \Size}\;
+		\Write{\Cache, \Out, \Size}\;
+		\From ← \From + \MaxTransferL  \tct*{May be wrong on the last transfer …}
+		\Out ← \Out + \MaxTransferL  \tct*{… but pointers are useless then, anyway.}
+	}
+
+	\caption{
+		Flushing the remainder of the non-depleted Run 0.
+	}
+	\label{alg:flush run}
+\end{algorithm*}
