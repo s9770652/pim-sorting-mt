@@ -44,6 +44,93 @@ this way of specifying bytes allows the sequential reader to support arbitrary d
 Once the pointer to the current item ends up in the second half of the buffer, it is set \lstinline|SEQREAD_CACHE_SIZE| many bytes back so that it points to an address in the first half again.
 Also, the MRAM address stored within the sequential reader is increased by \lstinline|SEQREAD_CACHE_SIZE| many bytes, and the next two subsequent pages are loaded.
 This means that the page which was stored in the second half of the buffer so far is loaded again from the MRAM but stored in the first half this time.
+\Cref{fig:mram:reader} visualises an intermediate state of a sequential reader.
+
+% taken from: https://tex.stackexchange.com/a/511203
+\ExplSyntaxOn
+\NewDocumentCommand{\hexa}{m}{\int_to_hex:n {#1}}
+\ExplSyntaxOff
+
+\tikzset{
+	reader figure/.style={scale=0.612, thick, line cap=round},
+	address/.style={node font=\ttfamily},
+	curr/.style={accentcolor},
+	excess/.style={gray, fill opacity=0.1},
+	ptr/.style={latex-, node font=\small}
+}
+\def\mramlen{20}
+\def\mramfirst{10}
+\def\ptrdist{0.65}
+\begin{figure}
+	\centering
+	\tikzsetnextfilename{sequential_reader}
+	\begin{tikzpicture}[reader figure]
+		% MRAM.
+		\def\mramstart{-2}
+		\def\mramend{2}
+
+		\fill[excess] (\mramstart,0) rectangle (                0, 1);
+		\fill[excess] (  \mramlen,0) rectangle (\mramlen+\mramend, 1);
+		\draw[excess] (\mramstart,0)      grid (                0, 1);
+		\draw[excess] (  \mramlen,0)      grid (\mramlen+\mramend, 1);
+
+		\draw (0,0) grid (\mramlen,1);
+
+		% Buffer.
+		\def\buflen{8}
+		\def\bufxoffset{\buflen}
+		\def\buffyoffset{-3}
+
+		\fill[excess] (0.5*\buflen+\bufxoffset+\mramstart, \buffyoffset) rectangle (\buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[excess] (0.5*\buflen+\bufxoffset+\mramstart, \buffyoffset)      grid (\buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
+
+		\draw(\bufxoffset+\mramstart, \buffyoffset) grid (0.5*\buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
+
+		% Mapping lines.
+		\draw[looseness=.8,                name path=M2Bl] (1.5*\buflen+\mramstart, 0) to[out=-90, in=90] (            \bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[looseness=.8, line cap=butt, name path=M2Br] (2.5*\buflen+\mramstart, 0) to[out=-90, in=90] (    \buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[looseness=.8, dashed]                        (2.0*\buflen+\mramstart, 0) to[out=-90, in=90] (0.5*\buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\tikzfillbetween[of=M2Bl and M2Br, split=false] {gray, ultra nearly transparent};
+
+		% Current item.
+		\def\currindex{2}
+
+		\fill[curr, fill opacity=.1]   (\currindex+\bufxoffset+\mramstart, \buffyoffset) rectangle (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[curr, ultra thick, fill] (\currindex+\bufxoffset+\mramstart, \buffyoffset)      grid (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[curr, -{Straight Barb[width=1.5mm]}] (\currindex+\bufxoffset+\mramstart, 1.25+\buffyoffset)--+(0:1);
+
+		% Item identifiers.
+		\pgfmathsetmacro{\looplastindex}{int(\mramlen+\mramend-1)}
+		\foreach \i in {\mramstart,...,\looplastindex}{
+			\pgfmathsetmacro{\itemindex}{int( 4*(\mramfirst+\i) )}
+			\node[address] at (\i+0.5, 0.5) { \hexa{\itemindex} };
+		}
+
+		\pgfmathsetmacro{\looplastindex}{int(\buflen-1)}
+		\foreach \i in {0,...,\looplastindex}{
+			\pgfmathsetmacro{\itemindex}{int( 4*(\mramfirst+1.5*\buflen+\mramstart+\i) )}
+			\node[address] at (\i+\bufxoffset+\mramstart+0.5, \buffyoffset+0.5) { \hexa{\itemindex} };
+		}
+
+		% Pointers.
+		\draw[ptr] (1.5*\buflen+\mramstart+0.5, 1)--+(90:\ptrdist) node[above] {\lstinline|from|};
+
+		\draw[ptr] (\bufxoffset+\mramstart+0.5, \buffyoffset)--+(-90:\ptrdist) node[below] {\lstinline|buffer|};
+
+		\draw[ptr] (\currindex+\bufxoffset+\mramstart+0.5, \buffyoffset)--+(-90:\ptrdist) node[below] {\lstinline|curr|\vphantom{\lstinline|f|}};
+	\end{tikzpicture}
+	\caption{
+		An exemplary sequential reader with \(\text{\lstinline|SEQREAD_CACHE_SIZE|} = 16\) being used to transfer 32-bit elements from the MRAM (top row) into the WRAM (bottom row).
+		The numbers denote the hexadecimal addresses of the respective elements within the MRAM.
+		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements at addresses \lstinline|0x20|, \lstinline|0x24|, \lstinline|0x78|, and \lstinline|0x7c| are also loaded.
+		The pointer \lstinline|buffer| constantly points to the beginning of the sequential-read buffer.
+		The pointer \lstinline|from| points to the first MRAM byte of the first of the two loaded page.
+		The pointer \lstinline|curr| moves within the first half of the buffer from left to right until being set back.
+		No byte of the second half of the buffer is ever read as the 32-bit elements fit perfectly within the first half.
+		\todo[inline]{Da fehlen noch vier MRAM-Elemente hintendran!}
+	}
+	\label{fig:mram:reader}
+\end{figure}
 
 The acclaimed speedup through more performant bounds checks happens within the function \lstinline|seqread_get|, which in turn calls the function \lstinline|__builtin_dpu_seqread_get|.
 Inspecting the compilation of \lstinline|__builtin_dpu_seqread_get| reveals the use of \emph{carry bits}.
