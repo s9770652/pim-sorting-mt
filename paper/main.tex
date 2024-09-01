@@ -15,12 +15,19 @@
 	numbers=left,
 	numbersep=4pt,
 	numberstyle=\addfontfeatures{RawFeature=+tnum}\liningnums,
-	language=C,
 	tabsize=2,
+	language=C,
 }
 \lstdefinelanguage[DPU]{Assembler}[x86masm]{Assembler}{
-	morekeywords={lw,jleu,jgtu,sw,move},
 	comment=[l]//,
+	% jump labels
+	keywords=[1]{:},
+	keywordsprefix=.LABEL,
+	keywordstyle=[1]\bfseries\itshape,
+	alsoletter=:.,
+	% instructions
+	keywords=[2]{lw,sw,move,add,jle,jleu,jgt,jgtu},
+	keywordstyle=[2]\bfseries,
 }
 
 \DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred’s red
@@ -41,6 +48,8 @@
 	Gray,  % 11
 }
 
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{arrows.meta}
 \pgfplotsset{
 	height=4cm,
 	cycle multiindex list={ZAW colour list \nextlist mark list*},  % automatic colouring of plots
@@ -123,6 +132,8 @@
 	\todo[inline]{Sortiergrundlagen: stable, in-place, \(\bigomega{n \log n}\)}
 	\todo[inline]{Master-Theorem + log-Spezialfall für Analyse des par.\ \MS{}?}
 	\todo[inline]{Grundlagen DPU-Assembler? (Nenne dann ajF \lstinline|move rb, ra, true, .LABEL|)}
+	\todo[inline]{Wie ist der Speedup definiert?}
+	\todo[inline]{Unterscheidung Größe/Länge. Außerdem: little/less/least und great/greater/greatest für Eingabeelemente}
 
 	\begin{problem}[Sorting]
 		Given a sequence \(\left\langle a_1, a_2, \dots, a_n \right\rangle\) of \(n\) numbers, output a permutation \(\left\langle a_1', a_2', \dots, a_n' \right\rangle\) of the input sequence such that \(a_1' \le a_2' \le \dots \le a_n'\) holds.
