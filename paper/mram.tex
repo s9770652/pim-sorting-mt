@@ -38,12 +38,9 @@
 		Verbesserungspotential
 		\begin{itemize}
 			\item
-			\lstinline|last_item| auch für den straighten Leser
-
-			\item
-			Daraus folgt auch vielleicht, dass das zweistufige Verschmelzen verbessert werden kann.
-			Bisher wird nach \unrolledcachelength{} Wiederholungen der Cache entleert und geprüft, ob in die zweite Stufe übergegangen werden muss.
-			Unter Umständen kann man billig nach \unrollfactor{} Wiederholungen prüfen, ob der Cache geleert werden muss.
+			\lstinline|last_item| auch für den straighten Leser.
+			Das macht es billiger zu prüfen, wann die erste Stufe verlassen werden muss.
+			Außerdem macht sie das Entleeren eines Laufes billiger, da leicht das wahre Ende des Puffers festgestellt werden kann.
 		\end{itemize}
 	\end{itemize}
 
