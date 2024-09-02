@@ -74,7 +74,7 @@ This means that the page which is stored in the second half of the buffer so far
 		\draw[excess] (\mramstart, 0)      grid (                0, 1);
 		\draw[excess] (  \mramlen, 0)      grid (\mramlen+\mramend, 1);
 
-		\draw (0,0) grid (\mramlen,1);
+		\draw (0, 0) grid (\mramlen,1);
 
 		% Buffer.
 		\def\buflen{8}
@@ -119,9 +119,10 @@ This means that the page which is stored in the second half of the buffer so far
 
 		\draw[ptr] (\currindex+\bufxoffset+\mramstart+0.5, \buffyoffset)--+(-90:\ptrdist) node[below] {\lstinline|curr|\vphantom{\lstinline|f|}};
 	\end{tikzpicture}
+
 	\caption{
 		An exemplary sequential reader with \(\text{\lstinline|SEQREAD_CACHE_SIZE|} = 16\) being used to transfer 32-bit elements from the MRAM (top row) into the WRAM (bottom row).
-		The numbers denote the hexadecimal addresses of the respective elements within the MRAM.
+		The hexadecimal numbers denote the addresses of the respective elements within the MRAM.
 		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| are also loaded.
 		The pointer \lstinline|buffer| constantly points to the beginning of the sequential-read buffer.
 		The pointer \lstinline|from| points to the MRAM address of the first byte within the buffer.
