@@ -14,7 +14,7 @@
 	basicstyle=\ttfamily,
 	numbers=left,
 	numbersep=4pt,
-	numberstyle=\addfontfeatures{RawFeature=+tnum}\liningnums,
+	numberstyle=\ttfamily\smaller\addfontfeatures{RawFeature=+tnum}\liningnums,
 	tabsize=2,
 	language=C,
 }
@@ -26,7 +26,7 @@
 	keywordstyle=[1]\bfseries\itshape,
 	alsoletter=:.,
 	% instructions
-	keywords=[2]{lw,sw,move,add,jle,jleu,jgt,jgtu},
+	keywords=[2]{lw,sw,move,add,jle,jleu,jgt,jgtu,ldma,sdma},
 	keywordstyle=[2]\bfseries,
 }
 
@@ -49,7 +49,7 @@
 }
 
 \usepgfplotslibrary{fillbetween}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing,calligraphy}
 \pgfplotsset{
 	height=4cm,
 	cycle multiindex list={ZAW colour list \nextlist mark list*},  % automatic colouring of plots
@@ -127,8 +127,7 @@
 
 	\bigskip
 	\todo[inline]{Architektur}
-	\todo[inline]{Speicherzugriffe (memcpy, mram\_read \dots)}
-	\todo[inline]{triple buffer}
+	\todo[inline]{Speicherzugriffe (memcpy, mram\_read \dots), \cite[9]{mutlu2022Benchmarking} Zahlen nennen}
 	\todo[inline]{Sortiergrundlagen: stable, in-place, \(\bigomega{n \log n}\)}
 	\todo[inline]{Master-Theorem + log-Spezialfall für Analyse des par.\ \MS{}?}
 	\todo[inline]{Grundlagen DPU-Assembler? (Nenne dann ajF \lstinline|move rb, ra, true, .LABEL|)}

@@ -42,6 +42,10 @@
 			Das macht es billiger zu prüfen, wann die erste Stufe verlassen werden muss.
 			Außerdem macht sie das Entleeren eines Laufes billiger, da leicht das wahre Ende des Puffers festgestellt werden kann.
 		\end{itemize}
+
+		\item
+		Aufgabe des Seitenmodells innerhalb des MRAMs.
+		Es war begründet, da der Zugewinn gering ist, seqread\_tell aber einen Ladeprozess und ein Register weniger braucht.
 	\end{itemize}
 
 	\item
@@ -119,7 +123,7 @@
 	Aufgrund der Schleifenstreckung ist es besser, den Cache etwas kleiner zu machen.
 
 	\item
-	Kann Flushed durch vollständiges Lesen des Puffers verschnellert werden?
+	Kann Flushed durch vollständiges Lesen des Puffers verschnellert werden? Ja! Siehe Erweiterung durch den reinen C-Leser
 \end{itemize}
 
 \clearpage
