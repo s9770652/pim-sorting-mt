@@ -28,3 +28,9 @@
 \langC{}#n
 \runless{}#n
 \startingrun{}#n
+\triplebuffersize{}#n
+\triplebuffersize*{}#n
+\unrolledcachelength{}#n
+\unrolledcachelength*{}#n
+\unrollfactor{}#n
+\unrollfactor*{}#n

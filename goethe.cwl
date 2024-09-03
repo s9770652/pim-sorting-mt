@@ -1,8 +1,10 @@
 #include:scrartcl
+#include:scrhack
 #include:beamer
 
 #include:babel
 #include:csquotes
+#include:siunitx
 
 #include:geometry
 
