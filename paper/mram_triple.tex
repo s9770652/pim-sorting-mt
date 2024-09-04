@@ -41,12 +41,12 @@ Note that only the first call of \lstinline|seqread_alloc| by each tasklet may s
 		\draw (-2, 0) grid (2*\buffer+\skipped+\cache, 1);
 
 		% Braces.
-		\draw[brace] (                      0, 1) --+(  \cache, 0) node[pos=0.5, above=1ex] {cache\vphantom{p}};
-		\draw[brace] (                 \cache, 1) --+(\skipped, 0) node[pos=0.5, above=1ex] {skipped};
-		\draw[brace] (        \skipped+\cache, 1) --+( \buffer, 0) node[pos=0.5, above=1ex] {first buffer\vphantom{p}};
-		\draw[brace] (\buffer+\skipped+\cache, 1) --+( \buffer, 0) node[pos=0.5, above=1ex] {second buffer\vphantom{p}};
+		\draw[brace] (                      0, 1) --+ (  \cache, 0) node[pos=0.5, above=1ex] {cache\vphantom{p}};
+		\draw[brace] (                 \cache, 1) --+ (\skipped, 0) node[pos=0.5, above=1ex] {skipped};
+		\draw[brace] (        \skipped+\cache, 1) --+ ( \buffer, 0) node[pos=0.5, above=1ex] {first buffer\vphantom{p}};
+		\draw[brace] (\buffer+\skipped+\cache, 1) --+ ( \buffer, 0) node[pos=0.5, above=1ex] {second buffer\vphantom{p}};
 
-		\draw[brace down] (0, 0) --+(2*\buffer+\cache, 0) node[pos=0.5, below=1ex] {\triplebuffersize\vphantom{f}};
+		\draw[brace down] (0, 0) --+ (2*\buffer+\cache, 0) node[pos=0.5, below=1ex] {\triplebuffersize\vphantom{f}};
 
 		% Item identifiers.
 		\pgfmathsetmacro{\looplastindex}{int(2*\buffer+\skipped+\cache+1)}
@@ -56,7 +56,7 @@ Note that only the first call of \lstinline|seqread_alloc| by each tasklet may s
 		}
 
 		% Pointers.
-		\draw[ptr] (-.5, 1)--+(90:14.5pt) node[above] {sentinel};
+		\draw[ptr] (-.5, 1) --+ (90:14.5pt) node[above] {sentinel};
 	\end{tikzpicture}
 
 	\caption{
