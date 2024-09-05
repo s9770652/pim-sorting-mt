@@ -176,9 +176,9 @@
 \LinesNumbered  % numbered lines
 \SetNlSty{texttt}{}{}
 \SetAlgoNlRelativeSize{-1}  % size of line numbers
-\IncMargin{0.4em}  % increase margin such that two-digit line numbers do not extend outwards
+\setlength{\algomargin}{0pt}  % removes margin so that line numbers extend outwards
 \SetAlCapHSkip{0em}  % no skip in front of algorithm label
-\SetAlCapSkip{0.0em}  % skip between caption and body
+\SetAlCapSkip{0ex}  % skip between caption and body
 \SetAlgoSkip{}  % remove extra skip above and below algorithm floats
 \SetAlCapFnt{\accentcolor\maybesffamily}  % print algorithm label like a caption label
 \SetKwComment{tct}{\raisebox{0.10em}{\(\triangleright\)}\,}{}  % triangle as comment symbol
