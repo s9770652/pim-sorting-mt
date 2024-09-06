@@ -25,8 +25,12 @@
 \SelS{}#n
 \ShS{}#n
 
+\cachesize{}#n
+\cachesize*{}#n
 \langC{}#n
 \runless{}#n
+\seqreadcachesize{}#n
+\seqreadcachesize*{}#n
 \startingrun{}#n
 \triplebuffersize{}#n
 \triplebuffersize*{}#n

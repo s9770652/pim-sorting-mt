@@ -21,28 +21,28 @@ Since processing MRAM data consecutively is a common occurrence, UPMEM provides 
 Through a set of \langC{} functions, these sequential readers automate the read-in process and, thereby, remove any need to care for the alignment of addresses or the loading of new data.
 On top of that, UPMEM claims that \textquote{[\dots] this abstraction implementation has been optimized and will provide better performance than a standard \langC{} check of the cache boundaries.}~\cite[Memory management -- Sequential readers]{upmemSDK}
 
-The size of the sequential-read buffer within the WRAM is determined by the compile-time constant \lstinline|SEQREAD_CACHE_SIZE|, which can be set to either 32, 64, 128, 256, 512, or 1024.
+The size of the sequential-read buffer within the WRAM is determined by the compile-time constant \seqreadcachesize{}, which can be set to either 32, 64, 128, 256, 512, or 1024.
 The initialisation of the buffer happens through the function \lstinline|seqread_alloc| and is worth a closer look.
 Remember that the heap is actually implemented as a never-decreasing stack.
 This means that new memory is only ever allocated behind the \emph{stack pointer}, which stores the end of the stack.
-For \(\text{\lstinline|SEQREAD_CACHE_SIZE|} = 2^i\), the \(i\) least significant bits of the first byte in the buffer are required to be zero, for reasons explained shortly.
-Therefore, the stack pointer skips to the next higher multiple of \lstinline|SEQREAD_CACHE_SIZE| if not already on such a multiple.
+For \(\seqreadcachesize{} = 2^i\), the \(i\) least significant bits of the first byte in the buffer are required to be zero, for reasons explained shortly.
+Therefore, the stack pointer skips to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
 Due to the nature of a stack, this has the drawback that the skipped WRAM memory can never be allocated by something else.
-Eventually, a total of 2 × \lstinline|SEQREAD_CACHE_SIZE| many bytes are allocated, also for reasons explained shortly.
-All in all, the memory footprint of a sequential-read buffer is at least 2 × \lstinline|SEQREAD_CACHE_SIZE| many bytes but less than 3 × \lstinline|SEQREAD_CACHE_SIZE| many.
+Eventually, a total of 2 × \seqreadcachesize{} many bytes are allocated, also for reasons explained shortly.
+All in all, the memory footprint of a sequential-read buffer is at least \(2 \times \seqreadcachesize{}\) many bytes but less than \(3 \times \seqreadcachesize{}\) many.
 
 The function \lstinline|seqread_init| instructs a sequential reader to load data from a specified MRAM address into its buffer.
 In addition, the function returns a pointer to the corresponding position of said MRAM address within the buffer, to which we will refer as pointer to the \emph{current element}.
-Conceptually, the whole MRAM is divided into \emph{pages} of size \lstinline|SEQREAD_CACHE_SIZE|.
-To load data from the specified MRAM address, the given address is rounded down the the next multiple of \lstinline|SEQREAD_CACHE_SIZE|, which yields the beginning of the page containing the MRAM address.
-Then, 2 × \lstinline|SEQREAD_CACHE_SIZE| many bytes are loaded so that the buffer holds two pages.
+Conceptually, the whole MRAM is divided into \emph{pages} of size \seqreadcachesize{}.
+To load data from the specified MRAM address, the given address is rounded down the the next multiple of \seqreadcachesize{}, which yields the beginning of the page containing the MRAM address.
+Then, \(2 \times \seqreadcachesize{}\) many bytes are loaded so that the buffer holds two pages.
 This way, data of some long, compound type at the end of the first page is fully loaded even if extending into the other page.
 
 To access the current element, one simply dereferences the pointer returned by \lstinline|seqread_init|.
-Calling the function \lstinline|seqread_get| advances this pointer by a given number of bytes, which cannot be greater than \lstinline|SEQREAD_CACHE_SIZE|;
+Calling the function \lstinline|seqread_get| advances this pointer by a given number of bytes, which cannot be greater than \seqreadcachesize{};
 this way of specifying bytes allows the sequential reader to support arbitrary data types.
-Once the pointer to the current item ends up in the second half of the buffer, it is set \lstinline|SEQREAD_CACHE_SIZE| many bytes back so that it points to an address in the first half again.
-Also, the MRAM address stored within the sequential reader is increased by \lstinline|SEQREAD_CACHE_SIZE| many bytes, and the next two subsequent pages are loaded.
+Once the pointer to the current element ends up in the second half of the buffer, it is set \seqreadcachesize{} many bytes back so that it points to an address in the first half again.
+Also, the MRAM address stored within the sequential reader is increased by \seqreadcachesize{} many bytes, and the next two subsequent pages are loaded.
 This means that the page which is stored in the second half of the buffer so far is loaded from the MRAM again but stored in the first half this time.
 \Cref{fig:mram:reader} visualises an intermediate state of a sequential reader, showcasing its characteristic read behaviour.
 
@@ -121,9 +121,9 @@ This means that the page which is stored in the second half of the buffer so far
 	\end{tikzpicture}
 
 	\caption{
-		An exemplary sequential reader with \(\text{\lstinline|SEQREAD_CACHE_SIZE|} = 16\) being used to transfer 32-bit elements from the MRAM (top row) into the WRAM (bottom row).
+		An exemplary sequential reader with \(\seqreadcachesize{} = 16\) being used to transfer 32-bit elements from the MRAM (top row) into the WRAM (bottom row).
 		The hexadecimal numbers denote the addresses of the respective elements within the MRAM.
-		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| are also loaded.
+		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| are also loaded at some point.
 		The pointer \lstinline|buffer| constantly points to the beginning of the sequential-read buffer.
 		The pointer \lstinline|from| points to the MRAM address of the first byte within the buffer.
 		The pointer \lstinline|curr| moves from left to right, 4 bytes at a time.
@@ -136,6 +136,6 @@ The acclaimed speedup through more performant bounds checks happens within the f
 An inspection of the compilation of \lstinline|__builtin_dpu_seqread_get| reveals the use of \emph{carry bits}.
 The instruction \lstinline|add| which is used to advance the pointer by the specified number of bytes is capable of checking whether bit \(i\) generated a carry bit.
 To be more precise, carry bit \(i\) is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the two involved operands, in this case the pointer and the number of bytes.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
-Due to the alignment of the buffer on a power of two and due to page sizes being also a power of two, the generation of such a carry bit signifies that the pointer to the current item left the first buffer half.
+Due to the alignment of the buffer on a power of two and due to page sizes being also a power of two, the generation of such a carry bit signifies that the pointer to the current element left the first buffer half.
 Next to detecting the generation of carry bit \(i\), the instruction \lstinline|add| is also capable of performing a conditional jump dependant on the generation of the carry bit.
 This means that it takes just one instruction to advance the pointer, check the cache boundaries and skip \Dash if needed \Dash the subsequent instruction responsible for loading the next pages and resetting the pointer.

@@ -1,4 +1,4 @@
-\section{Triple Buffers}
+\section{The Triple Buffer}
 \label{sec:mram:triple}
 
 It is yet again beneficial to form starting runs.
@@ -16,15 +16,15 @@ Nonetheless, the runtime difference between 1100 and 1200 elements per starting 
 This does raise the question how the starting run formation can allocate a large WRAM buffer while still leaving memory for two sequential-read buffers used during merging.
 The answer is a \emph{triple buffer} which consists of a general-purpose buffer followed by two consecutive sequential-read buffers.
 If sequential readers are not in use, the triple buffer can be regarded as one contiguous buffer.
-To initialise the triple buffer, a tasklet first calls \lstinline|mem_alloc| to allocate \(\text{\lstinline|CACHE_SIZE|} + \min\braces{ 8, \text{\lstinline[keywords={}]|sizeof(T)|} }\) many bytes on the heap, where \lstinline|CACHE_SIZE| is a compile-time constant divisible by 8 and~\lstinline|T| is the data type of the input.
+To initialise the triple buffer, a tasklet first calls \lstinline|mem_alloc| to allocate \(\cachesize{} + \min\braces{ 8, \text{\lstinline[keywords={}]|sizeof(T)|} }\) many bytes on the heap, where \cachesize{} is a compile-time constant divisible by 8 and~\lstinline|T| is the data type of the input.
 This memory, excluding the first \(\min\braces{ 8, \text{\lstinline[keywords={}]|sizeof(T)|} }\) many bytes, is referred to as \emph{cache} and will be used later to store merged runs.
 The element right before the beginning of the cache is set to the least possible value of~\lstinline|T| so that it acts as sentinel value for \IS{}, hence the allocation of at least \lstinline[keywords={}]|sizeof(T)| additional bytes.
 In case of integers smaller than 8 bytes, the beginning of the cache would not be aligned on 8 bytes anymore, hence the allocation of at least 8 additional bytes to simplify DMAs.
 After the initialisation of the cache, the tasklet calls \lstinline|seqread_alloc| twice.
 Due to the stack nature of the heap, the two sequential-read buffers are allocated directly behind the cache.
 To ensure the contiguity of the triple buffer if more than one tasklet is present, a mutex is employed such that only one tasklet initialises its triple buffer at a time.
-The entire triple buffer has the size \(\triplebuffersize \coloneqq \text{\lstinline|CACHE_SIZE|} + 4 \times \text{\lstinline|SEQREAD_CACHE_SIZE|}\), which is, for simplicity, the minimum guaranteed number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| skipped some bytes.
-Note that only the first call of \lstinline|seqread_alloc| by each tasklet may skip some memory since the stack pointer is necessarily at a multiple of \lstinline|SEQREAD_CACHE_SIZE| after any call of \lstinline|seqread_alloc|.
+The entire triple buffer has the size \(\triplebuffersize \coloneqq \cachesize{} + 4 \times \seqreadcachesize{}\), which is, for simplicity, the minimum guaranteed number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| skipped some bytes.
+Note that only the first call of \lstinline|seqread_alloc| by each tasklet may skip some memory since the stack pointer is necessarily at a multiple of \seqreadcachesize{} after any call of \lstinline|seqread_alloc|.
 
 \begin{figure}[b]
 	\centering
@@ -60,7 +60,7 @@ Note that only the first call of \lstinline|seqread_alloc| by each tasklet may s
 	\end{tikzpicture}
 
 	\caption{
-		An exemplary triple buffer with \(\text{\lstinline|CACHE_SIZE|} = 24\) and \(\text{\lstinline|SEQREAD_CACHE_SIZE|} = 16\) for 32-bit elements.
+		An exemplary triple buffer with \(\cachesize{} = 24\) and \(\seqreadcachesize{}= 16\) for 32-bit elements.
 		The hexadecimal numbers denote WRAM addresses.
 	}
 	\label{fig:mram:triple}

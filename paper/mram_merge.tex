@@ -2,11 +2,10 @@
 \label{sec:mram:merge}
 
 The MRAM \MS{} is based on the half-space WRAM \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations of the merge process to the two-tier memory hierarchy are discussed.
-A precondition for the presented algorithm to work is that the sizes of both runs are multiples of 8.
-This precondition simplifies DMAs and is trivially met for 64-bit elements.
+Preconditions for the presented algorithm to work are that the size of every run is a multiple of 8 and that the address of each first byte also a multiple of 8.
+These preconditions simplify DMAs and are trivially met for 64-bit elements.
 To meet it for 32-bit elements, the parallel \MS{} (\cref{sec:par}) divides the work amongst tasklets accordingly and, if need be, introduces dummy elements.
-First, the general MRAM merge process with basic optimisations is presented.
-Thereafter, we discuss several optimisations concerning sequential readers.
+First, the general MRAM merge process with basic optimisations is presented and, thereafter, several optimisations concerning sequential readers.
 
 
 \subsection{Merging in the MRAM}
@@ -24,7 +23,7 @@ For this reason, the merge process (\cref{alg:two-tier merge}) consists of two t
 The first tier is in operation as long as there are at least \unrollfactor{} many elements left to merge in the less run.
 This is verifiable through the function \lstinline|seqread_tell|, which returns the corresponding MRAM address of an element within a sequential-read buffer.
 First, an unrolled loop with \unrollfactor{} many iterations is executed, with each iteration comparing the current elements of both runs, writing the less element to the cache, and advancing the respective pointer (\cref{alg:unrolled loop}).
-Afterwards, it is checked whether the cache is filled with \unrolledcachelength{} many elements, with \unrolledcachelength{} being a multiple of \unrollfactor{} and \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|} \le \text{\lstinline|CACHE_SIZE|}\) being a multiple of 8.
+Afterwards, it is checked whether the cache is filled with \unrolledcachelength{} many elements, with \unrolledcachelength{} being a multiple of \unrollfactor{} and \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|} \le \cachesize{}\) being a multiple of 8.
 If the fill level is too low, it is jumped back to the beginning of the tier and the number of remaining elements checked anew.
 If, however, the maximum fill level is indeed reached, the cache is emptied before jumping back to the beginning of the tier.
 Because of \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|}\) being a multiple of 8, emptying the cache is possible through a simple call of \lstinline|mram_write|.
@@ -34,7 +33,7 @@ If so, the cache is emptied and the remainder of the greater run is flushed.
 To do the latter, the data is iteratively transferred from its original position in the MRAM to the output location using \lstinline|mram_read| and \lstinline|mram_write|.
 Since the sequential readers are of no use anymore, the whole triple buffer may be used during the transfer in case that the cache size is below \qty{2048}{\byte}.
 Should the number of elements within the cache be odd and the input be 32-bit elements, the size of the cache content is not a multiple of 8.
-Furthermore, the size of the remainder of the greater run is also not a multiple of 8 then, given that both the sizes of two runs as well as \unrolledcachelength{} × \lstinline[keywords={}]|sizeof(T)| were such.
+Furthermore, the size of the remainder of the greater run is also not a multiple of 8 then, given that both the sizes of two runs as well as \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|}\) were such.
 For this reason, the current element of the greater run is moved to the cache to bring the size of its content to a multiple of 8, making calling \lstinline|mram_write| to empty the cache and flush the remainder unproblematic.
 
 \NewDocumentCommand{\codeparttitle}{m}{\nonl\textsf{\textbf{\uppercase{#1}}}}
@@ -141,7 +140,7 @@ When it occurs, the cache is emptied and the greater run is flushed, completing 
 	\caption{
 		Merging \unrollfactor{} many elements.
 		This algorithm is part of \cref{alg:two-tier merge}, meaning any change to a variable carries over.
-		In the event of the first run being less, flip the indices in the inner if statement and move it up into the outer if block.
+		In the event of the first run being less, flip the indices in the inner \lstinline[keywords={}]|if| statement and move it up into the outer \lstinline[keywords={}]|if| block.
 	}
 	\label{alg:unrolled loop}
 \end{algorithm*}
@@ -209,38 +208,3 @@ When it occurs, the cache is emptied and the greater run is flushed, completing 
 %	}
 %	\label{alg:flush run}
 %\end{algorithm*}
-
-%\begin{figure}[p]
-%	\begin{subfigure}{\textwidth}
-%		\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
-%	add rcurr, rcurr, 8, nc10, .LABEL  // curr ← curr + 8; jump if no carry bit 10
-%	add rreader, r22, -120             // get address of reader in the WRAM
-%	lw rmram, rreader, 4               // load MRAM address of reader
-%	add rmram, rmram, 1024             // MRAM address ← MRAM address + 1024
-%	sw rrdr, 4, rreader                // store new MRAM address in reader
-%	lw rwram, rreader, 0               // load buffer address of reader
-%	ldma rwram, rmram, 255             // load (255 + 1) $×$ 8 bytes from the MRAM
-%	add rcurr, rcurr, -1024            // curr ← curr - 1024
-%.LABEL:\end{lstlisting}
-%		\caption{
-%			The assembler code as generated by \lstinline|__builtin_dpu_seqread_get|.
-%			In some cases, line 2 is omitted, namely when the address of the reader is kept in an own register.
-%		}
-%	\end{subfigure}
-%
-%	\begin{subfigure}{\textwidth}
-%		\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
-%	add rcurr, rcurr, 8, nc11, .LABEL  // curr ← curr + 8; jump if no carry bit 11
-%	add rmram, rmram, 2048             // MRAM address ← MRAM address + 2048
-%	ldma rwram, rmram, 255             // load (255 + 1) $×$ 8 bytes from the MRAM
-%	add rcurr, rcurr, -2048            // curr ← curr - 2048
-%.LABEL:\end{lstlisting}
-%		\caption{
-%			The handwritten assembler code.
-%		}
-%	\end{subfigure}
-%	\caption{
-%		Comparison of the assembler codes of the regular function \lstinline|seqread_get|, which calls \lstinline|__builtin_dpu_seqread_get|, and the improved one, which is handwritten.
-%		In both cases, elements are \qty{8}{\byte} large and \lstinline|SEQREAD_CACHE_SIZE| is set to 1024.
-%	}
-%\end{figure}

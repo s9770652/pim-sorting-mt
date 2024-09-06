@@ -84,8 +84,10 @@
 \NewDocumentCommand{\SelS}{s}{Selection\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\ShS}{s}{Shell\-Sort\IfBooleanT{#1}{s}}
 
+\NewDocumentCommand{\cachesize}{s}{\IfBooleanTF{#1}{CACHE\_SIZE}{\text{\lstinline|CACHE_SIZE|}}}
 \NewDocumentCommand{\langC}{}{C}
 \NewDocumentCommand{\runless}{}{\ensuremath{r_{1}}}
+\NewDocumentCommand{\seqreadcachesize}{s}{\IfBooleanTF{#1}{SEQREAD_CACHE\_SIZE}{\text{\lstinline|SEQREAD_CACHE_SIZE|}}}
 \NewDocumentCommand{\startingrun}{}{\ensuremath{\ell}}
 \NewDocumentCommand{\triplebuffersize}{s}{\IfBooleanTF{#1}{TRIPLE\_BUFFER\_SIZE}{\text{\lstinline|TRIPLE_BUFFER_SIZE|}}}
 \NewDocumentCommand{\unrolledcachelength}{s}{\IfBooleanTF{#1}{MAX\_FILL\_LEVEL}{\text{\lstinline|MAX_FILL_LEVEL|}}}
