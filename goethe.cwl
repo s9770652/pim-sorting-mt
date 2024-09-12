@@ -25,6 +25,7 @@
 #include:tikz
 #include:tikzpagenodes
 #include:pgfplots
+#include:pgfplotstable
 
 #include:algorithm2e
 
