@@ -94,6 +94,8 @@
 \NewDocumentCommand{\unrollfactor}{s}{\IfBooleanTF{#1}{UNROLL\_FACTOR}{\text{\lstinline|UNROLL_FACTOR|}}}
 
 \makeatletter
+\crefname{line}{ln.}{lns.}
+\Crefname{line}{Line}{Lines}
 \@ifpackagewith{cleveref}{capitalize}{
 	\crefname{implementation}{Handl.}{Handls.}
 	\Crefname{implementation}{Handling}{Handlings}
