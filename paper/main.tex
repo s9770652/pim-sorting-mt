@@ -9,6 +9,7 @@
 
 \input{../macros.sty}
 %\RequirePackage{showframe}
+\RequirePackage{booktabs-de,tabularx}
 \RequirePackage[final]{listings}
 \lstset{
 	basicstyle=\ttfamily,
@@ -47,12 +48,26 @@
 	Black,  % 10
 	Gray,  % 11
 }
+\pgfplotscreateplotcyclelist{ZAW colour bar list}{
+	{color=RoyalBlue!75!Green, draw, fill=.!75!white},  % 1
+	{color=BurntOrange!90!Black, draw, fill=.!75!white},  % 2
+	{color=Lavender!85!White, draw, fill=.!75!white},  % 3
+	{color=LimeGreen, draw, fill=.!75!white},  % 4
+	{color=Mulberry, draw, fill=.!75!white},  % 5
+	{color=CornflowerBlue, draw, fill=.!75!white},  % 6
+	{color=colour=Goldenrod!95!Black, draw, fill=.!75!white},  % 7
+	{color=OliveGreen, draw, fill=.!75!white},  % 8
+	{color=Red, draw, fill=.!75!white},  % 9
+	{color=Black, draw, fill=.!75!white},  % 10
+	{color=Gray, draw, fill=.!75!white},  % 11
+}
 
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{arrows.meta,decorations.pathreplacing,calligraphy}
 \pgfplotsset{
 	height=4cm,
-	cycle multiindex list={ZAW colour list \nextlist mark list*},  % automatic colouring of plots
+	cycle multiindex list={ZAW colour list \nextlist mark list*},  % automatic colouring of line plots
+	bar cycle list/.style={cycle list name={ZAW colour bar list}},  % automatic colouring of bar plots
 	x from 16 to 1024/.style={
 		xmode=log,
 		xtick={16, 32, 64, 128, 256, 512, 1024},

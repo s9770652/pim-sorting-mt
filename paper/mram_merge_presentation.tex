@@ -1,0 +1,128 @@
+\subsection{Merging in the MRAM}
+\label{sec:mram:merge:presentation}
+
+The idea underlying MRAM merging is the following:
+First, initialise a sequential reader on either run.
+Then, repeatedly compare the current elements, write the less element to the cache, and read the next element.
+Whenever the cache is full, empty it by writing its content to the output location.
+Once the end of the less run is reached, stop comparing and empty the cache.
+Finally, flush the greater run by transferring its remainder from the MRAM to the output location with the help of the entire triple buffer.
+
+During merging, checks on both the depletion\todo{Bezeichnung schon in \cref{sec:tasklet} einführen!} of the less run\todo{ebenso} and the fill level of the cache are needed.
+For this reason, the merge process (\cref{alg:mram:two-tier merge}) consists of two tiers, with the first one having fewer depletion checks and with both making use of unrolled loops to reduce the number of fill level checks.
+The first tier is in operation as long as there are at least \unrollfactor{} many elements left to merge in the less run.
+This is verifiable through the function \lstinline|seqread_tell|, which returns the corresponding MRAM address of an element within a sequential-read buffer.
+First, an unrolled loop with \unrollfactor{} many iterations is executed, with each iteration comparing the current elements of both runs, writing the less element to the cache, and advancing the respective pointer (\cref{alg:mram:unrolled loop}).
+Afterwards, it is checked whether the cache is filled with \unrolledcachelength{} many elements, with \unrolledcachelength{} being a multiple of \unrollfactor{} and \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|} \le \cachesize{}\) being a multiple of 8.
+If the fill level is too low, it is jumped back to the beginning of the tier.
+If, however, the maximum fill level is indeed reached, the cache is emptied before jumping back to the beginning of the tier.
+Because of the output location and \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|}\) being multiples of 8, emptying the cache is possible through a simple call of \lstinline|mram_write|.
+
+Once there are \unrollfactor{} many elements or fewer left in the less run, the second tier begins.
+This one is structurally equal to the first tier with a single exception, for there is no guarantee that the unrolled loop will be executed in full:
+The depletion check now happens whenever an element of the less run is written to the cache.
+When it occurs, the cache is emptied and the greater run is flushed, completing the merging.
+To flush the run, its remainder is iteratively transferred from its original position in the MRAM to the output location in blocks of size \qty{2048}{\byte} using \lstinline|mram_read| and \lstinline|mram_write|.
+Since the sequential readers are of no use anymore, the whole triple buffer may be used during the transfers in case that \cachesize{} is below 2048.
+Emptying the cache requires checking the fill level in case of 32-bit elements as input.
+Should the number of elements within the cache be odd, then the size of the cache content is not a multiple of 8.
+In addition, the size of the remainder of the greater run is also not a multiple of 8, given that both the sizes of two runs as well as \(\unrolledcachelength{} \times \text{\lstinline[keywords={}]|sizeof(T)|}\) were such.
+For this reason, the current element of the greater run is moved to the cache to bring the size of its content to a multiple of 8, making emptying the cache and flushing the remainder of the run via \lstinline|mram_write| unproblematic.
+
+\NewDocumentCommand{\codeparttitle}{m}{\nonl\textsf{\textbf{\uppercase{#1}}}}
+\SetArgSty{}
+\SetFuncArgSty{}
+\SetKw{KwAnd}{and}
+\SetKw{KwContinue}{continue}
+\SetKw{KwT}{T}
+
+\SetKwArray{Cache}{cache}
+\SetKwArray{Currs}{curr}
+\SetKwArray{Ends}{ends}
+\SetKwArray{Readers}{readers}
+
+\SetKwData{Early}{early\_end}
+\SetKwData{Factor}{\unrollfactor*}
+\SetKwData{Length}{\unrolledcachelength*}
+\SetKwData{Out}{out}
+
+\SetKwFunction{Get}{seqread\_get}
+\SetKwFunction{Read}{mram\_read}
+\SetKwFunction{SizeOf}{sizeof}
+\SetKwFunction{Tell}{seqread\_tell}
+\SetKwFunction{Write}{mram\_write}
+
+\begin{algorithm*}[!t]
+	\KwData{%
+		sequential readers \Readers{\(2\)},
+		pointers \Currs{\(2\)} to current elements,
+		pointers \Ends{\(2\)} to tail elements,
+		output location \Out,
+		cache \Cache
+	}
+	\KwResult{%
+		both runs merged together and written to \Out
+	}
+
+	\(i\) ← \(0\)  \tct*{number of elements in cache}
+	\Early ← \Ends{\(0\)} – \Factor + \(1\)  \tct*{no depletion certain until this point}
+	\While(\tct*[f]{first tier}){\Tell{\Currs{\(0\)}, \Readers{\(0\)}} < \Early}{\label{alg:mram:two-tier merge:first tier}
+		Merge \Factor many elements \emph{without} checking for depletion (\cref{alg:mram:unrolled loop}).\;
+		\If{\(i\) = \Length}{
+			\Write{\Cache, \Out, \Length × \SizeOf{\KwT}}\;
+			\(i\) ← \(0\)\;
+			\Out ← \Out + \Length\;
+		}
+	}
+	\While(\tct*[f]{second tier}){true}{
+		Merge \Factor many elements \emph{with} checking for depletion (\cref{alg:mram:unrolled loop}).\;
+		\If{\(i\) = \Length}{
+			\Write{\Cache, \Out, \Length × \SizeOf{\KwT}}\;
+			\(i\) ← \(0\)\;
+			\Out ← \Out + \Length\;
+		}
+	}
+
+	\caption{
+		Two-tier merging of two MRAM runs, where the first one is the less run.
+		In the event of the second run being less, flip all indices.
+	}
+	\label{alg:mram:two-tier merge}
+\end{algorithm*}
+
+\begin{algorithm*}[!t]
+	\KwData{%
+		sequential readers \Readers{\(2\)},
+		pointers \Currs{\(2\)} to current elements,
+		pointers \Ends{\(2\)} to tail elements,
+		output location \Out,
+		cache \Cache,
+		number \(i\) of elements in the cache
+	}
+	\KwResult{%
+		\Factor many elements merged to \Cache{\(i\) .. \(i\) + \Factor – \(1\)}
+	}
+
+	\For(\tct*[f]{unrolled loop}){\(k\) ← \(1\) \KwTo \Factor}{
+		\eIf{*\Currs{\(0\)} ≤ *\Currs{\(1\)}}{
+			\Cache{\(i\)++} ← *\Currs{\(0\)}\;
+			\If(\tct*[f]{omit in tier 1}){\Tell{\Currs{\(0\)}, \Readers{\(0\)}} = \Ends{\(0\)}}{
+				Empty the cache.\;
+				Flush the other, nondepleted run.\;
+				\Return  \tct*{stops \cref{alg:mram:two-tier merge}}
+			}
+			\Currs{\(0\)} ← \Get{\Currs{\(0\)}, \Readers{\(0\)}}\;
+		}{
+			\Cache{\(i\)++} ← *\Currs{\(1\)}\;
+			\Currs{\(1\)} ← \Get{\Currs{\(1\)}, \Readers{\(1\)}}\;
+		}
+	}
+
+	\caption{
+		Merging \unrollfactor{} many elements.
+		This algorithm is part of \cref{alg:mram:two-tier merge}, meaning any change to a variable carries over.
+		In the event of the second run being less, flip the indices in the inner \lstinline[keywords={}]|if| statement and move it down into the \lstinline[keywords={}]|else| block.
+		\vphantom{g}  % needed to move the separator line down as there is no letter extending downwards after ‘flip’
+	}
+	\label{alg:mram:unrolled loop}
+\end{algorithm*}

@@ -294,9 +294,9 @@
 % taken from: https://tex.stackexchange.com/a/603677
 \ExplSyntaxOn
 \NewDocumentCommand{\addplotnamedtable}{oO{}m}{%
-	\IfNoValueTF{#1}{  % the call is like \addplot table[...}{...}
+	\IfNoValueTF{#1}{  % the call is like \addplot+ table[...] {...}
 		\use:e { \exp_not:n { \addplot+ table~[#2] } { \exp_not:c { #3 } } }
-	}{  % the call is like \addplot [...] table [...] {...}
+	}{  % the call is like \addplot+ [...] table [...] {...}
 		\use:e { \exp_not:n { \addplot+ [#1]~table~[#2] } { \exp_not:c { #3 } } }
 	}
 }

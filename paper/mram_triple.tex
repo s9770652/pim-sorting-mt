@@ -4,33 +4,33 @@
 It is yet again beneficial to form starting runs.
 This is done by loading a section of the MRAM into the WRAM, sorting it through one of the algorithms presented in \cref{sec:tasklet}, and writing the sorted section back to the MRAM.
 As those sorting algorithm rely on the data being present entirely within the WRAM, the functions \lstinline|mram_read| and \lstinline|mram_write| are used directly.
-Contrary to the WRAM \MS*{} with starting runs of length 14, the starting runs of the MRAM \MS{} are much longer, easily containing a thousand elements and more.
+Contrary to the WRAM \MS*{} with starting runs of length 14, the lengths of the starting runs of the MRAM \MS{} go well into the hundreds.
 The reason is that longer starting runs reduce the number of rounds of MRAM merging and, thus, reduce DMAs, which are relatively costly.
 However, again similar to the WRAM \MS*{}, it can be beneficial to slightly reduce the starting run length to achieve more balanced and faster rounds.
-Nonetheless, the runtime difference between 1100 and 1200 elements per starting run is in the magnitude of one per mille, so for the sake of simplicity, the starting run length is set to the maximum a tasklet can store at once in the WRAM.
+Nonetheless, the runtime difference between 500, 600 and 700 elements per starting run is in the magnitude of one per mille, so for the sake of simplicity, the starting run length is set to the maximum a tasklet can store at once in the WRAM.
 
 %Recall the rough calculation from the beginning of \cref{sec:tasklet} showing that tasklets can hold about \qty{5}{\kibi\byte} of data.
 %This space must be used for both forming the starting runs (without any sequential-read buffers) and merging the runs (with two sequential-read buffers).
 %One possibility would be to allocate one starting run buffer of size \qty{5}{\kibi\byte}, reset the entire heap after the starting runs have been formed and, then, allocate the sequential-read buffers.
 
-This does raise the question how the starting run formation can allocate a large WRAM buffer while still leaving memory for two sequential-read buffers used during merging.
+This does raise the question how the starting run formation can allocate a large WRAM buffer while still leaving memory for two sequential-read buffers used later during merging.
 The answer is a \emph{triple buffer} which consists of a general-purpose buffer followed by two consecutive sequential-read buffers.
 If sequential readers are not in use, the triple buffer can be regarded as one contiguous buffer.
-To initialise the triple buffer, a tasklet first calls \lstinline|mem_alloc| to allocate \(\cachesize{} + \min\braces{ 8, \text{\lstinline[keywords={}]|sizeof(T)|} }\) many bytes on the heap, where \cachesize{} is a compile-time constant divisible by 8 and~\lstinline|T| is the data type of the input.
-This memory, excluding the first \(\min\braces{ 8, \text{\lstinline[keywords={}]|sizeof(T)|} }\) many bytes, is referred to as \emph{cache} and will be used later to store merged runs.
-The element right before the beginning of the cache is set to the least possible value of~\lstinline|T| so that it acts as sentinel value for \IS{}, hence the allocation of at least \lstinline[keywords={}]|sizeof(T)| additional bytes.
-In case of integers smaller than 8 bytes, the beginning of the cache would not be aligned on 8 bytes anymore, hence the allocation of at least 8 additional bytes to simplify DMAs.
+To initialise the triple buffer, a tasklet first calls \lstinline|mem_alloc| to allocate \(\cachesize{}\) many bytes on the heap, where \cachesize{} is a compile-time constant divisible by 8.
+This memory is referred to as \emph{cache} and will be used later to store merged runs.
 After the initialisation of the cache, the tasklet calls \lstinline|seqread_alloc| twice.
 Due to the stack nature of the heap, the two sequential-read buffers are allocated directly behind the cache.
 To ensure the contiguity of the triple buffer if more than one tasklet is present, a mutex is employed such that only one tasklet initialises its triple buffer at a time.
-The entire triple buffer has the size \(\triplebuffersize \coloneqq \cachesize{} + 4 \times \seqreadcachesize{}\), which is, for simplicity, the minimum guaranteed number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| skipped some bytes.
-Note that only the first call of \lstinline|seqread_alloc| by each tasklet may skip some memory since the stack pointer is necessarily at a multiple of \seqreadcachesize{} after any call of \lstinline|seqread_alloc|.
+The entire triple buffer has the size \(\triplebuffersize \coloneqq \cachesize{} + 4 \times \seqreadcachesize{}\), which is, for simplicity, the minimum number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| skipped some bytes.
+Note that skipped memory may appear in front of only the first buffer, since the stack pointer is necessarily at a multiple of \seqreadcachesize{} after any call of \lstinline|seqread_alloc|.
+Because of otherwise skipped memory, it makes little sense to set \cachesize{} to a value which is not a multiple of \seqreadcachesize{}.
+The optimal values for both \cachesize{} and \seqreadcachesize{} are determined in \cref{sec:mram:merge:performance}.
 
 \begin{figure}[b]
 	\centering
 	\tikzsetnextfilename{triple_buffer}
 	\begin{tikzpicture}[reader figure, brace/.style={decorate, decoration={calligraphic brace, amplitude=5.5pt, raise=2pt}, line width=1.1pt}, brace down/.style={brace, decoration={mirror}}]
-		\def\cache{6}
+		\def\cache{8}
 		\def\skipped{2}
 		\def\buffer{8}
 
@@ -38,7 +38,7 @@ Note that only the first call of \lstinline|seqread_alloc| by each tasklet may s
 		\fill[excess] (0.5*\buffer+\skipped+\cache, 0) rectangle (1*\buffer+\skipped+\cache, 1);
 		\fill[excess] (1.5*\buffer+\skipped+\cache, 0) rectangle (2*\buffer+\skipped+\cache, 1);
 
-		\draw (-2, 0) grid (2*\buffer+\skipped+\cache, 1);
+		\draw (0, 0) grid (2*\buffer+\skipped+\cache, 1);
 
 		% Braces.
 		\draw[brace] (                      0, 1) --+ (  \cache, 0) node[pos=0.5, above=1ex] {cache\vphantom{p}};
@@ -49,19 +49,18 @@ Note that only the first call of \lstinline|seqread_alloc| by each tasklet may s
 		\draw[brace down] (0, 0) --+ (2*\buffer+\cache, 0) node[pos=0.5, below=1ex] {\triplebuffersize\vphantom{f}};
 
 		% Item identifiers.
-		\pgfmathsetmacro{\looplastindex}{int(2*\buffer+\skipped+\cache+1)}
+		\pgfmathsetmacro{\looplastindex}{int(2*\buffer+\skipped+\cache-1)}
 		\foreach \i in {0,...,\looplastindex}{
-			\pgfmathsetmacro{\itemindex}{int( 4*(24+\i) )}
-			\node[address] at (\i-1.5, 0.5) { \hexa{\itemindex}\vphantom{f} };
+			\pgfmathsetmacro{\itemindex}{int( 4*(22+\i) )}
+			\node[address] at (\i+.5, 0.5) { \hexa{\itemindex}\vphantom{f} };
 		}
-
-		% Pointers.
-		\draw[ptr] (-.5, 1) --+ (90:14.5pt) node[above] {sentinel};
 	\end{tikzpicture}
 
 	\caption{
-		An exemplary triple buffer with \(\cachesize{} = 24\) and \(\seqreadcachesize{}= 16\) for 32-bit elements.
+		An exemplary triple buffer with \(\cachesize{} = 32\) and \(\seqreadcachesize{}= 16\) for 32-bit elements.
 		The hexadecimal numbers denote WRAM addresses.
+		Note that the skipped byte are still used when regarding the triple buffer as one contiguous buffer.
+		Then, however, the last bytes of the second sequential-read buffer are unused.
 	}
-	\label{fig:mram:triple}
+	\label{fig:merge:triple}
 \end{figure}

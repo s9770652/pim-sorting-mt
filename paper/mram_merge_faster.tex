@@ -1,21 +1,39 @@
 \subsection{Making Sequential Readers Faster}
 \label{sec:mram:merge:faster}
 
+%\pgfmathsetmacro{\timeReaderReg}{2247671968}  % NR_TASKLETS=1, n=0x100000
+%\pgfmathsetmacro{\timeReaderStraight}{1485456192}
+%\pgfmathsetmacro{\timeReaderOpt}{1383808848}
+%\pgfmathsetmacro{\timeReaderReg}{1047700054}  % NR_TASKLETS=1, n=0x80000
+%\pgfmathsetmacro{\timeReaderStraight}{701941684}
+%\pgfmathsetmacro{\timeReaderOpt}{656291931}
+\pgfmathsetmacro{\timeReaderReg}{1481489417}  % NR_TASKLETS=16, n=0x800000
+\pgfmathsetmacro{\timeReaderStraight}{1059008129}
+\pgfmathsetmacro{\timeReaderOpt}{932219524}
+\pgfkeys{/pgf/fpu,/pgf/fpu/output format=fixed}
+\pgfmathsetmacro{\timeSaveStraightReg}{ (1 - \timeReaderStraight / \timeReaderReg) * 100 }
+\pgfmathsetmacro{\timeSaveOptReg}{ (1 - \timeReaderOpt / \timeReaderReg) * 100 }
+\pgfmathsetmacro{\timeSaveOptStraight}{ (1 - \timeReaderOpt / \timeReaderStraight) * 100 }
+\pgfkeys{/pgf/fpu=false}
+
+
 The most widely used sequential-reader function is \lstinline|seqread_get|, followed at some distance by \lstinline|seqread_tell| and, at even more distance, \lstinline|seqread_init|.
 Those functions cannot be inlined, so each use of them constitutes a function call.
-Each function call comes at non-negligible cost since arguments have to be loaded into the respective registers, the jump to the function itself be performed, the stack pointer and return address be saved and reloaded, modified registers be restored if need be, and the jump back to the return address be performed.
+Each function call comes at non-negligible cost since every argument has to be loaded into the respective register, the jump to the function itself be performed, the stack pointer and return address be saved and reloaded, modified registers be restored if need be, and the jump back to the return address be performed.
 Since the DPU architecture is fundamentally compute-bound, function calls are a serious impediment to performance.
-This has already been an argument in favour of the oft-used \IS{} whose short implementation lent itself to inlining.
+This has already been an argument in \cref{sec:tasklet} in favour of the oft-used \IS{} whose short implementation lent itself to inlining.
 
 Earlier attempts at reducing function calls included maintaining a counter on the number of elements left to make \lstinline|seqread_tell| obsolete.
 This alone yielded prominent speedup while still being independent of the exact implementation of sequential readers and possible future changes to them.
-Similarly, calls to \lstinline|seqread_get| can be reduced by advancing the pointers to current elements manually as long as the end of the first buffer halves are sufficiently far away.
-Nevertheless, larger speedup is achievable by implementing an own sequential reader which can be inlined.
-The simplest way to do so is to duplicate the driver source file \lstinline|seqread.inc| and make its content visible to the sorting algorithm;
-the BSD-style licence of the driver permits such modification and redistribution given proper credits.
+Similarly, calls to \lstinline|seqread_get| were reduced by advancing the pointers to current elements manually as long as the end of the first buffer halves was sufficiently far away.
+Ultimately, even larger speedup is achievable by implementing an own sequential reader which can be inlined.
+The simplest way to do so is to duplicate the driver source file \lstinline|seqread.inc| and make its content visible to the sorting algorithm.%
+\footnote{
+	The BSD-style licence of the driver permits modification and redistribution of its files given proper credits.
+}
 The speedup through inlining is significant.
-For example, with \cachesize{} = 2880, \seqreadcachesize{} = 1024, \QS{} as WRAM sorting algorithm, and 2\textsuperscript{20} uniformly distributed 32-bit integers, \MS{} finishes after \qty[exponent-mode=engineering, round-mode=places, round-precision=2]{2143534915}{\cycle} if sequential readers are used as is, that is with function calls.
-With inlining, the runtime drops down by \qty{32}{\percent} to \qty[exponent-mode=engineering, round-mode=places, round-precision=2]{1455341742}{\cycle}.
+For example, with \cachesize{} = 1024, \seqreadcachesize{} = 512, \QS{} as WRAM sorting algorithm, and 2\textsuperscript{19} uniformly distributed 32-bit integers, \MS{} finishes after \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderReg}{\cycle} if sequential readers are used as is, that is with function calls.
+With inlining, the runtime drops down by \qty[round-mode=places, round-precision=0]{\timeSaveStraightReg}{\percent} to \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderStraight}{\cycle}.
 
 \begin{figure}[t]
 	\begin{subfigure}{\textwidth}
@@ -30,11 +48,13 @@ With inlining, the runtime drops down by \qty{32}{\percent} to \qty[exponent-mod
 	add rcurr, rcurr, –1024            // curr ← curr – 1024
 .LABEL:\end{lstlisting}
 		\caption{
-			The assembler code as generated by \lstinline|__builtin_dpu_seqread_get|.
-			In some cases, line 2 is omitted, namely when the address of the reader is kept in an own register.
+			The assembler code generated for \lstinline|__builtin_dpu_seqread_get|.
+			In half of the cases, line 2 is omitted, namely when the address of the reader is already stored in a register.
 		}
 		\label{fig:mram:assembler:auto}
 	\end{subfigure}
+
+	\smallskip
 
 	\begin{subfigure}{\textwidth}
 		\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
@@ -49,34 +69,44 @@ With inlining, the runtime drops down by \qty{32}{\percent} to \qty[exponent-mod
 		\label{fig:mram:assembler:manual}
 	\end{subfigure}
 	\caption{
-		Comparison of the assembler codes of the regular function \lstinline|seqread_get|, which calls \lstinline|__builtin_dpu_seqread_get|, and the improved one, which is handwritten.
+		Comparison of the assembler code of the function \lstinline|__builtin_dpu_seqread_get| and the improved assembler code, which is handwritten.
 		In both cases, elements are \qty{8}{\byte} large and \seqreadcachesize{} is set to 1024.
-		If no update to the sequential-read buffers is needed, the instruction \lstinline|add| jumps to the label at the end, skipping the rest of the code.
+		The flags \lstinline|nc10| and \lstinline|nc11| are true if and only if the respective \emph{c}arry bit is \emph{n}ot generated.
+		Only if a flag is set to true, a jump to the specified label is performed.
 	}
 	\label{fig:mram:assembler}
 \end{figure}
 
 A downside to the two-buffer system is that data are loaded twice.
-Since one of the preconditions demands that the address of the first byte of each run is a multiple of 8 and since elements are either \qty{32}{\bit} or \qty{64}{\bit} large, it is assured that the last element in the first buffer can never extend into the second half.
-Therefore, a natural optimisation is to regard two consecutive sequential-read buffers as one and to load new data only when the pointer to the current element reaches the end of the second original buffer.
-However, the two-buffer system is intrinsic to \lstinline|__builtin_dpu_seqread_get|, that is the function used by \lstinline|seqread_get|, and we know of no alternative to it.
-For this reason, inline assembly is employed to imitate its compilation but with a check on the next greater carry bit and appropriate pointer modifications.
+Since one of the preconditions demands that runs be aligned on 8 bytes and since elements are either \qty{32}{\bit} or \qty{64}{\bit} large, it is assured that the last element in the first buffer can never extend into the second half.
+Therefore, a natural optimisation is to regard two consecutive sequential-read buffers as a singular one and to load new data only when the pointer to the current element reaches the end of the second original buffer.
+However, the two-buffer system is intrinsic to \lstinline|__builtin_dpu_seqread_get|, that is the function used by \lstinline|seqread_get|, and we know of no alternative \langC{}~function to it.
+For this reason, inline assembly is employed, imitating its compilation.
+Of course, it is now the next greater carry bit which gets checked and pointers are modified appropriate to the doubled buffer size.
 
 A closer look at the original compilation (\cref{fig:mram:assembler:auto}) reveals more savings potential.
-Whenever new data need to be loaded, the address of the sequential-read buffer is loaded from the \lstinline[keywords={}]|struct| representing the reader (ln.~6) despite being a constant.
+Despite being a constant, the WRAM address of the sequential-read buffer is loaded from the \lstinline[keywords={}]|struct| representing the reader (ln.~6) whenever new data need to be loaded.
 The MRAM address stored in the reader is not only loaded (ln.~3) but also stored (ln.~5) after being set to the new value.
-In half of the cases, even the address of the reader \lstinline[keywords={}]|struct| itself needs to be loaded first from the stack (ln.~2), because the register into which it is loaded gets overwritten later
-These four load and store instruction can be saved by abandoning \lstinline[keywords={}]|struct|s to represent readers and using two array of length 2, one for the buffer addresses and one for the MRAM addresses.
-As a consequence, these values are kept permanently within registers without ever being overwritten, making the inline assembler code (\cref{fig:mram:assembler:manual}) significantly shorter \Dash admittedly, the savings are less than the reduced number of lines suggests as the DMA dominates the runtime in this piece of code.
+In exactly half of the cases, even the address of the reader \lstinline[keywords={}]|struct| itself needs to be loaded first from the stack (ln.~2), because the register into which it is loaded gets overwritten later on.
+These four load and store instruction can be saved by abandoning \lstinline[keywords={}]|struct|s to represent the two readers used and employing two arrays of length 2, one for the buffer addresses and one for the MRAM addresses.
+As a consequence, these four values are kept permanently within registers without ever being overwritten, making the inline assembler code (\cref{fig:mram:assembler:manual}) significantly shorter \Dash admittedly, the savings are less than the reduced number of lines suggests as the DMA dominates the runtime in this piece of code.
 
 Next to \lstinline|seqread_get|, more optimisation potential is hidden in the function \lstinline|seqread_init|, which is called twice before a pair of runs is merged.
-The original function checks whether the MRAM address to which a sequential reader is set is already in the buffer.
+This function checks whether the MRAM address to which a sequential reader is set is already in the buffer.
 Since sequential readers are always initialised to the beginnings of runs and the runs are too long, this check is always negative and can be omitted.
 Moreover, recall that the original function divides the MRAM into pages, which always begin at a multiple of \seqreadcachesize{}.
 This means that a run may begin in the middle of a page so the preceding, uninteresting data must be loaded as well.
-Since runs begin at multiples of 8, the function \lstinline|seqread_init| can load from the first byte of the run onwards directly without issues because of \lstinline|mram_read|.
+Since runs are aligned on 8 bytes, the function \lstinline|seqread_init| can load from the first byte of the run onwards directly using \lstinline|mram_read| without issues.
 The reason why the original function \lstinline|seqread_init| did not simply round the given MRAM address down to the next multiple of 8 but instead bothered with computing the page boundaries can only be speculated.
 
-Where the previous two versions take \qty[exponent-mode=engineering, round-mode=places, round-precision=2]{2143534915}{\cycle} and \qty[exponent-mode=engineering, round-mode=places, round-precision=2]{1455341742}{\cycle}, respectively, the optimised version takes \qty[exponent-mode=engineering, round-mode=places, round-precision=2]{1411887248}{\cycle}, that is \qty{34}{\percent} less than the regular sequential reader and \qty{3}{\percent} less than the inlined sequential reader.
-This small gain is a testament to how overwhelmingly compute-bound \MS{} is.
-The share of time spend on memory accesses shall be assessed in more detail in the following section.
+Where the previous two versions take \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderReg}{\cycle} and \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderStraight}{\cycle}, respectively, the optimised version takes \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderOpt}{\cycle}, that is \qty[round-mode=places, round-precision=0]{\timeSaveOptReg}{\percent} less than the regular sequential reader and \qty[round-mode=places, round-precision=0]{\timeSaveOptStraight}{\percent} less than the inlined one.
+This small gain despite the halved data transfers is testament to the overwhelming dominance of computations on the runtime of \MS{}.
+
+Moreover, there is a bug present in regular sequential readers.
+Recall that the MRAM is divided into pages and that always two whole pages are loaded, which may lead to unneeded data being loaded at the beginning by \lstinline|seqread_init|;
+the reason why a given MRAM address is not simply rounded down to the next multiple of 8 can only be speculated.
+The bug occurs if one accesses data within the very last page of the MRAM since the regular sequential reader attempts to load the following, nonexistent page as well.
+This results in a DMA fault and aborts the execution of the algorithm.
+For this reason, the optimised sequential reader keeps the page model in spite of perhaps unnecessarily transferred data, for in combination with only one page being loaded, the DMA fault is prevented.
+This DMA fault is also a reason why the first tier cannot continue when reaching the address \lstinline|early_end|, that is, why \cref{alg:mram:two-tier merge:first tier} of \cref{alg:mram:two-tier merge} contains a <-sign and not a ≤-sign.
+Otherwise, the remaining \unrollfactor{} many elements of the less run might all get merged back to back, leading even the optimised sequential reader to load a nonexistent page on the last element.

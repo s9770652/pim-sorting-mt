@@ -1,0 +1,258 @@
+\subsection{Evaluation of the Performance}
+\label{sec:mram:merge:performance}
+
+%%% Table with different values for CACHE_SIZE and SEQREAD_CACHE_SIZE.
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramCxxviii}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramCclvi}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramDxii}
+\pgfplotsinvokeforeach{11,12,16}{
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+}
+
+\pgfplotstablenew[
+	create on use/tasklets/.style={create col/set list={11,,,12,,,16,,}},
+	create on use/cache size/.style={create col/set list={256,512,1024,256,512,1024,256,512,1024}},
+	create on use/seqread 128/.style={create col/copy column from table={\tableMergeMramCxxviii}{µ_MergeFS}},
+	create on use/seqread 256/.style={create col/copy column from table={\tableMergeMramCclvi}{µ_MergeFS}},
+	create on use/seqread 512/.style={create col/copy column from table={\tableMergeMramDxii}{µ_MergeFS}},
+	columns={tasklets,cache size,seqread 128,seqread 256,seqread 512},
+]{9}{\tableMergeMramXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivCxxviii}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivCclvi}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivDxii}
+\pgfplotsinvokeforeach{11,12,16}{
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+}
+
+\pgfplotstablenew[
+	create on use/tasklets/.style={create col/set list={11,,,12,,,16,,}},
+	create on use/cache size/.style={create col/set list={256,512,1024,256,512,1024,256,512,1024}},
+	create on use/seqread 128/.style={create col/copy column from table={\tableMergeMramLxivCxxviii}{µ_MergeFS}},
+	create on use/seqread 256/.style={create col/copy column from table={\tableMergeMramLxivCclvi}{µ_MergeFS}},
+	create on use/seqread 512/.style={create col/copy column from table={\tableMergeMramLxivDxii}{µ_MergeFS}},
+	columns={tasklets,cache size,seqread 128,seqread 256,seqread 512},
+]{9}{\tableMergeMramLxiv}
+
+
+
+%%% Comparison of normalised runtimes.
+\pgfkeys{/pgf/fpu,/pgf/fpu/output format=fixed}
+\pgfplotstablegetelem{8}{seqread 128}\of{\tableMergeMramXxxii}
+\pgfmathsetmacro{\timeMergeMramSeqreadSmall}{\pgfplotsretval}
+\pgfplotstablegetelem{8}{seqread 256}\of{\tableMergeMramXxxii}
+\pgfmathsetmacro{\timeMergeMramSeqreadLarge}{\pgfplotsretval}
+\pgfmathsetmacro{\ratioSeqreadSmallLarge}{ (\timeMergeMramSeqreadLarge / \timeMergeMramSeqreadSmall - 1) * 100 }
+
+\pgfplotstablegetelem{2}{seqread 512}\of{\tableMergeMramXxxii}
+\pgfmathsetmacro{\timeMergeMramEleven}{\pgfplotsretval}
+\pgfmathsetmacro{\timeMergeMramElevenNorm}{ \timeMergeMramEleven / ((2^23 / 11) * log2((2^23 / 11))) }
+\pgfplotstablegetelem{5}{seqread 512}\of{\tableMergeMramXxxii}
+\pgfmathsetmacro{\timeMergeMramTwelve}{\pgfplotsretval}
+\pgfmathsetmacro{\timeMergeMramTwelveNorm}{ \timeMergeMramTwelve / ((2^23 / 12) * log2((2^23 / 12))) }
+\pgfmathsetmacro{\timeMergeMramTwelveNormExpected}{ \timeMergeMramElevenNorm * 12 / 11 }
+\pgfplotstablegetelem{8}{seqread 512}\of{\tableMergeMramXxxii}
+\pgfmathsetmacro{\timeMergeMramSixteen}{\pgfplotsretval}
+\pgfmathsetmacro{\timeMergeMramSixteenNorm}{ \timeMergeMramSixteen / ((2^23 / 16) * log2((2^23 / 16))) }
+\pgfmathsetmacro{\timeMergeMramSixteenNormExpected}{ \timeMergeMramElevenNorm * 16 / 11 }
+\pgfkeys{/pgf/fpu=false}
+
+
+
+%%% Bar plot.
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeHS/.style={}, create on use/σ_MergeHS/.style={}, columns={n,µ_MergeHS,σ_MergeHS}]{0}{\tableMergeMramHalf}
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablevertcat{\tableMergeMramHalf}{data/merge_mram/half-space/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramFull}
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablevertcat{\tableMergeMramFull}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint32/#1.txt}
+}
+
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse,Almost,Uniform,Zipf's,Normal}},
+	create on use/half/.style={create col/copy column from table={\tableMergeMramHalf}{µ_MergeHS}},
+	create on use/full/.style={create col/copy column from table={\tableMergeMramFull}{µ_MergeFS}},
+	columns={dist,half,full}
+]{6}{\tableMergeMramHalfFullXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeHS/.style={}, create on use/σ_MergeHS/.style={}, columns={n,µ_MergeHS,σ_MergeHS}]{0}{\tableMergeMramHalf}
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablevertcat{\tableMergeMramHalf}{data/merge_mram/half-space/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramFull}
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	\pgfplotstablevertcat{\tableMergeMramFull}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint64/#1.txt}
+}
+
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse,Almost,Uniform,Zipf's,Normal}},
+	create on use/half/.style={create col/copy column from table={\tableMergeMramHalf}{µ_MergeHS}},
+	create on use/full/.style={create col/copy column from table={\tableMergeMramFull}{µ_MergeFS}},
+	columns={dist,half,full}
+]{6}{\tableMergeMramHalfFullLxiv}
+
+
+
+With only a single tasklet computing, the optimal parameter choice is clearly to set \cachesize{} and \seqreadcachesize{} to the maximum value in order to minimise DMAs.
+Employing eleven tasklets, while limiting the possible values for \cachesize{} and \seqreadcachesize{} severely, is profitable as the pipeline is utilised fully then, allowing to execute more instructions at the same time.
+Comparing the runtimes of one tasklet and of eleven tasklets performing an MRAM \MS{} concurrently shows an increase of the runtime in the single digits percentagewise.
+This tiny increase is owed to multiple tasklets performing DMAs at the same time, stalling all involved tasklets but one since data transfers happen sequentially.
+Employing twelve tasklets not only makes simultaneous DMAs more frequent, it also increases the effective execution time of a single instruction from eleven cycles to twelve cycles.
+The latter part, however, is only true in general for pure WRAM algorithms.
+During a DMA, a tasklet is suspended \Dash whether it be stalled or not \Dash\!, meaning it is removed from the pipeline.
+Because of this, employing twelve or more tasklets helps keeping the pipeline full.
+Of course, using more than eleven tasklets may also be more convenient from an algorithmic point of view.
+This is the case for the parallel \MS{} presented in \cref{sec:par}, where sixteen tasklets is easier to handle than twelve and twelve easier than eleven.
+For this reason, we will look at the influence of different values for \cachesize{} and \seqreadcachesize{} with eleven, twelve and sixteen tasklets in this \lcnamecref{sec:mram:merge:performance}.
+Please note that \unrollfactor{} is always set to 8 and cannot be set greater, for the whole program would, otherwise, not fit within the IRAM anymore.
+Also, \unrolledcachelength{} is always set to \cachesize{} / \lstinline[keywords={}]|sizeof(T)|.
+
+\begin{table}[t]
+	\centering
+	\sisetup{
+		table-alignment-mode=format,
+		table-format=4.0,
+		round-precision=0,
+		round-mode=places,
+		exponent-mode=fixed,
+		fixed-exponent=6,
+		text-font-command=\addfontfeatures{RawFeature=+tnum}
+	}
+	\pgfplotstableset{
+		every head row/.style={
+			before row=\toprule Tasklets & \lstinline|CACHE| & \multicolumn{6}{c}{4 × \lstinline|SEQREAD_CACHE|} \\ \cmidrule{3-5},
+			after row=\midrule,
+		},
+		every last row/.style={after row=\bottomrule},
+		every nth row={3}{before row=\addlinespace},
+		column type={c c S S S},
+		columns/tasklets/.style={column name={}, string type},
+		columns/cache size/.style={column name={}, string type},
+		seqread/.style={column name={#1}, string type},
+		columns/seqread 128/.style={seqread={512}},
+		columns/seqread 256/.style={seqread={1024}},
+		columns/seqread 512/.style={seqread={2048}},
+		multicolumn names,
+	}
+	\begin{subtable}{0.49\textwidth}
+		\centering
+		\pgfplotstabletypeset{\tableMergeMramXxxii}
+		\caption{
+			32-bit integers (\(n = 2^{23} / \mathit{Tasklets}\))
+		}
+	\end{subtable}
+	\hfil
+	\begin{subtable}{0.49\textwidth}
+		\centering
+		\pgfplotstabletypeset{\tableMergeMramLxiv}
+		\caption{
+			64-bit integers (\(n = 2^{22} / \mathit{Tasklets}\))
+		}
+	\end{subtable}
+	\setmathfont{LibertinusMath-Regular.otf}
+	\caption{
+		Runtimes of the sequential MRAM \MS{} in hundred thousand cycles for different values of \cachesize{} and \seqreadcachesize{} on uniformly distributed inputs.
+		The input is divided evenly amongst the eleven to sixteen tasklets, which sort their proportion of the input concurrently.
+		Each measurement represents the mean of the maximum runtimes of individual tasklets.
+	}
+	\label{tab:mram:sizes}
+\end{table}
+
+Since this \lcnamecref{sec:mram} is in preparation of the parallel \MS{}, measurements are restricted to the maximum amount of data which the MRAM can hold.
+The parallel \MS{} is essentially a full-space \MS{} needing auxiliary space of the same size as the input.
+As the total size of the MRAM is \qty{64}{\mebi\byte}, the total input size is capped at \qty{32}{\mebi\byte}.
+Although the logging buffer of a DPU resides in the MRAM, this buffer is not created if no use of \lstinline|printf|, \lstinline|puts|, and \lstinline|putchar| is detected in the program.
+Therefore, the entirety of the MRAM is indeed freely usable.
+
+\Cref{tab:mram:sizes} shows the runtime of the full-space MRAM \MS{} for different values of \cachesize{} and \seqreadcachesize{}.
+The number of tasklets is eleven, twelve, and thirteen, and each tasklet is assigned the same proportion of the input, which is 2\textsuperscript{23} and 2\textsuperscript{22} elements for 32-bit and 64-bit integers, respectively.
+Whilst the measurements were conducted on a uniform input distribution, we confirmed that the general observations hold true for the other input distributions as well.
+Since the parallel \MS{} requires some tasklets to wait for others, we opt to show the mean of the maximum runtimes.
+The difference between maximum and average runtimes is barely noticeably, however, being in the magnitude of one per mille for deterministic input distributions and in the magnitude of one per myriad for the random ones.
+
+In most cases, it holds that the larger caches and buffers are, the faster the execution is.
+This suggests that being possibly stalled for longer is outweighed by the fewer DMAs, especially when many tasklets are present.
+Also, the larger one of the sizes is, the greater the gain from enlarging the other one tends to be.
+The speedup tends to be greater for 64-bit integers than for 32-bit integers.
+Still, some exceptions to these observations appear.
+For example, with sixteen tasklets, \cachesize{} = 1024, and 32-bit integers, doubling the combined size of two sequential-read buffers from \qty{512}{\byte} to \qty{1024}{\byte} increases the runtime by around \qty[round-mode=places, round-precision=0]{\ratioSeqreadSmallLarge}{\percent}.
+In summary, though, it is reasonable to set all sizes to the largest values allowed for by the limited WRAM, that is \cachesize{} = 1024 and \seqreadcachesize{} = 512, like it is done in this thesis henceforth.
+
+As conclusive remark to \cref{tab:mram:sizes}, it should be noted that the reduction of the runtime through more tasklets is solely owed to the log-linear runtime of \MS{} and individual tasklets having to sort fewer elements.
+Indeed, the effect of the overfull pipeline becomes apparent when looking at the normalised runtimes.
+With 32-bit integers, it is \qty[round-mode=places, round-precision=1]{\timeMergeMramElevenNorm}{\cycle} for eleven tasklets, \qty[round-mode=places, round-precision=1]{\timeMergeMramTwelveNorm}{\cycle} for twelve, and \qty[round-mode=places, round-precision=1]{\timeMergeMramSixteenNorm}{\cycle} for sixteen.
+However, these normalised runtimes still evince that suspended tasklets free the pipeline up, as multiplying the normalised runtime for eleven tasklets by \Lfrac{12/11} and \Lfrac{16/11} yields \qty[round-mode=places, round-precision=1]{\timeMergeMramTwelveNormExpected}{\cycle} and \qty[round-mode=places, round-precision=1]{\timeMergeMramSixteenNormExpected}{\cycle}, which would be expected if no DMAs were involved.
+
+\begin{figure}
+	\tikzsetnextfilename{merge_mram}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=1 by 2,
+			groupplot xlabel={},
+			groupplot ylabel={Cycles},
+			enlarge x limits={abs=6mm},
+			xtick style={draw=none},
+			symbolic x coords={Sorted,Reverse,Almost,Uniform,Zipf's,Normal},
+			x tick label style={
+				rotate=90,
+				anchor=east,
+			},
+			ybar,
+			ymin=0,
+			ytick distance=2e8,
+			scaled y ticks=base 10:-6,
+			tick scale binop=\times,
+			xmajorgrids=false,
+		]
+			\nextgroupplot[title/.add={}{32-bit}]
+			\pgfplotsset{legend to name=leg:merge:mram, legend entries={Half-Space, Full-Space}}
+			\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullXxxii};
+			\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullXxxii};
+			%
+			\nextgroupplot[title/.add={}{64-bit}]
+			\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullLxiv};
+			\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullLxiv};
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:merge:mram}\hfil
+	\caption{
+		Mean of the maximum runtimes of concurrently executed MRAM \MS*{} on all benchmarked input distributions and data types.
+		Sixteen tasklets were employed, each sorting 2\textsuperscript{19} many 32-bit integers and 2\textsuperscript{18} many 64-bit integers.
+	}
+	\label{fig:merge:mram}
+\end{figure}
+
+Next, we look at the performance of MRAM \MS{}, both in its half-space and its full-space variant, across all benchmarked input distributions.
+As \cref{fig:merge:mram} shows that like its WRAM counterpart, the full-space MRAM \MS{} works the fastest on sorted inputs, which is because one of the runs in each pair of runs to merge is flushed in its entirety without the overhead from the comparisons and elementwise moves.
+Reverse sorted inputs are sorted a bit slower despite the same flushing pattern
+This is explicable through the worse performance of \IS{} on reverse sorted inputs.
+The same phenomenon occurs with WRAM \MS*{}, but there, the influence of \IS{} on the total runtime is much higher because of the shorter inputs, leading to this input distribution being the worst-case, which is not the case anymore for MRAM \MS*{}.
+Almost sorted inputs are also sorted a bit slower, however, this is because more elements need to be compared before nondepleted runs can be flushed.
+The effect becomes stronger for the rest of the input distributions, explaining why the uniform one constitutes the worst-case.
+
+For the half-space \MS{}, the picture is different.
+Only on sorted inputs does the half-space \MS{} manage to beat its full-space counterpart, and it falls back on all other input distributions decisively.
+This is because copying the first runs has become too costly due to the DMAs, and not having to flush the second runs yields a considerable advantage only on sorted inputs.
+In conclusion, merging WRAM data is the fastest with the half-space variant, while merging MRAM data is the fastest with the full-space variant.

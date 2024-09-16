@@ -3,7 +3,7 @@
 
 It is technically feasible to access data in the MRAM in the same way as data in the WRAM.\todo{überarbeiten, sobald Grundlagen stehen}
 For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
-Such \emph{direct memory accesses} (DMAs) to the MRAM are translated into the assembler instructions \lstinline|ldma| and \lstinline|sdma|, which load and store the respective data.
+Such \emph{direct memory accesses} (DMAs) to the MRAM are translated into the assembler instructions \lstinline|ldma| and \lstinline|sdma|, which load and store the particular pieces of data.
 However, each DMA comes with an overhead, and accessing MRAM data in the same way as WRAM data means an execution of \lstinline|ldma| or \lstinline|sdma| on each access.
 For this reason, the preferred way to load contiguous data from the MRAM is through the function \lstinline|mram_read|.
 This function takes the MRAM address of the first byte to load, the WRAM address of a buffer where the data are to be stored, and the number of consecutive bytes to load.
@@ -29,22 +29,22 @@ For \(\seqreadcachesize{} = 2^i\), the \(i\) least significant bits of the first
 Therefore, the stack pointer skips to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
 Due to the nature of a stack, this has the drawback that the skipped WRAM memory can never be allocated by something else.
 Eventually, a total of 2 × \seqreadcachesize{} many bytes are allocated, also for reasons explained shortly.
-All in all, the memory footprint of a sequential-read buffer is at least \(2 \times \seqreadcachesize{}\) many bytes but less than \(3 \times \seqreadcachesize{}\) many.
+All in all, the memory footprint of a sequential-read buffer is at least 2 × \seqreadcachesize{} many bytes but less than 3 × \seqreadcachesize{} many.
 
 The function \lstinline|seqread_init| instructs a sequential reader to load data from a specified MRAM address into its buffer.
 In addition, the function returns a pointer to the corresponding position of said MRAM address within the buffer, to which we will refer as pointer to the \emph{current element}.
 Conceptually, the whole MRAM is divided into \emph{pages} of size \seqreadcachesize{}.
-To load data from the specified MRAM address, the given address is rounded down the the next multiple of \seqreadcachesize{}, which yields the beginning of the page containing the MRAM address.
-Then, \(2 \times \seqreadcachesize{}\) many bytes are loaded so that the buffer holds two pages.
-This way, data of some long, compound type at the end of the first page is fully loaded even if extending into the other page.
+To load data from the specified MRAM address, the address is rounded down the the next multiple of \seqreadcachesize{}, which yields the beginning of the page containing the MRAM address.
+Then, 2 × \seqreadcachesize{} many bytes are loaded so that the buffer holds two pages.
+This way, data of some long, compound type at the end of the first page are fully loaded even if extending into the other page.
 
-To access the current element, one simply dereferences the pointer returned by \lstinline|seqread_init|.
+To access the current element, one simply dereferences the pointer to the current element.
 Calling the function \lstinline|seqread_get| advances this pointer by a given number of bytes, which cannot be greater than \seqreadcachesize{};
 this way of specifying bytes allows the sequential reader to support arbitrary data types.
 Once the pointer to the current element ends up in the second half of the buffer, it is set \seqreadcachesize{} many bytes back so that it points to an address in the first half again.
 Also, the MRAM address stored within the sequential reader is increased by \seqreadcachesize{} many bytes, and the next two subsequent pages are loaded.
-This means that the page which is stored in the second half of the buffer so far is loaded from the MRAM again but stored in the first half this time.
-\Cref{fig:mram:reader} visualises an intermediate state of a sequential reader, showcasing its characteristic read behaviour.
+This means that the page which was stored in the second half of the buffer so far is loaded from the MRAM again but stored in the first half this time.
+\Cref{fig:merge:reader} visualises an intermediate state of a sequential reader, showcasing its characteristic read behaviour.
 
 % taken from: https://tex.stackexchange.com/a/511203
 \ExplSyntaxOn
@@ -129,13 +129,13 @@ This means that the page which is stored in the second half of the buffer so far
 		The pointer \lstinline|curr| moves from left to right, 4 bytes at a time.
 		No byte of the second half of the buffer is ever read as the elements fit perfectly within the first half.
 	}
-	\label{fig:mram:reader}
+	\label{fig:merge:reader}
 \end{figure}
 
 The acclaimed speedup through more performant bounds checks happens within the function \lstinline|seqread_get|, which in turn calls the function \lstinline|__builtin_dpu_seqread_get|.
 An inspection of the compilation of \lstinline|__builtin_dpu_seqread_get| reveals the use of \emph{carry bits}.
 The instruction \lstinline|add| which is used to advance the pointer by the specified number of bytes is capable of checking whether bit \(i\) generated a carry bit.
 To be more precise, carry bit \(i\) is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the two involved operands, in this case the pointer and the number of bytes.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
-Due to the alignment of the buffer on a power of two and due to page sizes being also a power of two, the generation of such a carry bit signifies that the pointer to the current element left the first buffer half.
+Due to the alignment of the buffer on a power of two and due to page sizes being also a power of two, the generation of such a carry bit signifies that the pointer to the current element has left the first buffer half.
 Next to detecting the generation of carry bit \(i\), the instruction \lstinline|add| is also capable of performing a conditional jump dependant on the generation of the carry bit.
 This means that it takes just one instruction to advance the pointer, check the cache boundaries and skip \Dash if needed \Dash the subsequent instruction responsible for loading the next pages and resetting the pointer.
