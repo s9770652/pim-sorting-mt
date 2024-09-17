@@ -66,14 +66,6 @@
 	{#3};
 }
 
-% Draws a plot of column µ_#3 divided by column µ_#2 of table #4.
-% A column n must be present. Applies custom options #1.
-\NewDocumentCommand{\plotspeedup}{O{} m m m}{
-	\addplotnamedtable
-	[#1]
-	[x=n, y expr={\thisrow{µ_#3} / \thisrow{µ_#2}}]
-	{#4};
-}
 
 % Texts.
 \NewDocumentCommand{\BS}{s}{Bubble\-Sort\IfBooleanT{#1}{s}}

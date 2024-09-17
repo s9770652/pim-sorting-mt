@@ -37,6 +37,14 @@
 \cs_set_eq:NN\IfEmptyTF\tl_if_blank:nTF
 \ExplSyntaxOff
 
+%%% Allows for files with the name `par.…`.
+\makeatletter
+\long\def\@set@curr@file@aux#1{%
+	%%%%%
+	\expandafter\ifx\csname\endcsname#1%
+	.tex\else\string#1\fi}
+\makeatother
+
 \input{../packages.def}
 \input{../notation.sty}
 \input{../article.sty}

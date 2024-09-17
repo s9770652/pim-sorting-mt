@@ -172,11 +172,13 @@
 \Norm#m
 \Unif#m
 
-# group plots
-\pgfplotstablereadnamed{file}{tableName}#n
-\addplotnamedtable{table}#n
-\addplotnamedtable[tableOptions]{table}#n
+# tables
 \addplotnamedtable[plotOptions][tableOptions]{table}#n
+\addplotnamedtable[tableOptions]{table}#n
+\addplotnamedtable{table}#n
+\pgfplotstablenewnamed[options]{columns}{table}#n
+\pgfplotstablereadnamed{file}{tableName}#n
+\pgfplotstablevertcatnamed{existingTable}{file path}#n
 
 # Algorithm.
 \nonl#n

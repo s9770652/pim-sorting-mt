@@ -1,0 +1,135 @@
+\chapter{Parallel Sorting in the MRAM}
+\label{sec:par}
+
+\begin{itemize}
+	\item
+	Falls Einzelelemente verwendet werden, geschieht das um den Pivot herum.
+
+	\item
+	Ausrechnen, dass die binäre Suche eine Promyriade der Laufzeit oder so ausmacht.
+
+	\item
+	Bzgl.\ des Fehlers bei sortierten und fast sortierten Eingaben
+	\begin{itemize}
+		\item
+		Tritt anscheinend noch nicht bei der sequentiellen Phase auf.
+
+		\item
+		Effekt wird mit steigendem \lstinline|NR_TASKLETS| größer, aber erst bei \lstinline|NR_TASKLETS| = 16 dreht sich die Reihenfolge um.
+
+		\item
+		Wenn man Anweisungen statt Takte zählt, stimmt die Reihenfolge wieder und zwar deutlich.
+		Unabhängig davon, wo \lstinline|NR_TASKLETS| steht, gilt, dass die sortierte Eingabe 5,65× weniger Anweisungen braucht, d.\,h., es muss an der Datenübertragung liegen.
+	\end{itemize}
+
+	\item
+	Warum der \MS{} gut ist:
+	\begin{itemize}
+		\item
+		Es gibt nur vier Synchronisationspunkte.
+
+		\item
+		Binäres Mischen heißt, es gibt nur zwei sequentielle Leser. Drei wären wohl noch machbar (nötig bei zwölf Tasklets), aber 16-Wege-Verschmelzen wäre unurst.
+
+		\item
+		Die besonders frühen Tasklets nehmen keine Rechenzeit bei der Suspendierung ein.
+	\end{itemize}
+
+	\item
+	\lstinline|resume| braucht ungefähr 100 Takte
+
+	\item
+	sehr ungleiche Laufzeiten für Binärsuche:
+	stabil, sortiert -> Min: 8000 T, Max: 320\,000 T (Sortiert, 16 Tasklets, erste Runde)
+	\begin{itemize}
+		\item
+		viel Warterei auf andere -> DMA dominieren Laufzeit der Binärsuche
+	\end{itemize}
+\end{itemize}
+
+\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+	% 32-bit | Instabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParUnstable_32#1}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=2/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=4/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=8/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint32/#1.txt}
+
+	% 64-bit | Instabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParUnstable_64#1}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=1/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=2/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint64/#1.txt}
+
+	% 32-bit | Stabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_32#1}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint32/#1.txt}
+
+	% 64-bit | Stabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_64#1}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
+}
+
+\NewDocumentCommand{\speedup}{m}{
+	\pgfplotstablegetelem{0}{µ_MergePar}\of#1
+	\pgfmathsetmacro{\messlatte}{\pgfplotsretval}
+		\addplot+ table[
+		create on use/tasklets/.style={create col/set list={1,2,4,8,16}},
+		create on use/factor/.style={create col/expr={\messlatte / \thisrow{µ_MergePar}}},
+		x=tasklets, y=factor
+	] {#1};
+}
+
+\begin{figure}
+	\tikzsetnextfilename{speedup}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=2 by 2,
+			groupplot xlabel={Tasklets},
+			groupplot ylabel={Speedup},
+			xtick={1,2,4,8,16},
+			xmode=log,
+			ymin=0,
+			ymax=12,
+			ytick distance=2,
+		]
+			\nextgroupplot[title/.add={}{32-bit | Instabil}]
+			\pgfplotsset{legend to name=leg:par:speedup, legend entries={Sorted, Reverse S., Almost S., Uniform, Zipf's, Normal}}
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\expandafter\speedup\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
+			}
+			%
+			\nextgroupplot[title/.add={}{64-bit | Instabil}]
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\expandafter\speedup\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
+			}
+			%
+			\nextgroupplot[title/.add={}{32-bit | Stabil}]
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\expandafter\speedup\expandafter{\csname tableMergeParStable_32#1\endcsname}
+			}
+			%
+			\nextgroupplot[title/.add={}{64-bit | Stabil}]
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+				\expandafter\speedup\expandafter{\csname tableMergeParStable_64#1\endcsname}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil
+\end{figure}

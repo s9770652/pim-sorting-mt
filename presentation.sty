@@ -16,8 +16,6 @@
 \definecolor{hellgruen}{cmyk}{0.4,0.17,.81,.07}
 \definecolor{lichtblau}{rgb}{0.282,0.663,0.855}
 
-
-
 \useinnertheme{rectangles}  % shape of labels
 \useinnertheme[showtitle=false]{tcolorbox}  % turning off background of boxes without title
 \beamertemplatenavigationsymbolsempty
@@ -221,5 +219,14 @@
 \hypersetup{
 	pdfdisplaydoctitle=true,
 }
+
+
+%%% Allows for files with the name `par.…`.
+\makeatletter
+\long\def\@set@curr@file@aux#1{%
+	%%%%%
+	\expandafter\ifx\csname\endcsname#1%
+	.tex\else\string#1\fi}
+\makeatother
 
 % TODO: Opaqueness? (Beamer manual p. 186)

@@ -100,7 +100,7 @@ Since runs are aligned on 8 bytes, the function \lstinline|seqread_init| can loa
 The reason why the original function \lstinline|seqread_init| did not simply round the given MRAM address down to the next multiple of 8 but instead bothered with computing the page boundaries can only be speculated.
 
 Where the previous two versions take \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderReg}{\cycle} and \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderStraight}{\cycle}, respectively, the optimised version takes \qty[exponent-mode=fixed, fixed-exponent=9, round-mode=places, round-precision=2]{\timeReaderOpt}{\cycle}, that is \qty[round-mode=places, round-precision=0]{\timeSaveOptReg}{\percent} less than the regular sequential reader and \qty[round-mode=places, round-precision=0]{\timeSaveOptStraight}{\percent} less than the inlined one.
-This small gain despite the halved data transfers is testament to the overwhelming dominance of computations on the runtime of \MS{}.
+This little gain despite the halved data transfers is testament to the dominance of computations on the runtime of \MS{}.
 
 Moreover, there is a bug present in regular sequential readers.
 Recall that the MRAM is divided into pages and that always two whole pages are loaded, which may lead to unneeded data being loaded at the beginning by \lstinline|seqread_init|;

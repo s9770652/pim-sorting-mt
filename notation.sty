@@ -288,11 +288,9 @@
 \NewDocumentCommand{\pgfplotstablereadnamed}{m m}{%
 	\use:e { \exp_not:n { \pgfplotstableread { #1 } } { \exp_not:c { #2 } } }
 }
-\ExplSyntaxOff
 
 % Allows to plot a table with a parametrised name (e.g.: \addplotnamedtable{table#1};).
 % taken from: https://tex.stackexchange.com/a/603677
-\ExplSyntaxOn
 \NewDocumentCommand{\addplotnamedtable}{oO{}m}{%
 	\IfNoValueTF{#1}{  % the call is like \addplot+ table[...] {...}
 		\use:e { \exp_not:n { \addplot+ table~[#2] } { \exp_not:c { #3 } } }
@@ -300,6 +298,19 @@
 		\use:e { \exp_not:n { \addplot+ [#1]~table~[#2] } { \exp_not:c { #3 } } }
 	}
 }
+
+% Allows to create a table with a parametrised name (e.g. \pgfplotstablenewnamed{4}{table#1}).
+% taken from: my brain
+\NewDocumentCommand{\pgfplotstablenewnamed}{O{} m m}{%
+	\use:e { \exp_not:n { \pgfplotstablenew [ #1 ] { #2 } } { \exp_not:c { #3 } } }
+}
+
+% Allows to append a table with a parametrised name (e.g. \pgfplotstablevertcatnamed{table#1}{data.txt}).
+% taken from: my brain
+\NewDocumentCommand{\pgfplotstablevertcatnamed}{m m}{%
+	\use:e { \exp_not:n { \pgfplotstablevertcat } { \exp_not:c { #1 } } \exp_not:n { { #2 } } }
+}
+
 \ExplSyntaxOff
 
 \fi
