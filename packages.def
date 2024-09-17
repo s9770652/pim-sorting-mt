@@ -33,7 +33,14 @@
 \usepgfplotslibrary{groupplots,fillbetween}
 \fi
 
-\RequirePackage{algorithm2e}  % Algorithmen setzen
+\makeatletter
+\@ifclassloaded{scrbook}{
+	\RequirePackage[algochapter]{algorithm2e}  % Algorithmen setzen
+}{
+	\RequirePackage{algorithm2e}  % Algorithmen setzen
+}
+\makeatother
+
 
 \RequirePackage{hyperref}  % klickbare Verweise
 \hypersetup{final}  % nicht direkt geladen, da 'beamer' vorher schon 'hyperref' lädt
@@ -46,11 +53,11 @@
 
 \makeatletter
 \@ifclassloaded{beamer}{}{
-\RequirePackage{lipsum}  % lorem ipsum dolor sit amet
-\RequirePackage[obeyFinal, colorinlistoftodos, tickmarkheight=.25em, textwidth=2.1cm]{todonotes}  % Notizen
-\todostyle{info}{color=CornflowerBlue, textcolor=white}
-\RequirePackage{marginnote}  % benötigt, um \todo in Gleitobjekten benutzen zu können
-\renewcommand{\marginpar}{\marginnote}
+	\RequirePackage{lipsum}  % lorem ipsum dolor sit amet
+	\RequirePackage[obeyFinal, colorinlistoftodos, tickmarkheight=.25em, textwidth=2.1cm]{todonotes}  % Notizen
+	\todostyle{info}{color=CornflowerBlue, textcolor=white}
+	\RequirePackage{marginnote}  % benötigt, um \todo in Gleitobjekten benutzen zu können
+	\renewcommand{\marginpar}{\marginnote}
 }
 \@ifclassloaded{scrartcl}{}{\RequirePackage{scrhack}}
 \makeatother

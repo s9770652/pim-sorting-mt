@@ -77,6 +77,8 @@
 \makeatletter
 \@ifclassloaded{scrbook}{
 	\captionsetup{labelsep=space}
+	\RestyleAlgo{algochapter}
+	\SetAlgoCaptionSeparator{.}
 }{
 	\KOMAoptions{
 		abstract,  % heading for abstract
@@ -190,6 +192,7 @@
 %\SetKwInOut{KwEnsure}{\maybesffamily Ensure}
 \SetKwInOut{KwData}{\maybesffamily Data}
 \SetKwInOut{KwResult}{\maybesffamily Result\!}
+\hyphenation{Al-go-rithm}
 
 % Allowing underscores in names of procedure and function environments.
 % taken from: https://tex.stackexchange.com/a/680985
