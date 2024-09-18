@@ -44,10 +44,241 @@
 	\begin{itemize}
 		\item
 		viel Warterei auf andere -> DMA dominieren Laufzeit der Binärsuche
+
+		\item
+		Es wird immer das alignierte Flushen genommen.
+
+		\item
+		Mithilfe von Barrieren wurde Tasklet 0 sequentiell laufen gelassen (in letzter Runde) -> keine Verbesserung der Laufzeit von 0
 	\end{itemize}
+
+	\item
+	zweiseitige Binärsuche um sortiert und dergleichen schneller zu machen.
 \end{itemize}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\medbreak
+
+A simple way to parallelise \MS{} is the following:
+Let us assume that the number of tasklets is a power of two and that they are indexed starting from zero.
+The whole input is shared evenly amongst all tasklets, and each tasklet sorts its share sequentially with the MRAM \MS{} of \cref{sec:mram}.
+Once finished, tasklet \(t\) with \(t \bmod 2 = 1\) informs tasklet \(t - 1\) that it is finished with sorting its share and gets permanently suspended.
+Tasklet \(t - 1\) uses \cref{alg:mram:two-tier merge} to merge its original share and the share of tasklet \(t\) into a bigger run.
+Once finished, tasklet \(t\) with \(t \bmod 4 = 2\) informs tasklet \(t - 2\) that it is finished with sorting its share and gets permanently suspended.
+Then, tasklet \(t - 2\) merges its original share with that of tasklet \(t\).
+This scheme is continued until only two runs remain which get merged by tasklet \(0\).
+
+The obvious bottleneck is the sequential execution of the traditional merge procedure \Dash the one also used in \cref{sec:tasklet,sec:mram} \Dash which eventually leads to an overall sequential merge in the last round.
+\Citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} propose a parallel \MS{} which employs pivot elements to quickly partition runs recursively.
+Whilst the first parallel \MS{} with sequential merging can achieve a theoretical parallel speedup of at most \(\bigtheta{\log n}\) with infinite many processors, the parallel \MS{} with pivot elements reaches a theoretical parallel speedup of \(\bigtheta{n / \log^2 n}\).
+
+The parallel \MS{} is essentially a full-space \MS{}, meaning it needs an auxiliary array of the same size as the input array and the two arrays switch roles after each round.
+The merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer demanded that two runs be neighboured when merging.
+Instead, the indices of the first and last elements are passed as arguments.
+Likewise, the output location is arbitrary now, too, and not related to the indices of the two runs.
+Please note that the algorithm presented here is not stable but will be stabilised later on in this \lcnamecref{sec:par}.
+Suppose that there are but two tasklets and both have sorted their respective halves of the input.
+One of the tasklets is now suspended, whilst the other one determines which of the runs is longer.
+Then, it determines the middle element of the longer run, which will act as the aforementioned \emph{pivot}.
+The pivot is used to find an index~\(i\) which separates the shorter run such that any element with index \(i' < i\) is not greater than the pivot and any element with index \(i \ge i'\) is at least as great as the pivot.
+Finding such an index \(i\) can be done through a binary search.
+The elements in front of the pivot and index \(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
+This means that the final position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two first halves.
+Now, the first halves of both runs can be merged to the positions in front of the pivot, and the second halves can be merged to the positions behind the pivot.
+Since these two mergings affect distinct elements, they can be performed in parallel by the two tasklets.
+
+The parallel \MS{} can be generalised to work with more than two tasklets.
+If there are, for example, four tasklets, then Tasklets~0 and 1 merge their runs in parallel, as do Tasklets~2 and~3.
+Then, Tasklet~0 partitions the resulting two runs and assigns two of their halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their assigned halves again and merge in parallel with Tasklets~1 and~3, respectively.
+
+
+
+
+
+%\SetKw{KwSpawn}{spawn}
+%\SetKw{KwSync}{sync}
+%
+%\SetKwArray{Ends}{ends}
+%\SetKwArray{In}{input}
+%\SetKwArray{Out}{output}
+%\SetKwArray{Starts}{starts}
+%
+%\SetKwData{CutAt}{cut\_at}
+%\SetKwData{NewOffset}{new\_offset}
+%\SetKwData{Offset}{offset}
+%\SetKwData{Pivot}{pivot}
+%
+%\SetKwFunction{ParMerge}{par\_merge}
+%\SetKwFunction{Search}{binary\_search}
+%
+%\SetKwProg{KwFunction}{function}{}{end function}
+%
+%\begin{algorithm*}[!t]
+%	\KwData{%
+%		array \In containing two runs to merge,
+%		indices \Starts{\(2\)} of the first element of either run,
+%		indices \Ends{\(2\)} of the last element of either run,
+%		array \Out whither to merge the runs,
+%		index \Offset
+%	}
+%	\KwResult{%
+%		both runs merged together and written to \Out, starting at index \Offset
+%	}
+%
+%	\KwFunction{\ParMerge{\In, \Starts, \Ends, \Out, \Offset}}{
+%		\If{Run \liningnums{0} is longer}{
+%			Switch the order of the two runs.
+%		}
+%		\lIf{Run \liningnums{1} is empty}{\KwRet}
+%		\Pivot ← (\Starts{\(1\)} + \Ends{\(1\)}) ÷ \(2\)\;
+%		\CutAt ← \Search{\In{\Pivot}, \In, \Starts{\(0\)}, \Ends{\(0\)}}\;
+%		\NewOffset ← \Offset + (\CutAt – \Starts{\(0\)}) + (\Pivot\ – \Starts{\(1\)})\;
+%		\Out{\NewOffset} ← \In{\Pivot}\;
+%		\KwSpawn \ParMerge{\In, \Starts, \textup{[\CutAt\ – \(1\), \Pivot\ – \(1\)]}, \Out, \Offset}\;
+%		\ParMerge{\In, \textup{[\CutAt + \(1\), \Pivot + \(1\)]}, \Ends, \Out, \NewOffset \textup{+} \(1\)}\;
+%		\KwSync\;
+%	}
+%
+%	\caption{
+%		Two-tier merging of two MRAM runs, where the first one is the less run.
+%		In the event of the second run being less, flip all indices.
+%	}
+%\end{algorithm*}
+
+\begin{figure}
+	\centering
+	\tikzsetnextfilename{par_merge}
+	\begin{tikzpicture}[
+		scale=0.525, thick, line cap=round,  % todo: replace with general styles
+		ptr/.style={latex-, node font=\small},  % todo: replace with general styles
+		less/.style={very nearly transparent},
+		greater/.style={nearly transparent},
+		brace/.style={decorate, decoration={calligraphic brace, amplitude=5.5pt, raise=2pt}, line width=1.1pt},
+		brace down/.style={brace, decoration={mirror}},
+		fade left/.style={dash pattern=on 1pt off 3pt on 1pt off 3pt on 2pt off 3pt on 3pt off 2pt on 12pt},
+		fade right/.style={dash pattern=on 12pt off 2pt on 3pt off 3pt on 2pt off 3pt on 1pt off 3pt on 1pt},
+		long fade left/.style={dash pattern=on 1pt off 3pt on 1pt off 3pt on 1pt off 3pt on 2pt off 3pt on 2pt off 2pt on 3pt off 2pt on 3pt off 2pt on 14pt},
+		long fade right/.style={dash pattern=on 14pt off 2pt on 3pt off 2pt on 3pt off 3pt on 2pt off 3pt on 2pt off 2pt on 1pt off 3pt on 1pt off 3pt on 1pt},
+	]
+		\def\startA{\pad}
+		\def\lenAA{5}
+		\def\lenAB{5}
+
+		\def\startB{\padMid+\lenAB+1+\lenAA+\startA}
+		\def\lenBA{4}
+		\def\lenBB{3}
+
+		\def\startZ{\padMid/2+\pad}
+
+		\def\pad{2}
+		\def\padMid{2}
+		\def\len{\pad+\lenBB+\lenBA+\padMid+\lenAB+1+\lenAA+\pad}
+		\def\distance{3}
+
+		% Arrows.
+		\draw[ptr]             (1+\startZ,           1) -- +(90:\distance);
+		\draw[rounded corners] (1+\startZ, \distance/3) -| ++(0, 1) -| +(\padMid+\lenAB+\lenAA, \distance/3*2);
+
+		\draw[white, line width=4pt] ({\len-(\startZ)-1}, \distance/3*2+1) -| +(-\lenBA-\padMid-\lenBB, \distance/3);
+		\draw[rounded corners]       ({\len-(\startZ)-1},   \distance/3*2) -| ++(0, 1) -| +(-\lenBA-\padMid-\lenBB, \distance/3);
+		\draw[ptr]                   ({\len-(\startZ)-1},               1) -- +(90:\distance);
+
+		%			\draw[white, line width=4pt] (\startZ+\lenAA+\lenBA+0.75, 1) to[out=90, in=-90] (0.5+\lenAA+\startA, \distance+1);
+		%			\draw[ptr]                   (\startZ+\lenAA+\lenBA+0.50, 1) to[out=90, in=-90] (0.5+\lenAA+\startA, \distance+1);
+
+		\draw[white, line width=4pt] (\startZ+\lenAA+\lenBA+0.45, 1) -| +(0, \distance/4) -- (0.5+\lenAA+\startA, 1+\distance/16*13) -| +(0, \distance/16*3);
+		\draw[ptr, rounded corners]  (\startZ+\lenAA+\lenBA+0.50, 1) -| +(0, \distance/4) -- (0.5+\lenAA+\startA, 1+\distance/16*13) -| +(0, \distance/16*3);
+
+		% Filling.
+		\fill[   less, accentcolor] (         \startA, 1+\distance) rectangle +(\lenAA, 1);
+		\fill[greater, accentcolor] (1+\lenAA+\startA, 1+\distance) rectangle +(\lenAB, 1);
+
+		\fill[   less, accentcolor] (       \startB, 1+\distance) rectangle +(\lenBA, 1);
+		\fill[greater, accentcolor] (\lenBA+\startB, 1+\distance) rectangle +(\lenBB, 1);
+
+		\fill[   less, accentcolor] (                \startZ, 0) rectangle +(\lenBA+\lenAA, 1);
+		\fill[greater, accentcolor] (1+\lenBA+\lenAA+\startZ, 0) rectangle +(\lenBB+\lenAB, 1);
+
+		% Horizontal lines.
+		\draw[fade left]  (        0, 2+\distance) -- +(\pad, 0);
+		\draw[fade left]  (        0, 1+\distance) -- +(\pad, 0);
+		\draw[fade right] (\len-\pad, 2+\distance) -- +(\pad, 0);
+		\draw[fade right] (\len-\pad, 1+\distance) -- +(\pad, 0);
+
+		\draw (\startA, 2+\distance) -- (\len-\pad, 2+\distance);
+		\draw (\startA, 1+\distance) -- (\len-\pad, 1+\distance);
+
+		\draw[long fade left]  (               0, 1) -- +(\startZ, 0);
+		\draw[long fade left]  (               0, 0) -- +(\startZ, 0);
+		\draw[long fade right] ({\len-(\startZ)}, 1) -- +(\startZ, 0);
+		\draw[long fade right] ({\len-(\startZ)}, 0) -- +(\startZ, 0);
+
+		\draw (\startZ, 1) -- +({\len-(\startZ)*2}, 0);
+		\draw (\startZ, 0) -- +({\len-(\startZ)*2}, 0);
+
+		% Borders.
+		\draw (                \startA, 1+\distance) -- +(90:1);
+		\draw (         \lenAA+\startA, 1+\distance) -- +(90:1);
+		\draw (       1+\lenAA+\startA, 1+\distance) -- +(90:1);
+		\draw (\lenAB+1+\lenAA+\startA, 1+\distance) -- +(90:1);
+
+		\draw (              \startB, 1+\distance) -- +(90:1);
+		\draw (       \lenBA+\startB, 1+\distance) -- +(90:1);
+		\draw (\lenBB+\lenBA+\startB, 1+\distance) -- +(90:1);
+
+		\draw (                              \startZ, 0) -- +(90:1);
+		\draw (                \lenBA+\lenAA+\startZ, 0) -- +(90:1);
+		\draw (              1+\lenBA+\lenAA+\startZ, 0) -- +(90:1);
+		\draw (\lenBB+\lenAB+1+\lenBA+\lenAA+\startZ, 0) -- +(90:1);
+
+		% Braces.
+		\draw[brace] (\startA, 2+\distance) --+(\lenAB+1+\lenAA, 0) node[pos=0.5, above=1ex] {longer run\vphantom{p}};
+		\draw[brace] (\startB, 2+\distance) --+(  \lenBB+\lenBA, 0) node[pos=0.5, above=1ex] {shorter run\vphantom{p}};
+
+		% Texts.
+		\node[align=right, inner sep=0pt, text width=11mm] at (-1.3, 1+\distance+0.5) {\lstinline|Input|};
+		\node[align=right, inner sep=0pt]                  at (-1.3,             0.5) {\lstinline|Output|};
+
+		\node at (\startB-\padMid/2, 1+\distance+0.45) {⋯};
+
+		\node at (         \lenAA/2+\startA, 1+\distance+0.5) {\(\le p\)};
+		\node at (       0.5+\lenAA+\startA, 1+\distance+0.5) {\(p\vphantom{>}\)};
+		\node at (\lenAB/2+1+\lenAA+\startA, 1+\distance+0.5) {\(\ge p\)};
+
+		\node at (       \lenBA/2+\startB, 1+\distance+0.5) {\(\le p\)};
+		\node at (\lenBB/2+\lenBA+\startB, 1+\distance+0.5) {\(\ge p\)};
+
+		\node at (                \lenBA/2+\lenAA/2+\startZ, 0.5) {\(\le p\)};
+		\node at (                0.5+\lenBA+\lenAA+\startZ, 0.5) {\(p\vphantom{>}\)};
+		\node at (\lenBB/2+\lenAB/2+1+\lenBA+\lenAA+\startZ, 0.5) {\(\ge p\)};
+	\end{tikzpicture}
+	\caption{
+		A parallel merge of two runs.
+		The first run is the longer one, so its middle element \(p\) is chosen as pivot which is used to divide the shorter run.
+		Afterwards, the pivot is moved to its output location.
+		The two first halves of the runs are assigned to one tasklet and, eventually, are written to the positions in front of the pivot.
+		At the same time, the two second halves of the runs are processed by another tasklet.
+		\cite[Figure~27.6]{cormen2013algorithmen}
+	}
+	\label{fig:par:merge}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	% 32-bit | Instabil
 	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParUnstable_32#1}
 	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=false/uint32/#1.txt}
@@ -81,7 +312,7 @@
 	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
 }
 
-\NewDocumentCommand{\speedup}{m}{
+\NewDocumentCommand{\speeduppar}{m}{
 	\pgfplotstablegetelem{0}{µ_MergePar}\of#1
 	\pgfmathsetmacro{\messlatte}{\pgfplotsretval}
 		\addplot+ table[
@@ -97,39 +328,42 @@
 		\begin{groupplot}[
 			adaptive group=2 by 2,
 			groupplot xlabel={Tasklets},
-			groupplot ylabel={Speedup},
+			groupplot ylabel={Parallel Speedup},
 			xtick={1,2,4,8,16},
 			xmode=log,
 			ymin=0,
 			ymax=12,
 			ytick distance=2,
 		]
-			\nextgroupplot[title/.add={}{32-bit | Instabil}]
-			\pgfplotsset{legend to name=leg:par:speedup, legend entries={Sorted, Reverse S., Almost S., Uniform, Zipf's, Normal}}
+			\nextgroupplot[title/.add={}{32-bit | Unstable}]
+			\pgfplotsset{legend to name=leg:par:speedup, legend entries={Sorted, Reverse S., Almost S., Zero-One, Uniform, Zipf's}}
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-				\expandafter\speedup\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
 			}
 			%
-			\nextgroupplot[title/.add={}{64-bit | Instabil}]
+			\nextgroupplot[title/.add={}{64-bit | Unstable}]
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-				\expandafter\speedup\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
 			}
 			%
-			\nextgroupplot[title/.add={}{32-bit | Stabil}]
+			\nextgroupplot[title/.add={}{32-bit | Stable}]
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-				\expandafter\speedup\expandafter{\csname tableMergeParStable_32#1\endcsname}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParStable_32#1\endcsname}
 			}
 			%
-			\nextgroupplot[title/.add={}{64-bit | Stabil}]
+			\nextgroupplot[title/.add={}{64-bit | Stable}]
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
-				\expandafter\speedup\expandafter{\csname tableMergeParStable_64#1\endcsname}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParStable_64#1\endcsname}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil
+	\caption{
+		The parallel speedup of the parallel \MS{} on all benchmarked input distributions and data types, both in its stable and unstable variant.
+	}
 \end{figure}
