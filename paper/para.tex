@@ -82,67 +82,19 @@ Then, it determines the middle element of the longer run, which will act as the 
 The pivot is used to find an index~\(i\) which separates the shorter run such that any element with index \(i' < i\) is not greater than the pivot and any element with index \(i \ge i'\) is at least as great as the pivot.
 Finding such an index \(i\) can be done through a binary search.
 The elements in front of the pivot and index \(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
-This means that the final position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two first halves.
-Now, the first halves of both runs can be merged to the positions in front of the pivot, and the second halves can be merged to the positions behind the pivot.
+This means that the final position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two front halves.
+Now, the front halves of both runs can be merged to the positions in front of the pivot, and the back halves can be merged to the positions behind the pivot.
 Since these two mergings affect distinct elements, they can be performed in parallel by the two tasklets.
+
+The two tasklets do not merge the same number of elements necessarily, but the workloads cannot differ by a factor greater than three.
+The longer run has a length of at least \(n/2\) elements, the shorter run of at most \(n/2\) many.
+Due to the pivot being the middle element of the longer run, both tasklets are guaranteed to merge at least \(n/4\) elements.
+In the worst case, the pivot is either strictly less or strictly greater than all elements in the shorter run, meaning the shorter run divided at its beginning or end, respectively, and is merged in its entirety by one of the tasklets.
+This means that each tasklet merges at least \qty{25}{\percent} and at most \qty{75}{\percent} of the elements.
 
 The parallel \MS{} can be generalised to work with more than two tasklets.
 If there are, for example, four tasklets, then Tasklets~0 and 1 merge their runs in parallel, as do Tasklets~2 and~3.
 Then, Tasklet~0 partitions the resulting two runs and assigns two of their halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their assigned halves again and merge in parallel with Tasklets~1 and~3, respectively.
-
-
-
-
-
-%\SetKw{KwSpawn}{spawn}
-%\SetKw{KwSync}{sync}
-%
-%\SetKwArray{Ends}{ends}
-%\SetKwArray{In}{input}
-%\SetKwArray{Out}{output}
-%\SetKwArray{Starts}{starts}
-%
-%\SetKwData{CutAt}{cut\_at}
-%\SetKwData{NewOffset}{new\_offset}
-%\SetKwData{Offset}{offset}
-%\SetKwData{Pivot}{pivot}
-%
-%\SetKwFunction{ParMerge}{par\_merge}
-%\SetKwFunction{Search}{binary\_search}
-%
-%\SetKwProg{KwFunction}{function}{}{end function}
-%
-%\begin{algorithm*}[!t]
-%	\KwData{%
-%		array \In containing two runs to merge,
-%		indices \Starts{\(2\)} of the first element of either run,
-%		indices \Ends{\(2\)} of the last element of either run,
-%		array \Out whither to merge the runs,
-%		index \Offset
-%	}
-%	\KwResult{%
-%		both runs merged together and written to \Out, starting at index \Offset
-%	}
-%
-%	\KwFunction{\ParMerge{\In, \Starts, \Ends, \Out, \Offset}}{
-%		\If{Run \liningnums{0} is longer}{
-%			Switch the order of the two runs.
-%		}
-%		\lIf{Run \liningnums{1} is empty}{\KwRet}
-%		\Pivot ← (\Starts{\(1\)} + \Ends{\(1\)}) ÷ \(2\)\;
-%		\CutAt ← \Search{\In{\Pivot}, \In, \Starts{\(0\)}, \Ends{\(0\)}}\;
-%		\NewOffset ← \Offset + (\CutAt – \Starts{\(0\)}) + (\Pivot\ – \Starts{\(1\)})\;
-%		\Out{\NewOffset} ← \In{\Pivot}\;
-%		\KwSpawn \ParMerge{\In, \Starts, \textup{[\CutAt\ – \(1\), \Pivot\ – \(1\)]}, \Out, \Offset}\;
-%		\ParMerge{\In, \textup{[\CutAt + \(1\), \Pivot + \(1\)]}, \Ends, \Out, \NewOffset \textup{+} \(1\)}\;
-%		\KwSync\;
-%	}
-%
-%	\caption{
-%		Two-tier merging of two MRAM runs, where the first one is the less run.
-%		In the event of the second run being less, flip all indices.
-%	}
-%\end{algorithm*}
 
 \begin{figure}
 	\centering
@@ -252,23 +204,33 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 		\node at (\lenBB/2+\lenAB/2+1+\lenBA+\lenAA+\startZ, 0.5) {\(\ge p\)};
 	\end{tikzpicture}
 	\caption{
-		A parallel merge of two runs.
+		Parallel merging of two runs.
 		The first run is the longer one, so its middle element \(p\) is chosen as pivot which is used to divide the shorter run.
 		Afterwards, the pivot is moved to its output location.
-		The two first halves of the runs are assigned to one tasklet and, eventually, are written to the positions in front of the pivot.
-		At the same time, the two second halves of the runs are processed by another tasklet.
+		The two front halves of the runs are assigned to one tasklet and, eventually, are written to the positions in front of the pivot.
+		At the same time, the two back halves of the runs are processed by another tasklet.
 		\cite[Figure~27.6]{cormen2013algorithmen}
 	}
 	\label{fig:par:merge}
 \end{figure}
 
+\paragraph{Binary Search}
+The binary search is conventionally implemented, meaning elements are loaded individually from the MRAM and there is no mechanism to load a batch of data via \lstinline|mram_read| and search within the WRAM once the search interval has been narrowed down enough.
+Whilst we did implement such a two-tier binary search, the runtime reduction is only about \qty{2}{\permyriad}.
+The reason is that the binary search is executed a few times only, so its share of the total runtime is minuscule.
+For the sake of code simplicity and program size, the WRAM search tier has been removed.
+Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the IRAM remain free.
 
+Recall that the two halves assigned to a tasklet contain between \qty{25}{\percent} and \qty{75}{\percent} of the elements of the respective runs, which can lead to workload imbalances.
+A more even workload of \qty{50}{\percent} would be achieved if the middle element of the merged run were chosen as pivot and the runs divided accordingly.
+Finding the two positions where the runs shall be divided requires a modification to the binary search:
+Divide both runs in the middle.
+If these are not valid division points, then one of the runs has more little elements in its front half than the other run.
+This means that the front half of this run must be longer and the front half of the other run be shorter.
+Therefore, the search intervals can be narrowed down to the right side of the run with the less element and to the left side of the run with the greater element.
+The process can now be repeated until two valid division points are found.
 
-
-
-
-
-
+To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe, so the effect of load imbalances manifests in our measurements.
 
 
 
