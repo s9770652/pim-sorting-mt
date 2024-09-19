@@ -59,7 +59,7 @@
 \medbreak
 
 A simple way to parallelise \MS{} is the following:
-Let us assume that the number of tasklets is a power of two and that they are indexed starting from zero.
+Let us assume that the number of tasklets is a power of two and that they are indexed starting from 0.
 The whole input is shared evenly amongst all tasklets, and each tasklet sorts its share sequentially with the MRAM \MS{} of \cref{sec:mram}.
 Once finished, tasklet \(t\) with \(t \bmod 2 = 1\) informs tasklet \(t - 1\) that it is finished with sorting its share and gets permanently suspended.
 Tasklet \(t - 1\) uses \cref{alg:mram:two-tier merge} to merge its original share and the share of tasklet \(t\) into a bigger run.
@@ -83,7 +83,7 @@ The pivot is used to find an index~\(i\) which separates the shorter run such th
 Finding such an index \(i\) can be done through a binary search.
 The elements in front of the pivot and index \(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
 This means that the final position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two front halves.
-Now, the front halves of both runs can be merged to the positions in front of the pivot, and the back halves can be merged to the positions behind the pivot.
+Now, the front halves of both runs can be merged to the positions in front of the pivot using \cref{alg:mram:two-tier merge}, and the back halves can be merged to the positions behind the pivot.
 Since these two mergings affect distinct elements, they can be performed in parallel by the two tasklets.
 
 The two tasklets do not merge the same number of elements necessarily, but the workloads cannot differ by a factor greater than three.
@@ -230,10 +230,30 @@ This means that the front half of this run must be longer and the front half of 
 Therefore, the search intervals can be narrowed down to the right side of the run with the less element and to the left side of the run with the greater element.
 The process can now be repeated until two valid division points are found.
 
-To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe, so the effect of load imbalances manifests in our measurements.
+To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe of this thesis, so the effect of load imbalances manifests in our measurements.
 
 
 
+\paragraph{Alignment}
+In \cref{sec:mram}, it is demanded that all sizes and positions be multiples of 8.
+This can be ensured during the first, sequential phase of the parallel \MS{} by dividing the input accordingly and introducing dummy variables if need be.
+In the second phase with parallel merging, there is no control of any alignment whatsoever because the sizes of run halves are arbitrary.
+This raises the need for modifications to the sequential merge procedure (\cref{alg:mram:two-tier merge}), which slow it down, if the input consists of 32-bit elements.
+
+Before beginning with the first tier, the alignment of the output location must be checked.
+If it is unaligned, the less of the head elements of the runs is written to the output location.
+Now, the output location is aligned on 8 bytes again, meaning the first tier can proceed as normal since the cache can be emptied through \lstinline|mram_write| unproblematically.
+
+At first, the second tier proceeds as normal, too.
+Once the less run is depleted, the cache may contain an odd number of elements, so the current element of the greater run is written to the cache before emptying it.
+However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in the first phase, where it was sufficient to loop over the remainder in the MRAM, write it to the cache, and move it to the respective output location.
+The current output location is still aligned on 8 bytes but it may very well be that the first element of the remainder is on an unaligned address.
+This indicates a mismatch, as all unaligned elements must be transferred to an aligned address and all aligned elements to an unaligned one.
+When using \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the MRAM and within the WRAM is the same.
+In such an instance, the remainder is loaded blockwise from the MRAM into the cache.
+There, a loop shifts each element forward by one position, resolving the mismatch.
+Afterwards, the shifted elements can be written to the output location.
+Since only an even number of elements can be moved via \lstinline|mram_write|, it may be necessary to transfer a single item individually at the end in case that the remainder had an odd length.
 
 
 
@@ -284,7 +304,7 @@ To our dissatisfaction, we did not manage to implement a bug-free version of thi
 	] {#1};
 }
 
-\begin{figure}
+\begin{figure}[p]
 	\tikzsetnextfilename{speedup}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
