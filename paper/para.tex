@@ -3,9 +3,6 @@
 
 \begin{itemize}
 	\item
-	Falls Einzelelemente verwendet werden, geschieht das um den Pivot herum.
-
-	\item
 	Ausrechnen, dass die binäre Suche eine Promyriade der Laufzeit oder so ausmacht.
 
 	\item
@@ -58,11 +55,11 @@
 A simple way to parallelise \MS{} is the following:
 Let us assume that the number of tasklets is a power of two and that they are indexed starting from 0.
 The whole input is shared evenly amongst all tasklets, and each tasklet sorts its share sequentially with the MRAM \MS{} of \cref{sec:mram}.
-Once finished, tasklet \(t\) with \(t \bmod 2 = 1\) informs tasklet \(t - 1\) that it is finished with sorting its share and gets permanently suspended.
-Tasklet \(t - 1\) uses \cref{alg:mram:two-tier merge} to merge its original share and the share of tasklet \(t\) into a bigger run.
-Once finished, tasklet \(t\) with \(t \bmod 4 = 2\) informs tasklet \(t - 2\) that it is finished with sorting its share and gets permanently suspended.
-Then, tasklet \(t - 2\) merges its original share with that of tasklet \(t\).
-This scheme is continued until only two runs remain which get merged by tasklet \(0\).
+Once finished, Tasklet \(t\) with \(t \bmod 2 = 1\) informs Tasklet \(t - 1\) that it is finished with sorting its share and gets permanently suspended.
+Tasklet \(t - 1\) uses \cref{alg:mram:two-tier merge} to merge its original share and the share of Tasklet \(t\) into a bigger run.
+Once finished, Tasklet \(t\) with~\(t \bmod 4 = 2\) informs Tasklet \(t - 2\) that it is finished with sorting its share and gets permanently suspended.
+Then, Tasklet \(t - 2\) merges its original share with that of Tasklet \(t\).
+This scheme is continued until only two runs remain which get merged by Tasklet \(0\).
 
 The obvious bottleneck is the sequential execution of the traditional merge procedure \Dash the one also used in \cref{sec:tasklet,sec:mram} \Dash which eventually leads to an overall sequential merge in the last round.
 \Citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} propose a parallel \MS{} which employs pivot elements to quickly partition runs recursively.
@@ -221,7 +218,7 @@ Then, both tasklets partition again and inform Tasklet 1 and 3, respectively.
 This bidirectional scheme is expanded for the third and fourth round of parallel merging.
 Tasklets identify their communication partners and roles through bitwise logic on tasklet Ids.
 
-To inform others on \emph{which} elements they have to sort, a WRAM array is employed whither the particular indices are written by the tasklets performing the partitioning.
+To inform others on \emph{which} elements they have to sort, there is a WRAM array whither the particular indices are written by the tasklets performing the partitioning.
 To inform others on \emph{when} they are finished with sorting or partitioning, tasklets employ \emph{handshakes}.
 Handshakes allow for bilateral communication, which is enough for parallel \MS{}.
 A tasklet can invoke \lstinline|handshake_wait_for(id)| and is suspended until tasklet \lstinline|id| invokes \lstinline|handshake_notify()|.
@@ -280,6 +277,20 @@ Writing single 32-bit elements to the MRAM is not threadsafe, since, internally,
 Therefore, a so-called atomic write, which utilises costly virtual mutexes, must be performed.
 
 
+\paragraph{Stability}
+The parallel merging algorithm as presented above makes \MS{} unstable.
+The reason is that one or both runs may contain the pivot multiple times and that a division point separates the duplicates.
+Therefore, it must be ensured that all duplicates of a run remain within the same half.
+To do so, it is checked if its left neighbour has the same value once the value of the middle element is determined
+If so, there may be even more duplicates so a binary search is employed to find the first occurrence of the pivot value within the longer run.
+This first occurrence marks the division point for the longer run.
+Then, it must be checked whether the shorter run precedes or follows the longer run.
+If it precedes it, then possible duplicates of the pivot must also precede the counterparts in the longer run.
+In such an instance, a binary search is employed to find the greatest index \(i\) of the shorter run such that the element with index \(i - 1\) is at most as great as the pivot.
+If, however, the shorter run follows the longer run, analogous reasoning dictates the employment of a binary search to find the least index \(i\) such that the element with index \(i\) is at least as great as the pivot.
+In any case, it is now known how many elements precede the pivot so its position in the output can be determined.
+
+To our great dissatisfaction, we did not manage to implement a bug-free version within the timeframe of this thesis, as edge cases with many empty pairs of runs lead to buffer overflows with unknown sources.
 
 
 
@@ -299,22 +310,6 @@ Therefore, a so-called atomic write, which utilises costly virtual mutexes, must
 	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=false/uint64/#1.txt}
 	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=false/uint64/#1.txt}
 	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint64/#1.txt}
-
-	% 32-bit | Stabil
-	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_32#1}
-	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint32/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint32/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint32/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint32/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint32/#1.txt}
-
-	% 64-bit | Stabil
-	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_64#1}
-	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint64/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint64/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint64/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint64/#1.txt}
-	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
 }
 
 \NewDocumentCommand{\speeduppar}{m}{
@@ -331,7 +326,7 @@ Therefore, a so-called atomic write, which utilises costly virtual mutexes, must
 	\tikzsetnextfilename{speedup}
 	\begin{tikzpicture}[plot]
 		\begin{groupplot}[
-			adaptive group=2 by 2,
+			adaptive group=1 by 2,
 			groupplot xlabel={Tasklets},
 			groupplot ylabel={Parallel Speedup},
 			xtick={1,2,4,8,16},
@@ -340,29 +335,17 @@ Therefore, a so-called atomic write, which utilises costly virtual mutexes, must
 			ymax=12,
 			ytick distance=2,
 		]
-			\nextgroupplot[title/.add={}{32-bit | Unstable}]
+			\nextgroupplot[title/.add={}{32-bit}]
 			\pgfplotsset{legend to name=leg:par:speedup, legend entries={Sorted, Reverse S., Almost S., Zero-One, Uniform, Zipf's}}
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
 			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
 			}
 			%
-			\nextgroupplot[title/.add={}{64-bit | Unstable}]
+			\nextgroupplot[title/.add={}{64-bit}]
 			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
 			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
-			}
-			%
-			\nextgroupplot[title/.add={}{32-bit | Stable}]
-			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
-				\expandafter\speeduppar\expandafter{\csname tableMergeParStable_32#1\endcsname}
-			}
-			%
-			\nextgroupplot[title/.add={}{64-bit | Stable}]
-			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
-			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
-				\expandafter\speeduppar\expandafter{\csname tableMergeParStable_64#1\endcsname}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
