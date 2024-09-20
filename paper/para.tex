@@ -51,9 +51,6 @@
 		\item
 		Mithilfe von Barrieren wurde Tasklet 0 sequentiell laufen gelassen (in letzter Runde) -> keine Verbesserung der Laufzeit von 0
 	\end{itemize}
-
-	\item
-	zweiseitige Binärsuche um sortiert und dergleichen schneller zu machen.
 \end{itemize}
 
 \medbreak
@@ -214,9 +211,34 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 	\label{fig:par:merge}
 \end{figure}
 
+
+\paragraph{Communication \& Synchronisation}
+The communication network can be visualised as forest of binomial trees.
+During the first parallel merging, Tasklet 1 informs Tasklet 0 about being finished with sorting (\emph{bottom-up communication}), and Tasklet 0 informs Tasklet 1 about being finished with partitioning (\emph{top-down communication}).
+Likewise, Tasklet 3 and 4 communicate, Tasklets 5 and 6, and so on.
+During the second parallel merging, Tasklets 1, 2, and 3 inform Tasklet 0 about being finished with sorting, and Tasklet 0 informs Tasklet 2 about being finished with partitioning.
+Then, both tasklets partition again and inform Tasklet 1 and 3, respectively.
+This bidirectional scheme is expanded for the third and fourth round of parallel merging.
+Tasklets identify their communication partners and roles through bitwise logic on tasklet Ids.
+
+To inform others on \emph{which} elements they have to sort, a WRAM array is employed whither the particular indices are written by the tasklets performing the partitioning.
+To inform others on \emph{when} they are finished with sorting or partitioning, tasklets employ \emph{handshakes}.
+Handshakes allow for bilateral communication, which is enough for parallel \MS{}.
+A tasklet can invoke \lstinline|handshake_wait_for(id)| and is suspended until tasklet \lstinline|id| invokes \lstinline|handshake_notify()|.
+Likewise, if tasklet \lstinline|id| invokes \lstinline|handshake_notify|, it is suspended until some tasklet invokes \lstinline|handshake_wait_for| with its id.
+If two or more tasklets wait for the same tasklet, an error is thrown and the execution halts.
+Handshakes render bottom-up communication straightforward:
+Each non-root invokes \lstinline|handshake_notify| when done with sorting, and each root invokes \lstinline|handshake_wait_for| for all of its successors.
+Due to workload imbalances, some tasklets will try to shake hands earlier than others and have to wait.
+Because they are suspended while waiting, they free up the pipeline, thus quickening the pace of the remaining tasklets.
+Top-down communication is also straightforward:
+After having shaken hands, a non-root immediately invokes \lstinline|handshake_notify| again.
+The root repeatedly partitions the runs, writes the division points to the WRAM array mentioned earlier, and invokes \lstinline|handshake_wait_for| to resume the next tasklet.
+
+
 \paragraph{Binary Search}
 The binary search is conventionally implemented, meaning elements are loaded individually from the MRAM and there is no mechanism to load a batch of data via \lstinline|mram_read| and search within the WRAM once the search interval has been narrowed down enough.
-Whilst we did implement such a two-tier binary search, the runtime reduction is only about \qty{2}{\permyriad}.
+Whilst we did implement such a two-tier binary search, the runtime reduction is only about \qty{2}{\permyriad}, that is barely above measurement uncertainty.
 The reason is that the binary search is executed a few times only, so its share of the total runtime is minuscule.
 For the sake of code simplicity and program size, the WRAM search tier has been removed.
 Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the IRAM remain free.
@@ -231,7 +253,6 @@ Therefore, the search intervals can be narrowed down to the right side of the ru
 The process can now be repeated until two valid division points are found.
 
 To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe of this thesis, so the effect of load imbalances manifests in our measurements.
-
 
 
 \paragraph{Alignment}
@@ -255,6 +276,8 @@ There, a loop shifts each element forward by one position, resolving the mismatc
 Afterwards, the shifted elements can be written to the output location.
 Since only an even number of elements can be moved via \lstinline|mram_write|, it may be necessary to transfer a single item individually at the end in case that the remainder had an odd length.
 
+Writing single 32-bit elements to the MRAM is not threadsafe, since, internally, eight bytes are read to an oblique WRAM cache, partially modified, and written back to the MRAM.
+Therefore, a so-called atomic write, which utilises costly virtual mutexes, must be performed.
 
 
 
