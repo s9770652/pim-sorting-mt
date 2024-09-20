@@ -235,7 +235,7 @@ The root repeatedly partitions the runs, writes the division points to the WRAM 
 
 \paragraph{Binary Search}
 The binary search is conventionally implemented, meaning elements are loaded individually from the MRAM and there is no mechanism to load a batch of data via \lstinline|mram_read| and search within the WRAM once the search interval has been narrowed down enough.
-Whilst we did implement such a two-tier binary search, the runtime reduction is only about \qty{2}{\permyriad}, that is barely above measurement uncertainty.
+Whilst we did implement such a two-tier binary search, the runtime reduction is below measurement uncertainty.
 The reason is that the binary search is executed a few times only, so its share of the total runtime is minuscule.
 For the sake of code simplicity and program size, the WRAM search tier has been removed.
 Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the IRAM remain free.
@@ -292,6 +292,21 @@ In any case, it is now known how many elements precede the pivot so its position
 
 To our great dissatisfaction, we did not manage to implement a bug-free version within the timeframe of this thesis, as edge cases with many empty pairs of runs lead to buffer overflows with unknown sources.
 
+
+
+\subsection{Evaluation of the Performance}
+
+The parallel speedup of \MS{} for \qty{32}{\mebi\byte} of data is shown in \cref{fig:par:merge}.
+The optimal parallel speedup is linear in the number of elements but is capped at 11 or, rather, slightly above because of latency hiding.\todo{Begriff iwo einführen!}
+For uniformly distributed inputs and inputs following Zipf's law, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit elements.
+This is owed to workloads tending to be balanced naturally and tasklets being removed from the pipeline once they are finished.
+Also, there are only \(\lb(\text{\lstinline|NR_TASKLETS|})\) many synchronisation points during parallel merging.
+These are dominated by the DMAs for single elements performed by the binary searches.
+Still, a binary search on a run of \qty{16}{\mebi\byte} of 32-bit elements takes only 21 rounds, meaning that about \(21 \cdot (77 + 0.5 \cdot 4) = 1659\) cycles are spent on DMAs.
+Even taking stalling by other tasklets into account, this number is insignificant as total runtimes reach into billions of cycles.
+
+For zero-one inputs, the parallel speedup is between 8 and 9.
+Next to slight workload imbalances, we speculate that unaligned flushes affect considerably more elements than, for example, in case of the uniform input distribution.
 
 
 \expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
@@ -352,6 +367,7 @@ To our great dissatisfaction, we did not manage to implement a bug-free version 
 
 	\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil
 	\caption{
-		The parallel speedup of the parallel \MS{} on all benchmarked input distributions and data types, both in its stable and unstable variant.
+		The parallel speedup of \MS{} on all benchmarked input distributions and data types, both in its stable and unstable variant.
+		The grey line indicates an ideal, linear speedup which is capped at 11 because of the pipeline.
 	}
 \end{figure}
