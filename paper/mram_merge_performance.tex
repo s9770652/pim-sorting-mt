@@ -170,9 +170,9 @@ Also, \unrolledcachelength{} is always set to \cachesize{} / \lstinline[keywords
 			64-bit integers (\(n = 2^{22} / \mathit{Tasklets}\))
 		}
 	\end{subtable}
-	\setmathfont{LibertinusMath-Regular.otf}
+
 	\caption{
-		Runtimes of the sequential MRAM \MS{} in hundred thousand cycles for different values of \cachesize{} and \seqreadcachesize{} on uniformly distributed inputs.
+		Runtimes of the sequential MRAM \MS{} in hundred thousand cycles for different values of \cachesize{} and \seqreadcachesize{} on \qty{32}{\mebi\byte} of uniformly distributed inputs.
 		The input is divided evenly amongst the eleven to sixteen tasklets, which sort their proportion of the input concurrently.
 		Each measurement represents the mean of the maximum runtimes of individual tasklets.
 	}
@@ -246,10 +246,13 @@ However, these normalised runtimes still evince that suspended tasklets free the
 
 Next, we look at the performance of MRAM \MS{}, both in its half-space and its full-space variant, across all benchmarked input distributions.
 As \cref{fig:merge:mram} shows that like its WRAM counterpart, the full-space MRAM \MS{} works the fastest on sorted inputs, which is because one of the runs in each pair of runs to merge is flushed in its entirety without the overhead from the comparisons and elementwise moves.
-Reverse sorted inputs are sorted a bit slower despite the same flushing pattern
+Reverse sorted inputs are sorted a bit slower despite the same flushing pattern.
 This is explicable through the worse performance of \IS{} on reverse sorted inputs.
 The same phenomenon occurs with WRAM \MS*{}, but there, the influence of \IS{} on the total runtime is much higher because of the shorter inputs, leading to this input distribution being the worst-case, which is not the case anymore for MRAM \MS*{}.
-Almost sorted inputs are also sorted a bit slower, however, this is because more elements need to be compared before nondepleted runs can be flushed.
+Almost sorted inputs are also sorted a bit slower, however, this is because more elements need to be compared before nondepleted runs can be flushed:
+When a pair of runs is merged, one of them contains comparatively little elements for the most part, whereas the other contains comparatively great elements.
+If the former run contains just one great element, it will be merged almost entirely.
+Upon reaching the one greater element, some elements of the run with mostly great elements must be merged before the last element of the other run can finally be merged and a cheap flush be performed.
 The effect becomes stronger for the rest of the input distributions, explaining why the uniform one constitutes the worst-case.
 
 For the half-space \MS{}, the picture is different.
