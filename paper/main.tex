@@ -167,21 +167,17 @@
 		The numbers from \(0\) to \(n - 1\) are generated in descending order.
 
 		\item[Almost Sorted]
-		First, the numbers from \(0\) to \(n - 1\) are generated in ascending order, then, \(\floor{\sqrt{n}}\) random pairs are sequentially drawn and swapped.
-		There are no checks on whether pairs have common elements.
+		First, the numbers from \(0\) to \(n - 1\) are generated in ascending order, then, \(\floor{\sqrt{n}}\) many random pairs are drawn and swapped sequentially.
+		Pairs may not be disjoint.
+
+		\item[Zero-One]
+		Every number is set to either \(0\) or \(1\), each with a probability of \qty{50}{\percent}.
 
 		\item[Uniform]
-		Each number is drawn independently and uniformly from the range \([0, 2^{31} - 1]\).
-
-		\item[Narrow Uniform]
-		Each number is drawn independently and uniformly from the range \([0, n - 1]\).
-		\todo{Bisher nicht. Als Ersatz für die Normalverteilung?}
+		Every number is drawn independently and uniformly from the range \([0, 2^{31} - 1]\).
 
 		\item[Zipf's]
-		Each number is drawn independently from the range \([1, 100]\), with each value \(k\) drawn with a probability proportional to \(1/k^{0.75}\).
-
-		\item[Normal]
-		Each number is drawn independently according to a normal distribution with mean \(\mu = 2^{31}\) and standard deviation \(\sigma = \min\paren*{1, \floor*{n/8}}\).
+		Every number is drawn independently from the range \([1, 100]\), with each value \(k\) being drawn with a probability proportional to \(1/k^{0.75}\).
 	\end{description}
 
 	\include{tasklet}
