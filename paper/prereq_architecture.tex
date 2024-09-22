@@ -1,0 +1,383 @@
+\section{Architecture}
+\label{sec:prereq:architecture}
+
+\begin{itemize}
+	\item
+	unmodified DRAM process (DDR4 2400 DIMM)
+	\begin{itemize}
+		\item
+		replacement for standard DIMMS
+		\begin{itemize}
+			\item
+			two (?) regular DIMMS must still be present
+
+			\item
+			conventional memory controllers
+		\end{itemize}
+
+		\item
+		2 × 8 PIM chips
+
+		\item
+		chips on top
+
+		\item
+		64 MiB RAM per chip
+
+		\item
+		8 DPUs per PIM chip → 128 DPUs and 8 GiB per DIMM
+
+		\item
+		up to 28 DIMMs → 3584 DPUs
+
+		\item
+		software tasklets = hardware threads (24)
+		\begin{itemize}
+			\item
+			independent (Single Program Multiple Data (SPMD))
+		\end{itemize}
+
+		\item
+		high parallelisation is needed!
+
+		\item
+		reminiscent of GPU programming
+
+		\item
+		fast memory access due to spatial proximity → data movement bottleneck bypassed
+
+		\item
+		bad:
+		less dense and 3 times slower than ASICs
+
+		\item
+		compute-bound architecture, so memory-bound problems better
+
+		\item
+		energiesparsam:
+		etwa 1,2 W je Die
+		(+ ein paar Zahlen aus HotChips heraussuchen)
+	\end{itemize}
+
+	\item
+	memories
+	\begin{itemize}
+		\item
+		MRAM:
+		64 MiB
+		\begin{itemize}
+			\item
+			slow
+
+			\item
+			readily available to both DPU and host, but not at the same time
+
+			\item
+			structure up to the programmer
+		\end{itemize}
+
+		\item
+		WRAM:
+		64 KiB (less with v1B DPUs)
+		\begin{itemize}
+			\item
+			fast
+
+			\item
+			only available to host if specified
+
+			\item
+			allocated memory for stacks for each tasklet
+
+			\item
+			free memory allocatable later
+		\end{itemize}
+
+		\item
+		IRAM:
+		24 KiB IRAM (less with v1B DPUs)
+		\begin{itemize}
+			\item
+			contains instructions (up to 4096/3968)
+
+			\item
+			readable and writeable by the host, readable by the DPU
+		\end{itemize}
+
+		\item
+		atomic memory:
+		256 bits
+		\begin{itemize}
+			\item
+			hardware support for atomic accesses
+		\end{itemize}
+
+		\item
+		run memory:
+		64 bits
+		\begin{itemize}
+			\item
+			booting, suspending, and resuming threads/tasklets
+		\end{itemize}
+
+		\item
+		Grafik:
+		HotChips 31, Folie 14
+	\end{itemize}
+
+	\item
+	pipeline
+	\begin{itemize}
+		\item
+		Grafik:
+		HotChips 31, Folie 12
+
+		\item
+		350 MHz (Handbuch), 400 MHz (Handbuch), 450 MHz (\enquote{Reference Platfrom}), 500 MHz (Hot chip), 600 MHz (White paper)
+
+		\item
+		14 pipe stages; 3 overlap → 11 cycles effectively per instruction (uniform cost model → counting cycles/instructions useful)
+		\begin{itemize}
+			\item
+			Ausnahmen:
+			DMAs;
+			12 Takte
+		\end{itemize}
+
+		\item
+		interleaved → nominal performance of 1 instruction per cycle with 11+ tasklets (more not harmful)
+
+		\item
+		autonomous DMA engine with little to no effect on pipeline performance
+	\end{itemize}
+
+	\item
+	instruction set architecture (ISA)
+	\begin{itemize}
+		\item
+		RISC
+
+		\item
+		mostly no
+
+		\item
+		32-bit mostly with few 64-bit instructions
+
+		\item
+		many instructions for 64 bit emulated
+
+		\item
+		no native multiplication or division;
+		function calls if not emulatable through bitwise shifts
+
+		\item
+		no native floating point arithmetic
+
+		\item
+		registers
+		\begin{itemize}
+			\item
+			32 in total
+			\begin{itemize}
+				\item
+				r0 -- r7:
+				private,
+				general purpose,
+				caller saved,
+				argument 1 -- 7,
+				return register(s)
+
+				\item
+				r8 -- 13:
+				private,
+				general purpose,
+				caller saved
+
+				\item
+				r14 -- 21:
+				private,
+				general purpose,
+				callee saved
+
+				\item
+				r22:
+				private,
+				stack pointer
+
+				\item
+				r23:
+				private,
+				return address
+
+				\item
+				zero, one, lneg (--1), mneg (--2\textsuperscript{31}):
+				common,
+				read-only
+
+				\item
+				id, id2, id4, id8:
+				private,
+				read-only
+
+				\item
+				d0 -- d22:
+				64-bit integers
+
+				\item
+				still more:
+				program counter (12--16 bit);
+				time counter (36 bit);
+				carry bit for 64-bit instructions (persistent 1-bit flag);
+				zero flag (persistent 1-bit flag)
+			\end{itemize}
+
+			\item
+			64-bit loads, stores, moves
+		\end{itemize}
+
+		\item
+		3-operands design, but labels and immediate values also possible
+
+		\item
+		registers written in reverse order
+
+		\item
+		result register always last
+
+		\item
+		plethora of conditions (51!)
+		\begin{itemize}
+			\item
+			statuses used in conjunction with conditions
+
+			\item
+			jump, but also do something and jump
+
+			\item
+			cheaper loops
+		\end{itemize}
+
+		\item
+		no branch prediction
+
+		\item
+		costs for memory accesses independent from address
+	\end{itemize}
+
+	\item
+	programming model
+	\begin{itemize}
+		\item
+		C for DPU, C, C++, Java, or Python for host
+		\begin{itemize}
+			\item
+			theoretically no need for inline assembler
+		\end{itemize}
+
+		\item
+		software development kit includes simulator
+
+		\item
+		main orchestration by CPU
+
+		\item
+		typical approach:
+		boot host program → write to MRAM and/or WRAM → boot DPUs → compute on DPUs → read from MRAM and/or WRAM once finished → repeat if needed (no memory deletion)
+
+		\item
+		wichtig:
+		\lstinline|mram_read| und \lstinline|mram_write| statt normaler Zugriffe
+		\begin{itemize}
+			\item
+			DMAs:
+			MRAM → WRAM;
+			WRAM → MRAM;
+			MRAM → IRAM (not interesting)
+
+			\item
+			alignment on 8 bytes of targets and source addresses
+
+			\item
+			transfer size between 8 and 2048 bytes + multiple of 8
+
+			\item
+			serial transfer
+
+			\item
+			the greater the transfer, the less significant the overhead
+
+			\item
+			Angabe der Geschwindigkeiten der Zürcher
+		\end{itemize}
+
+		\item
+		WRAM heap allocation
+		\begin{itemize}
+			\item
+			several option:
+			incremental allocator (≈ \lstinline|malloc|), buddy allocator, block allocator
+
+			\item
+			free WRAM after the stacks, global variables, internal and oblique caches
+
+			\item
+			heap misnomer;
+			actually a stack
+
+			\item
+			no possibility to partially free;
+			full resets only
+
+			\item
+			no true ownership;
+			paying heed duty by programmer
+		\end{itemize}
+
+		\item
+		communication \& synchronisation with other tasklets mainly via global variables in WRAM and MRAM, barriers, semaphores and so on
+
+		\item
+		stick to 32-bit if possible
+		\begin{itemize}
+			\item
+			64 bit costs the same, twice or thrice
+		\end{itemize}
+
+		\item
+		stick to addition, subtraction, bitwise logic
+
+		\item
+		fewer instructions → better
+		\begin{itemize}
+			\item
+			store reused results as compiler may discard them
+
+			\item
+			global variables better than arguments if function called oftentimes
+
+			\item
+			inlining häufig besser, da kein Funktionsaufruf (empirisch 144 Takte bei zwei Argumenten), aber nicht immer
+
+			\item
+			pointer arithmetic tends to be compiler better
+		\end{itemize}
+
+		\item
+		aber:
+		Compiler macht eh immer einen Strich durch die Rechnung
+
+		\item
+		recall:
+		no imminent locality of time and space
+		\begin{itemize}
+			\item
+			of course, DMAs somewhat reintroduce it
+		\end{itemize}
+
+		\item
+		use as little synchronisation as possible, especially between DPUs
+
+		\item
+		utilise the pipeline as much as possible
+	\end{itemize}
+\end{itemize}
