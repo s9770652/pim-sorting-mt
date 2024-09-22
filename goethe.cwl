@@ -31,6 +31,7 @@
 
 #include:hyperref
 #include:cleveref
+#include:acronym
 
 #include:fixdif
 

@@ -41,10 +41,10 @@
 }
 \makeatother
 
-
 \RequirePackage{hyperref}  % klickbare Verweise
 \hypersetup{final}  % nicht direkt geladen, da 'beamer' vorher schon 'hyperref' lädt
 \RequirePackage[nameinlink, capitalize]{cleveref}  % Namen in Verweisen
+\RequirePackage[withpage, printonlyused]{acronym}
 
 \RequirePackage{fixdif}  % bessere Ableitungsoperatoren; benötigt 'unicode-math'; nach 'hyperref' zu laden
 
