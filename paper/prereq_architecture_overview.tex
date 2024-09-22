@@ -1,0 +1,24 @@
+\subsubsection{Overview}
+\label{sec:prereq:architecture:overview}
+
+The in-memory processing (PIM) capabilities are realised on, at its base, sticks of regular \emph{random access memory} (RAM) or, to be more precise, on \emph{Dual In-Line Memory Modules} (DIMMs) of \emph{Double Data Rate 4 Synchronous Dynamic Random-Access Memory} with a transfer rate of \qty{2400}{\mega\transfer\per\second} (DDR4-2400 SDRAM).
+Therefore, PIM DIMMs can act as replacement for DIMMs already present in existing systems without repercussion for tasks which do not rely on in-memory processing.
+With 8 on either side, a PIM DIMM contains 16 modified DRAM packages called \emph{PIM chips}.
+Each PIM chip, in turn, contains 8 \emph{DRAM processing units} (DPUs), so there are 128 DPUs per DIMM.
+Each DPU is closely situated to one of the memory banks of size \qty{64}{\mebi\byte} which constitute the memory of a regular DDR4 DIMM.
+Due to the spatial proximity to its memory bank, a DPU is capable of rapidly accessing data stored on a DIMM.
+
+A DPU possesses 24 hardware threads, whose software abstraction are called \emph{tasklets}.
+Taklets work independently from each other, meaning programs can use different control flows to process different data.
+The orchestration of DPUs and their tasklets pose a major challenge during programming.
+To put things into perspective:
+UPMEM sells systems with up to 28 PIM DIMMS, setting the total count of DPUs to \num{3584} and of tasklets to \num{86016}.
+Hence, for a task to run well on a PIM system, it not only needs to frequently access the RAM, it also needs to be highly parallelisable.
+If such a highly parallelisable task is indeed on hand, speedups well in the double digits for memory-bound tasks, compared to an execution on a CPU or GPU, are possible (compare \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}).
+Next to a faster execution, a gain in power efficiency is also to be expected, since data transfers between the RAM and a host CPU drive the energy consumption in regular systems significantly;
+UPMEM claims a tenfold increase of the power efficiency.
+
+The retention of the general DDR4 architecture comes at a price.
+A DPU is implemented using only three layers of silicon, resulting in three times slower transistors compared to other transistors of the same process node.
+Also, their density is considerably reduced.
+In consequence, DPUs are not suitable for computing-intensive tasks (compare also \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}).
