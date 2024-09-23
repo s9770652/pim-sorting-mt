@@ -1,43 +1,44 @@
-\chapter{Parallel Sorting in the MRAM}
+\chapter{Parallel Sorting in the \ac{MRAM}}
 \label{sec:par}
 
-A simple way to parallelise \MS{} is the following:
-Let us assume that the number of tasklets is a power of two and that they are indexed starting from 0.
-The whole input is shared evenly amongst all tasklets, and each tasklet sorts its share sequentially with the MRAM \MS{} of \cref{sec:mram}.
-Once finished, Tasklet \(t\) with \(t \bmod 2 = 1\) informs Tasklet \(t - 1\) that it is finished with sorting its share and gets permanently suspended.
-Tasklet \(t - 1\) uses \cref{alg:mram:two-tier merge} to merge its original share and the share of Tasklet \(t\) into a bigger run.
-Once finished, Tasklet \(t\) with~\(t \bmod 4 = 2\) informs Tasklet \(t - 2\) that it is finished with sorting its share and gets permanently suspended.
+A simplistic way to parallelise \MS{} is the following:
+Let us assume that the number of tasklets is a power of two and that they are numbered starting from 0.
+The whole input array is divided into as many shares of equal length as there are tasklets, and each tasklet sorts a share sequentially using the \ac{MRAM} \MS{} of \cref{sec:mram:merge}.
+Once finished, Tasklet \(t\) with \(t \bmod 2 = 1\) informs Tasklet \(t - 1\) that it is finished with sorting its share, and gets permanently suspended.
+Tasklet \(t - 1\) merges its original share and the share of Tasklet \(t\) into a bigger run.
+Once finished, Tasklet \(t\) with~\(t \bmod 4 = 2\) informs Tasklet \(t - 2\) that it is finished with sorting its share, and gets permanently suspended.
 Then, Tasklet \(t - 2\) merges its original share with that of Tasklet \(t\).
-This scheme is continued until only two runs remain which get merged by Tasklet \(0\).
+This scheme is continued until only two runs remain which get merged by Tasklet~0.
 
-The obvious bottleneck is the sequential execution of the traditional merge procedure \Dash the one also used in \cref{sec:tasklet,sec:mram} \Dash which eventually leads to an overall sequential merge in the last round.
-\Citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} propose a parallel \MS{} which employs pivot elements to quickly partition runs recursively.
-Whilst the first parallel \MS{} with sequential merging can achieve a theoretical parallel speedup of at most \(\bigtheta{\log n}\) with infinite many processors, the parallel \MS{} with pivot elements reaches a theoretical parallel speedup of \(\bigtheta{n / \log^2 n}\).
+The bottleneck is the sequential execution of each merge which eventually leads to an overall sequentially executed algorithm in the last round.
+Even with infinite many processors, this simplistic parallel \MS{} can achieve a theoretical parallel speedup of at most \(\bigtheta{\log n}\).
+\Citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} propose an alternative approach whose maximum theoretical parallel speedup is \(\bigtheta{n / \log^2 n}\).
+One of its advantage is that the merge procedure does not change fundamentally.
+Also, the number of synchronisation points is logarithmic in the number of tasklets only and the time which each synchronisation takes is insignificant compared to the total runtime.
 
 The parallel \MS{} is essentially a full-space \MS{}, meaning it needs an auxiliary array of the same size as the input array and the two arrays switch roles after each round.
-The merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer demanded that two runs be neighboured when merging.
-Instead, the indices of the first and last elements are passed as arguments.
+The parallel merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer demanded that two runs be neighboured when merging.
 Likewise, the output location is arbitrary now, too, and not related to the indices of the two runs.
 Please note that the algorithm presented here is not stable but will be stabilised later on in this \lcnamecref{sec:par}.
-Suppose that there are but two tasklets and both have sorted their respective halves of the input.
+Suppose that there are but two tasklets and both have sorted their respective share of the input.
 One of the tasklets is now suspended, whilst the other one determines which of the runs is longer.
-Then, it determines the middle element of the longer run, which will act as the aforementioned \emph{pivot}.
-The pivot is used to find an index~\(i\) which separates the shorter run such that any element with index \(i' < i\) is not greater than the pivot and any element with index \(i \ge i'\) is at least as great as the pivot.
+Then, it determines the median of the longer run, which will act as \emph{pivot element}.
+The pivot is used to find an index~\(i\) which separates the shorter run such that any element with index \(i' < i\) is not greater than the pivot and any element with index \(i' \ge i\) is at least as great as the pivot.
 Finding such an index \(i\) can be done through a binary search.
-The elements in front of the pivot and index \(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
-This means that the final position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two front halves.
+The elements in front of the pivot and index~\(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
+This means that the position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two front halves.
 Now, the front halves of both runs can be merged to the positions in front of the pivot using \cref{alg:mram:two-tier merge}, and the back halves can be merged to the positions behind the pivot.
-Since these two mergings affect distinct elements, they can be performed in parallel by the two tasklets.
+Since these two merges affect distinct elements, they can be performed in parallel by the two tasklets.
 
 The two tasklets do not merge the same number of elements necessarily, but the workloads cannot differ by a factor greater than three.
 The longer run has a length of at least \(n/2\) elements, the shorter run of at most \(n/2\) many.
-Due to the pivot being the middle element of the longer run, both tasklets are guaranteed to merge at least \(n/4\) elements.
+Due to the pivot being the median of the longer run, both tasklets are guaranteed to merge at least \(n/4\) elements.
 In the worst case, the pivot is either strictly less or strictly greater than all elements in the shorter run, meaning the shorter run divided at its beginning or end, respectively, and is merged in its entirety by one of the tasklets.
 This means that each tasklet merges at least \qty{25}{\percent} and at most \qty{75}{\percent} of the elements.
 
 The parallel \MS{} can be generalised to work with more than two tasklets.
 If there are, for example, four tasklets, then Tasklets~0 and 1 merge their runs in parallel, as do Tasklets~2 and~3.
-Then, Tasklet~0 partitions the resulting two runs and assigns two of their halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their assigned halves again and merge in parallel with Tasklets~1 and~3, respectively.
+Then, Tasklet~0 partitions the resulting two runs and assigns two of their halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their particular halves again and merge in parallel with Tasklets~1 and~3, respectively.
 
 \begin{figure}
 	\centering
@@ -147,8 +148,8 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 		\node at (\lenBB/2+\lenAB/2+1+\lenBA+\lenAA+\startZ, 0.5) {\(\ge p\)};
 	\end{tikzpicture}
 	\caption{
-		Parallel merging of two runs.
-		The first run is the longer one, so its middle element \(p\) is chosen as pivot which is used to divide the shorter run.
+		Parallel merge of two runs.
+		The first run is the longer one, so its median \(p\) is chosen as pivot which is used to divide the shorter run.
 		Afterwards, the pivot is moved to its output location.
 		The two front halves of the runs are assigned to one tasklet and, eventually, are written to the positions in front of the pivot.
 		At the same time, the two back halves of the runs are processed by another tasklet.
@@ -160,37 +161,37 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 
 \paragraph{Communication \& Synchronisation}
 The communication network can be visualised as forest of binomial trees.
-During the first parallel merging, Tasklet 1 informs Tasklet 0 about being finished with sorting (\emph{bottom-up communication}), and Tasklet 0 informs Tasklet 1 about being finished with partitioning (\emph{top-down communication}).
-Likewise, Tasklet 3 and 4 communicate, Tasklets 5 and 6, and so on.
-During the second parallel merging, Tasklets 1, 2, and 3 inform Tasklet 0 about being finished with sorting, and Tasklet 0 informs Tasklet 2 about being finished with partitioning.
-Then, both tasklets partition again and inform Tasklet 1 and 3, respectively.
-This bidirectional scheme is expanded for the third and fourth round of parallel merging.
-Tasklets identify their communication partners and roles through bitwise logic on tasklet Ids.
+During the first parallel merge, Tasklet~1 informs Tasklet~0 about being finished with sorting (\emph{bottom-up communication}), and Tasklet~0 informs Tasklet~1 about being finished with partitioning (\emph{top-down communication}).
+Likewise, Tasklet~3 and~4 communicate, Tasklets~5 and~6, and so on.
+During the second parallel merge, Tasklets~1, 2, and~3 inform Tasklet~0 about being finished with sorting, and Tasklet~0 informs Tasklet~2 about being finished with partitioning.
+Then, both tasklets partition again and inform Tasklet~1 and 3, respectively.
+This bidirectional scheme is expanded for the third and fourth round of parallel merging if those exist.
+Tasklets identify their communication partners through bitwise logic on tasklet identifiers.
 
-To inform others on \emph{which} elements they have to sort, there is a WRAM array whither the particular indices are written by the tasklets performing the partitioning.
+To inform others on \emph{which} elements they have to sort, there is a \ac{WRAM} array whither the particular indices are written by the tasklets performing the partitioning.
 To inform others on \emph{when} they are finished with sorting or partitioning, tasklets employ \emph{handshakes}.
 Handshakes allow for bilateral communication, which is enough for parallel \MS{}.
-A tasklet can invoke \lstinline|handshake_wait_for(id)| and is suspended until tasklet \lstinline|id| invokes \lstinline|handshake_notify()|.
-Likewise, if tasklet \lstinline|id| invokes \lstinline|handshake_notify|, it is suspended until some tasklet invokes \lstinline|handshake_wait_for| with its id.
+A tasklet can call \lstinline|handshake_wait_for(id)| and is suspended until Tasklet~\lstinline|id| calls \lstinline|handshake_notify()|.
+Likewise, if Tasklet \lstinline|id| calls \lstinline|handshake_notify|, it is suspended until some tasklet calls \lstinline|handshake_wait_for| with its id.
 If two or more tasklets wait for the same tasklet, an error is thrown and the execution halts.
 Handshakes render bottom-up communication straightforward:
-Each non-root invokes \lstinline|handshake_notify| when done with sorting, and each root invokes \lstinline|handshake_wait_for| for all of its successors.
+Each non-root calls \lstinline|handshake_notify| when done with sorting, and each root calls \lstinline|handshake_wait_for| for all of its successors.
 Due to workload imbalances, some tasklets will try to shake hands earlier than others and have to wait.
 Because they are suspended while waiting, they free up the pipeline, thus quickening the pace of the remaining tasklets.
 Top-down communication is also straightforward:
-After having shaken hands, a non-root immediately invokes \lstinline|handshake_notify| again.
-The root repeatedly partitions the runs, writes the division points to the WRAM array mentioned earlier, and invokes \lstinline|handshake_wait_for| to resume the next tasklet.
+After having shaken hands, a non-root immediately calls \lstinline|handshake_notify| again to get suspended once more.
+The root repeatedly partitions the runs, writes the division points to the \ac{WRAM} array mentioned earlier, and calls \lstinline|handshake_wait_for| to resume the next tasklet.
 
 
 \paragraph{Binary Search}
-The binary search is conventionally implemented, meaning elements are loaded individually from the MRAM and there is no mechanism to load a batch of data via \lstinline|mram_read| and search within the WRAM once the search interval has been narrowed down enough.
+The binary search is conventionally implemented, meaning elements are loaded individually from the \ac{MRAM} and there is no mechanism to load a block of data via \lstinline|mram_read| and search within the \ac{WRAM} once the search interval has been narrowed down enough.
 Whilst we did implement such a two-tier binary search, the runtime reduction is below measurement uncertainty.
-The reason is that the binary search is executed a few times only, so its share of the total runtime is minuscule.
-For the sake of code simplicity and program size, the WRAM search tier has been removed.
-Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the IRAM remain free.
+The reason is that the binary search is executed a few times in total only, so its impact on the total runtime is minuscule.
+For the sake of code simplicity and program size, the \ac{WRAM} search tier has been removed.
+Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the \ac{IRAM} remain free.
 
 Recall that the two halves assigned to a tasklet contain between \qty{25}{\percent} and \qty{75}{\percent} of the elements of the respective runs, which can lead to workload imbalances.
-A more even workload of \qty{50}{\percent} would be achieved if the middle element of the merged run were chosen as pivot and the runs divided accordingly.
+A more even workload of \qty{50}{\percent} would be achieved if the median of the merged run were chosen as pivot and the runs divided accordingly.
 Finding the two positions where the runs shall be divided requires a modification to the binary search:
 Divide both runs in the middle.
 If these are not valid division points, then one of the runs has more little elements in its front half than the other run.
@@ -202,35 +203,35 @@ To our dissatisfaction, we did not manage to implement a bug-free version of thi
 
 
 \paragraph{Alignment}
-In \cref{sec:mram}, it is demanded that all sizes and positions be multiples of 8.
+In \cref{sec:mram:merge}, it is demanded that all sizes and positions be multiples of 8.
 This can be ensured during the first, sequential phase of the parallel \MS{} by dividing the input accordingly and introducing dummy variables if need be.
-In the second phase with parallel merging, there is no control of any alignment whatsoever because the sizes of run halves are arbitrary.
-This raises the need for modifications to the sequential merge procedure (\cref{alg:mram:two-tier merge}), which slow it down, if the input consists of 32-bit elements.
+In the second phase with parallel merging, there is no control over any alignment whatsoever because the sizes of run halves are arbitrary.
+This raises the need for modifications to the sequential merge procedure, which slow it down if the input consists of 32-bit elements.
 
 Before beginning with the first tier, the alignment of the output location must be checked.
-If it is unaligned, the less of the head elements of the runs is written to the output location.
-Now, the output location is aligned on 8 bytes again, meaning the first tier can proceed as normal since the cache can be emptied through \lstinline|mram_write| unproblematically.
+If it is unaligned, the less of the head elements is written to the output location.
+Now, the output location is aligned to 8 bytes again, meaning the first tier can proceed as normal since emptying the cache through \lstinline|mram_write| is unproblematic.
 
 At first, the second tier proceeds as normal, too.
 Once the less run is depleted, the cache may contain an odd number of elements, so the current element of the greater run is written to the cache before emptying it.
-However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in the first phase, where it was sufficient to loop over the remainder in the MRAM, write it to the cache, and move it to the respective output location.
-The current output location is still aligned on 8 bytes but it may very well be that the first element of the remainder is on an unaligned address.
-This indicates a mismatch, as all unaligned elements must be transferred to an aligned address and all aligned elements to an unaligned one.
-When using \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the MRAM and within the WRAM is the same.
-In such an instance, the remainder is loaded blockwise from the MRAM into the cache.
+However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in \cref{sec:mram:merge}, where it was sufficient to loop over the remainder in the \ac{MRAM}, write it to the cache, and move it to the respective output location.
+The current output location is still aligned to 8 bytes but it may very well be that the first element of the remainder has an unaligned address.
+This indicates a mismatch, for all unaligned elements must be transferred to an aligned address and all aligned elements to an unaligned one.
+When using \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the \ac{MRAM} and within the \ac{WRAM} is the same.
+In such an instance, the remainder is loaded blockwise from the \ac{MRAM} into the cache.
 There, a loop shifts each element forward by one position, resolving the mismatch.
 Afterwards, the shifted elements can be written to the output location.
 Since only an even number of elements can be moved via \lstinline|mram_write|, it may be necessary to transfer a single item individually at the end in case that the remainder had an odd length.
 
-Writing single 32-bit elements to the MRAM is not threadsafe, since, internally, eight bytes are read to an oblique WRAM cache, partially modified, and written back to the MRAM.
+Writing single 32-bit elements to the \ac{MRAM} is not threadsafe, since, internally, eight bytes are read to an oblique \ac{WRAM} cache, partially modified, and written back to the \ac{MRAM}.
 Therefore, a so-called atomic write, which utilises costly virtual mutexes, must be performed.
 
 
 \paragraph{Stability}
 The parallel merging algorithm as presented above makes \MS{} unstable.
-The reason is that one or both runs may contain the pivot multiple times and that a division point separates the duplicates.
+The reason is that one or both runs may contain the pivot value multiple times and that a division point separates the duplicates.
 Therefore, it must be ensured that all duplicates of a run remain within the same half.
-To do so, it is checked if its left neighbour has the same value once the value of the middle element is determined
+To do so, it is checked if its left neighbour has the same value once the value of the median is determined.
 If so, there may be even more duplicates so a binary search is employed to find the first occurrence of the pivot value within the longer run.
 This first occurrence marks the division point for the longer run.
 Then, it must be checked whether the shorter run precedes or follows the longer run.
@@ -246,21 +247,16 @@ To our great dissatisfaction, we did not manage to implement a bug-free version 
 \subsection{Evaluation of the Performance}
 
 The parallel speedup of \MS{} for \qty{32}{\mebi\byte} of data is shown in \cref{fig:par:speedup}.
-The optimal parallel speedup is linear in the number of elements but is capped at 11 or, rather, slightly above because of latency hiding.\todo{Begriff iwo einführen!}
-For uniformly distributed inputs and inputs following Zipf's law, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit elements.
+The optimal parallel speedup is linear in the number of tasklets but is capped at 11 or, rather, slightly above because of \ac{DMA} latency hiding.
+For uniformly distributed inputs and inputs following Zipf's law, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit integers.
 This is owed to workloads tending to be balanced naturally and tasklets being removed from the pipeline once they are finished.
-Also, the number of synchronisation points during parallel merging is logarithmic in the number of tasklets only.
-Their runtimes are dominated by the DMAs for single elements performed by the binary searches.
-Still, a binary search on a run of \qty{16}{\mebi\byte} of 32-bit elements takes only 21 rounds, meaning that about \(21 \cdot (77 + 0.5 \cdot 4) = 1659\) cycles are spent on DMAs.
-Even taking stalling by other tasklets into account, this number is insignificant as total runtimes reach into billions of cycles.
-
 For all other inputs, the parallel speedup is roughly between 7 and 9 with 32-bit integers and between~6 and~8 with 64-bit integers \Dash a consequence of workloads becoming more unbalanced.
 This shall be illustrated by sorted inputs:
 In the last round, two runs remain.
-When Tasklet 0 performs the first partitioning, one of the runs is cut in half because of the pivot.
-However, the pivot is strictly less or greater than any element in the shorter run, meaning the shorter run keeps its size of about \(n/2\) many elements as it is divided at one of its ends.
+When Tasklet 0 performs the first partitioning step, the longer run is cut exactly in half because of the pivot being the median.
+However, the pivot is strictly less or greater than any element in the shorter run, meaning the shorter run keeps its size of about \(n/2\) many elements as the division point is at one of its ends.
 The ratio between the least and the greatest number of assigned elements in the last round of parallel merging is about 2.3 for zero-one inputs and 4 for the three kinds of sorted inputs.
-A two-tier binary search as described previously would probably help bringing these little parallel speedups on par with those of the uniform and Zipf's input distribution.
+A modified binary search as described previously would probably help bringing these little parallel speedups on par with those of the uniform and Zipf's input distribution.
 
 \expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	% 32-bit | Instabil
@@ -321,23 +317,23 @@ A two-tier binary search as described previously would probably help bringing th
 	\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil
 	\caption{
 		Mean parallel speedup of \MS{} on all benchmarked input distributions and data types with \qty{32}{\mebi\byte} of data.
-		The grey line indicates an ideal, linear speedup which is capped at 11 because of the pipeline.
+		The grey line indicates an idealistic, linear speedup which is capped at 11.
 	}
 	\label{fig:par:speedup}
 \end{figure}
 
 \Cref{fig:par:shares} shows the total runtimes of the parallel \MS{}, given in seconds.
-The measurements are subdivided into the three phases of the parallel \MS{}, that the sequential WRAM phase, the sequential MRAM phase, and the parallel MRAM phase.
+The measurements are subdivided into the three phases of the parallel \MS{}, that is the sequential \ac{WRAM} phase, the sequential \ac{MRAM} phase, and the parallel \ac{MRAM} phase.
 For the most part, the results are unsurprising.
-The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to a short first and second phase, whilst the uniform and Zipf's input distribution lead to longer runtimes of these phases.
-The third phases all take roughly the same amount of time, implying that workload balances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
+The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to a short first and second phase, whilst the uniform and Zipf's input distribution lead to longer runtimes as these two phases are longer.
+The third phase always takes roughly the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
 The greater parallel speedup of the uniform and Zipf's input distribution is explained by the third phase being shorter compared to the relatively long first and second phases.
 
 Almost sorted inputs, on the other hand, are clear outsiders because of the remarkably long third phase, making them the worst case amongst all six benchmarked ones.
 Despite the long runtime, the parallel speedup is about the same as for sorted and reverse sorted inputs.
 Indeed, they all share equal or nearly equal workload imbalances.
-The third phase being so long can be explained in the same way as the second phase being longer compared to sorted inputs (see also \cref{sec:mram:merge:performance}), that is through a few great elements placed in a run of mostly little elements which delays flushes.
-Since runs are longer in the third phase than in the second phase, it becomes more likely for these runs to contain any and more overly great elements.
+The explanation for the third phase being so long is the same as the one given in \cref{sec:mram:merge:performance} with respect to the second phase.
+A few great elements placed in a run of mostly little elements delays flushes, and the longer the runs become, the likelier it is for a run to contain an overly great element.
 
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
 \pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
@@ -420,7 +416,7 @@ Since runs are longer in the third phase than in the second phase, it becomes mo
 	\hfil\pgfplotslegendfromname{leg:par:shares}\hfil
 	\caption{
 		Mean runtimes of the parallel \MS{}, broken down into its three phases, on all benchmarked input distributions and data types with \qty{32}{\mebi\byte} of data.
-		The first phase comprises sequential sorting in the WRAM, the second sequential sorting in the MRAM, and the third parallel sorting in the MRAM.
+		The first phase comprises sequential sorting in the \ac{WRAM}, the second one sequential sorting in the \ac{MRAM}, and the third one parallel sorting in the \ac{MRAM}.
 	}
 	\label{fig:par:shares}
 \end{figure}
