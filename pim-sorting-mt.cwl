@@ -28,6 +28,9 @@
 \cachesize{}#n
 \cachesize*{}#n
 \langC{}#n
+\langCpp{}#n
+\langJava{}#n
+\langPython{}#n
 \runless{}#n
 \seqreadcachesize{}#n
 \seqreadcachesize*{}#n
