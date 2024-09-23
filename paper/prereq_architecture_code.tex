@@ -1,0 +1,101 @@
+\subsection{Programming for the \acs*{DPU}}
+\label{sec:prereq:arch:code}
+
+Executing a task on \acp{DPU} requires both a program executed on the host \ac{CPU} and a kernel executed on the \acp{DPU}.
+\Acp{DPU} are handled in groups, called \emph{ranks}, of up to 64 \acp{DPU} from the same side of a \ac{DIMM}.
+The ranks, in turn, are aggregated in a \emph{\ac{DPU} set}.
+A typical course of action is the following:
+\begin{enumerate}
+	\item
+	Start the host program.
+
+	\item
+	Write the input to the \ac{MRAM} and/or \ac{WRAM} of all involved \acp{DPU}.
+
+	\item
+	Boot the \acp{DPU} and execute the kernel synchronously or asynchronously.
+
+	\item
+	Read the output from the \ac{MRAM} and/or \ac{WRAM}.
+
+	\item
+	Go back to the third step if needed.
+\end{enumerate}
+When kernels are executed synchronously, the host cannot access the memory until the execution on all ranks is finished.
+Note that data is generally not deleted when a kernel finishes, so subsequent executions can hark back to previous results.
+Also, any communication between the host and the \acp{DPU} must be initiated by the host.
+The host program can be written in \langC{}, \langCpp{}, \langJava{}, or \langPython{}.
+Apart from a few additional functionalities provided by the UPMEM \ac{API} for communication with the \acp{DPU}, the host program is a regular executable.
+
+The kernel has to be written in either \langC{} or assembler, but we will focus on the former.
+The software development kit includes a simulator which allows to run kernels on machines without UPMEM \acp{DIMM}.
+The entry point for a kernel is the \lstinline|main| function, thence one can proceed as in any \langC{} program.
+The \langC{} standard library is only partially available as some compute-intensive functionalities have been removed, for example the entire \lstinline|math| library.
+All tasklets execute the same kernel but their control flow can be changed by simply including conditionals on the tasklet identifiers.
+Synchronisation between tasklets can be achieved, amongst others, via barriers, mutual exclusion, and semaphores.
+Communication between tasklets is achievable by defining global variables in the \ac{WRAM}.
+
+For a performant kernel execution, it is generally recommended to restrict oneself to simple 32-bit logic as much as possible.
+Some 64-bit functionalities are executed in eleven cycles, like loads and stores, but most take twice or even thrice as long.
+Multiplication and division are emulated through functions operating on bits, so they should be avoided if necessary.
+In their stead, addition, subtraction, and bitwise logic should be used.
+Also, due to the uniform-cost model, almost any decrease in the count of instructions translates into a performance gain unless secondary effects like register overusage\todo{!} emerge.
+Sometimes, one should explicitly save the result of a computation in a variable if the value is supposed to be reused at a later point, since the compiler includes a recalculation elsewise.
+It also seems that pointer logic tends to be compiled better than index logic.
+Lastly, we noticed during engineering that most of the time, inlining leads to a performance gain as the overhead for function calls is quite heavy.
+Even though the call itself is a mere jump taking elven cycles, several registers must be saved and reloaded which takes some time;
+for an empty function with two arguments, we determined a call overhead of \qty{144}{\cycle}, which can easily rise with heavier register usage.
+This may also explain why turning arguments into global variables nets a performance gain in some cases as well.
+
+The biggest changes to a regular program are in relation to the memory.
+Any variable resides in the \ac{WRAM} per default, but creating an \ac{MRAM} variable is as easy as adding the qualifier \lstinline|__mram| to the variable declaration.
+Per default, too, any pointer is assumed to point to data in the \ac{WRAM}, which can be changed by adding the qualifier \lstinline|__mram_ptr|.
+The compiler correctly identifies confusion between pointers of different address spaces.
+
+Local \ac{WRAM} variables are created on the stack of the respective tasklet, and the stack sizes can be changed on a case-by-case basis.
+Nonetheless, it is possible for tasklets to dynamically allocate more space on the \ac{WRAM} via an incremental allocator similar to the standard \langC{} function \lstinline|malloc| but also via a buddy allocator or a block allocator.
+Although this is called \emph{heap allocation}, the name is misleading.
+The compiler organises the \ac{WRAM} such that all tasklet stacks and anything else statically allocated on the \ac{WRAM} is in the front, so that the free memory comprises a contiguous block in the back of the \ac{WRAM}.
+Then, the so-called \emph{heap pointer} is set to the beginning of the free block.
+When memory is allocated on the heap, the heap pointer is sufficiently incremented to mark the space as reserved.
+Afterwards, the original position of the heap pointer is returned to the allocating tasklet, perhaps after some alignment.
+In other words:
+the heap memory is simply a stack memory shared by all tasklets.
+Indeed, a \ac{DPU} lacks an equivalent to the standard \langC{} function \lstinline|free| to deallocate heap memory.
+The only possibility is to reset the entire heap by setting the heap pointer back to its initial position.
+There is also no model of ownership, so tasklets can write to any memory address, including the stack and heap memory of other tasklets.
+In summary, one shall pay heed when structuring the scarce \ac{WRAM}.
+This is also subject of \cref{sec:mram:triple}.
+
+As hinted before, transferring data between the \ac{MRAM} and the \ac{WRAM} is in the responsibility of the programmer.
+When only single elements are to be accessed, \ac{MRAM} data can be handled like normal variables.
+For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
+However, this still constitutes one or more \acp{DMA} on each use, and each \ac{DMA} comes at a cost.
+According to measurements~\cite{mutlu2022Benchmarking}, reading from the \ac{MRAM} has an overhead of \qty{77}{\cycle}, whilst writing to the \ac{MRAM} has an overhead of \qty{61}{\cycle}.
+The transfer of each byte costs a further \qty{0.5}{\cycle}.
+This means that \acp{DMA} for about \qty{128}{\byte} of data or less are dominated by the overhead.
+Therefore, it recommended to move large blocks of \ac{MRAM} data into the \ac{WRAM}, perform calculations there, and move the modified data block back to the \ac{MRAM}.
+This way, the overhead is mitigated.
+Please note that, like for \ac{WRAM} data, the time to access \ac{MRAM} data is independent of the exact location \Dash only the memory type matters.
+
+To perform such blockwise moves, one calls the \langC{} function \lstinline|mram_read| and \lstinline|mram_write|, which take a source address, a target address, and the number of bytes to use transfer.
+There are, however, several limitations.
+\begin{itemize}
+	\item
+	The \ac{WRAM} address must be aligned on 8 bytes.
+	This can be ensured automatically by adding appropriate qualifiers to stack variables or by using heap memory.
+
+	\item
+	The \ac{MRAM} address must be aligned on 8 bytes.
+	No special functionality exists to this end;
+	it is up to the programmer to organise the \ac{MRAM} with this limitation in mind and to resort to \acp{DMA} to single elements if such an alignment is not given.
+
+	\item
+	The number of transferred bytes must be at least 8, at most 2048, and a multiple of 8.
+\end{itemize}
+Failing to fulfil these constraints can result in missing or corrupt data.
+The \ac{DMA} engine works sequentially, meaning data for only tasklet can be transferred at a time.
+If multiple tasklets call \lstinline|mram_read| or \lstinline|mram_write|, some of them will be suspended for longer as they wait for the other \acp{DMA} to finish.
+If \acp{DMA} are very frequent, having many active tasklets is especially important to keep the pipeline full.
+
+\todo[inline]{Schere Dich nicht darum, Kapitel 2 zu lesen. Es ist genauso unfertig wie beim letzten Male.}
