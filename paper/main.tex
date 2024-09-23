@@ -12,14 +12,6 @@
 \RequirePackage{duckuments}
 \RequirePackage{booktabs,tabularx}
 \RequirePackage[final]{listings}
-\lstset{
-	basicstyle=\ttfamily,
-	numbers=left,
-	numbersep=4pt,
-	numberstyle=\ttfamily\smaller\addfontfeatures{RawFeature=+tnum},
-	tabsize=2,
-	language=C,
-}
 \lstdefinelanguage[DPU]{Assembler}[x86masm]{Assembler}{
 	comment=[l]//,
 	% jump labels
@@ -28,8 +20,16 @@
 	keywordstyle=[1]\bfseries\itshape,
 	alsoletter=:.,
 	% instructions
-	keywords=[2]{lw,sw,move,add,jle,jleu,jgt,jgtu,ldma,sdma},
+	keywords=[2]{lw,sw,ld,sd,move,add,addc,jump,jle,jleu,jgt,jgtu,ldma,sdma},
 	keywordstyle=[2]\bfseries,
+}
+\lstset{
+	basicstyle=\ttfamily,
+	numbers=left,
+	numbersep=4pt,
+	numberstyle=\ttfamily\smaller\addfontfeatures{RawFeature=+tnum},
+	tabsize=2,
+	language=C
 }
 
 \DefineNamedColor{named}{accentcolor}{RGB}{118, 13, 28}  % Mordred’s red
