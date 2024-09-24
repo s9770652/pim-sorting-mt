@@ -1,4 +1,4 @@
-\chapter{Parallel Sorting in the \ac{MRAM}}
+\chapter{Parallel Sorting in the MRAM}
 \label{sec:par}
 
 A simplistic way to parallelise \MS{} is the following:
@@ -322,12 +322,12 @@ A modified binary search as described previously would probably help bringing th
 	\label{fig:par:speedup}
 \end{figure}
 
-\Cref{fig:par:shares} shows the total runtimes of the parallel \MS{}, given in seconds.
+\Cref{fig:par:shares} shows the total runtimes of the parallel \MS{}.
 The measurements are subdivided into the three phases of the parallel \MS{}, that is the sequential \ac{WRAM} phase, the sequential \ac{MRAM} phase, and the parallel \ac{MRAM} phase.
 For the most part, the results are unsurprising.
 The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to a short first and second phase, whilst the uniform and Zipf's input distribution lead to longer runtimes as these two phases are longer.
 The third phase always takes roughly the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
-The greater parallel speedup of the uniform and Zipf's input distribution is explained by the third phase being shorter compared to the relatively long first and second phases.
+The greater parallel speedup of the uniform and Zipf's input distribution shines through by the third phase being shorter compared to the relatively long first and second phase.
 
 Almost sorted inputs, on the other hand, are clear outsiders because of the remarkably long third phase, making them the worst case amongst all six benchmarked ones.
 Despite the long runtime, the parallel speedup is about the same as for sorted and reverse sorted inputs.
@@ -336,43 +336,43 @@ The explanation for the third phase being so long is the same as the one given i
 A few great elements placed in a run of mostly little elements delays flushes, and the longer the runs become, the likelier it is for a run to contain an overly great element.
 
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=false/uint32/#1.txt}
 }
-\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParSec}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
-	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_par/phase_2/STABLE=false/uint32/#1.txt}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint32/#1.txt}
 }
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint32/#1.txt}
 }
 \pgfplotstablenew[
 	create on use/dist/.style={create col/set list={Sorted,Reverse,Almost,Zero-One,Uniform,Zipf's}},
 	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
-	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
 	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
-	columns={dist,first,second,third}
+	columns={dist,first,second,third},
 ]{6}{\tableMergeMramXxxii}
 
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=false/uint64/#1.txt}
 }
-\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParSec}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
-	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_par/phase_2/STABLE=false/uint64/#1.txt}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint64/#1.txt}
 }
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
-\pgfplotsinvokeforeach{sorted,reverse,almost,zeroone,uniform,zipf}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint64/#1.txt}
 }
 \pgfplotstablenew[
 	create on use/dist/.style={create col/set list={Sorted,Reverse,Almost,Zero-One,Uniform,Zipf's}},
 	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
-	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
 	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
-	columns={dist,first,second,third}
+	columns={dist,first,second,third},
 ]{6}{\tableMergeMramLxiv}
 
 \begin{figure}
@@ -381,7 +381,7 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 		\begin{groupplot}[
 			adaptive group=1 by 2,
 			groupplot xlabel={},
-			groupplot ylabel={Seconds},
+			groupplot ylabel={Cycles},
 			enlarge x limits={abs=6mm},
 			xtick style={draw=none},
 			symbolic x coords={Sorted,Reverse,Almost,Zero-One,Uniform,Zipf's},
@@ -394,7 +394,7 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 			ytick scale label code/.code={},
 			xmajorgrids=false,
 		]
-			\nextgroupplot[title/.add={}{32-bit}]
+			\nextgroupplot[ymax=1.5e9, title/.add={}{32-bit}]
 			\pgfplotsset{legend to name=leg:par:shares, legend entries={Third Phase,Second Phase,First Phase}, legend reversed}
 			\pgfplotsset{cycle list shift=2}
 			\addplot+ table[x=dist, y=third] {\tableMergeMramXxxii};
@@ -403,7 +403,7 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 			\pgfplotsset{cycle list shift=-2}
 			\addplot+ table[x=dist, y=first] {\tableMergeMramXxxii};
 			%
-			\nextgroupplot[ytick distance=5e8, title/.add={}{64-bit}]
+			\nextgroupplot[ymax=1e9, title/.add={}{64-bit}]
 			\pgfplotsset{cycle list shift=2}
 			\addplot+ table[x=dist, y=third] {\tableMergeMramLxiv};
 			\pgfplotsset{cycle list shift=0}
