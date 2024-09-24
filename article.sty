@@ -91,6 +91,7 @@
 \@ifclassloaded{scrbook}{
 	\captionsetup{labelsep=space}
 	\SetAlgoCaptionSeparator{.}
+	\@ifclasswith{scrbook}{open=right}{\AddToHook{cmd/section/before}{\clearpage}}{}
 }{
 	\KOMAoptions{
 		abstract,  % heading for abstract
