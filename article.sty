@@ -6,6 +6,15 @@
 \NewDocumentCommand{\abb}{m}{\text{#1}}  % abbreviations
 \setkomafont{captionlabel}{\usekomafont{descriptionlabel}}
 
+\RedeclareSectionCommand[
+	tocentrynumberformat=\addfontfeatures{RawFeature=+tnum},
+	tocpagenumberformat=\addfontfeatures{RawFeature=+tnum},
+]{section}
+\RedeclareSectionCommand[
+	tocentrynumberformat=\addfontfeatures{RawFeature=+tnum},
+	tocpagenumberformat=\addfontfeatures{RawFeature=+tnum},
+]{subsection}
+
 \RenewDocumentCommand{\caseintextfont}{}{\maybesffamily\itshape}  % font used for case labels (e. g., Case 1 -- x > 1; Case 1 -- x <= 1)
 
 \renewcommand{\qedsymbol}{\accentcolor\square}  % coloured proof sign (tombstone)
@@ -25,7 +34,7 @@
 \addtokomafont{labelinglabel}{\accentcolor}
 \addtokomafont{itemizelabel}{\accentcolor\maybesffamily}
 \addtokomafont{descriptionlabel}{\accentcolor\maybesffamily}
-\addtokomafont{chapterentrypagenumber}{\color{black}}
+\addtokomafont{chapterentrypagenumber}{\addfontfeatures{RawFeature=+tnum}}
 
 \setlist[enumerate,1]{font=\usekomafont{labelitemi}}
 \setlist[enumerate,2]{font=\usekomafont{labelitemii}}
@@ -232,7 +241,7 @@
 		cells={anchor=west},  % left aligned labels
 		/tikz/column 2/.style={column sep=5pt}, /tikz/column 4/.style={column sep=5pt}, /tikz/column 6/.style={column sep=5pt}, /tikz/column 8/.style={column sep=5pt}, /tikz/column 10/.style={column sep=5pt}, /tikz/column 12/.style={column sep=5pt}, /tikz/column 14/.style={column sep=5pt}, /tikz/column 16/.style={column sep=5pt},
 	},
-	title style={font=\maybesffamily\bfseries},  % changing the style of every plot title
+	title style={font=\usekomafont{disposition}\normalcolor},  % changing the style of every plot title
 	every axis title shift=0pt,  % removing default shift upwards of 6pt
 }
 \fi
