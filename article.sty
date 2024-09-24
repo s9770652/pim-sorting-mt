@@ -32,8 +32,8 @@
 \addtokomafont{captionlabel}{\accentcolor}
 \addtokomafont{disposition}{\accentcolor}
 \addtokomafont{labelinglabel}{\accentcolor}
-\addtokomafont{itemizelabel}{\accentcolor\maybesffamily}
-\addtokomafont{descriptionlabel}{\accentcolor\maybesffamily}
+\addtokomafont{itemizelabel}{\accentcolor\maybesffamily\addfontfeatures{RawFeature=+tnum}}
+\addtokomafont{descriptionlabel}{\accentcolor}
 \addtokomafont{chapterentrypagenumber}{\addfontfeatures{RawFeature=+tnum}}
 
 \setlist[enumerate,1]{font=\usekomafont{labelitemi}}
@@ -74,9 +74,13 @@
 
 
 %%% Lists.
-\setlist[itemize]{leftmargin=*, nosep}
-\setlist[enumerate]{topsep=0.1em, itemsep=0.1em, parsep=0pt, left=0.5em}
-\setlist[description]{topsep=0.15em, itemsep=0.1em, parsep=0.1em}
+\newlength{\listtopsep}\setlength{\listtopsep}{0.5ex plus 0.25ex}
+\newlength{\listitemsep}\setlength{\listitemsep}{0.1ex}
+\newlength{\listparsep}\setlength{\listparsep}{0.25ex plus 0.125ex}
+\newlength{\listleft}\setlength{\listleft}{0.5em}
+\setlist[itemize]{topsep=\listtopsep, itemsep=\listitemsep, parsep=\listparsep, left=\listleft}
+\setlist[enumerate]{topsep=\listtopsep, itemsep=\listitemsep, parsep=\listparsep, left=\listleft}
+\setlist[description]{topsep=\listtopsep, itemsep=\listitemsep, parsep=\listparsep}
 
 
 %%% Page style.
@@ -86,7 +90,6 @@
 \makeatletter
 \@ifclassloaded{scrbook}{
 	\captionsetup{labelsep=space}
-	\RestyleAlgo{algochapter}
 	\SetAlgoCaptionSeparator{.}
 }{
 	\KOMAoptions{
