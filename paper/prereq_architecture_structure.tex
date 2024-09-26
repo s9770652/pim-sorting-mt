@@ -31,7 +31,9 @@
 		\coordinate (dpu) at (\pad, \pad);
 		\draw[dpu] (dpu) rectangle +({\lendpux}, {\lendpuy});
 		\foreach \i in {\numdpu,...,0}{
-			\draw[dpu, opacity=(\numdpu+1-\i)/(\numdpu+1)] ($(dpu) + (\i*\paddpu, \i*\paddpu)$) coordinate (dpu\i) rectangle +({\lendpux}, {\lendpuy});
+			\pgfmathsetmacro{\fade}{int( (\numdpu+1-\i)/(\numdpu+1) * 100 )}
+			\pgfmathsetmacro{\fadefill}{int( (\numdpu+1-\i)/(\numdpu+1) * 0.05 * 100 )}
+			\draw[dpu, draw=black!\fade, fill=black!\fadefill] ($(dpu) + (\i*\paddpu, \i*\paddpu)$) coordinate (dpu\i) rectangle +({\lendpux}, {\lendpuy});
 		}
 		\draw[latex-latex] ($(dpu) +  ({\lendpux+\pad/2}, 0)$) -- +(\numdpu*\paddpu, \numdpu*\paddpu) node[midway, below right=-1mm] {×8};
 		\node[above, opacity=0] at (dpu) {×8};
