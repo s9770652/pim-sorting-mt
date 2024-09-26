@@ -1,12 +1,82 @@
-\subsection{Structure of an UPMEM Chip}
+\subsection{Structure of an \texorpdfstring{\upmem{}}{UPMEM} Chip}
 \label{sec:prereq:arch:structure}
 
 \begin{figure}
 	\centering
-	\includegraphics[page=63]{example-image-duck}
+	\tikzsetnextfilename{arch_chip}
+	\begin{tikzpicture}[
+		sketch,
+		dpu/.style={ fill=black!5 },
+		mem d/.style={ fill=accentcolor!10!white },
+		mem u/.style={ fill=accentcolor!25!white },
+		flow/.style={ {Straight Barb[width=1.5mm]}-{Straight Barb[width=1.5mm]} },
+		flow left/.style={ {Straight Barb[width=1.5mm]}- },
+		flow right/.style={ -{Straight Barb[width=1.5mm]} },
+	]
+		\def\lenx{24}
+		\def\pad{0.5}
+		\def\numdpu{4}
+		\def\paddpu{0.35}
+		\def\paddpuflow{(0.75)}
+		\def\intermem{1}
+		\def\lendpux{(\lenx-2*\pad-\numdpu*\paddpu)}
+		\def\lendpuy{(5)}
+		\def\lencontrolx{((\lenx-2*\pad-\intermem)/2)}
+		\def\lencontroly{1}
+		\def\leny{(\lendpuy+\lencontroly+2*\pad+\numdpu*\paddpu+1)}
+
+		% DPUs.
+		%			\draw (0, 0) rectangle +(\lenx, \leny);
+
+		\coordinate (dpu) at (\pad, \pad);
+		\draw[dpu] (dpu) rectangle +({\lendpux}, {\lendpuy});
+		\foreach \i in {\numdpu,...,0}{
+			\draw[dpu, opacity=(\numdpu+1-\i)/(\numdpu+1)] ($(dpu) + (\i*\paddpu, \i*\paddpu)$) coordinate (dpu\i) rectangle +({\lendpux}, {\lendpuy});
+		}
+		\draw[latex-latex] ($(dpu) +  ({\lendpux+\pad/2}, 0)$) -- +(\numdpu*\paddpu, \numdpu*\paddpu) node[midway, below right=-1mm] {×8};
+		\node[above, opacity=0] at (dpu) {×8};
+
+		% Memories.
+		\def\padmem{\paddpu}
+		\def\lenmemtotalx{(\lendpux-2*\padmem-3*\intermem)}
+		\def\lenmramx{(\lenmemtotalx/2)}
+		\def\lenmemx{((\lenmemtotalx-\lenmramx)/3)}
+		\def\lenmemy{(\lendpuy-2*\padmem)}
+		\def\lenmemhalfy{((\lendpuy-2*\padmem-\intermem)/2)}
+
+		\coordinate (mem) at ($(dpu) + (\padmem, \padmem)$);
+		\draw[mem u] (mem)                                                        coordinate (pipe) rectangle +( {\lenmemx},     {\lenmemy}) node[midway] {Pipeline};
+		\draw[mem u] ($(mem) + ({\lenmemx+\intermem}, 0)$)                        coordinate (wram) rectangle +( {\lenmemx}, {\lenmemhalfy}) node[midway] {WRAM};
+		\draw[mem u] ($(mem) + ({\lenmemx+\intermem}, {\lenmemhalfy+\intermem})$) coordinate (iram) rectangle +( {\lenmemx}, {\lenmemhalfy}) node[midway] {IRAM};
+		\draw[mem u] ($(mem) + ({2*(\lenmemx+\intermem)}, 0)$)                    coordinate (dma)  rectangle +( {\lenmemx},     {\lenmemy}) node[midway, align=center] {DMA\\Engine};
+		\draw[mem d] ($(mem) + ({3*(\lenmemx+\intermem)}, 0)$)                    coordinate (mram) rectangle +({\lenmramx},     {\lenmemy}) node[midway] {MRAM};
+
+		% Data flows.
+		\draw[flow]       ($(iram) + (0, {\lenmemhalfy/2})$)          -- +(-\intermem, 0);  % Pipeline ↔ IRAM
+		\draw[flow]       ($(wram) + (0, {\lenmemhalfy/2})$)          -- +(-\intermem, 0);  % Pipeline ↔ WRAM
+		\draw[flow right] ($(pipe) + ({\lenmemx}, {\lenmemy/2})$)     -- +({2*\intermem+\lenmemx}, 0);  % Pipeline ↔ WRAM
+
+		\draw[flow]       ($(wram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % WRAM ↔ DMA
+		\draw[flow left]  ($(iram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % IRAM → DMA
+
+		\draw[flow]       ($(dma)  + ({\lenmemx}, {\lenmemy/2})$)     -- +(\intermem, 0);  % DMA ↔ MRAM
+
+		\draw[flow]       ($({\pad+\lencontrolx}, {\leny-\pad-\lencontroly/2})$)     -- +(\intermem, 0);  % CSI ↔ DDR
+		\foreach \i in {\numdpu,...,0}{
+			\pgfmathsetmacro{\fade}{int( (\numdpu+1-\i)/(\numdpu+1) * 100 )}
+			\def\flowlen{\leny-2*\pad-\lencontroly-\i*\paddpu-\lendpuy+\padmem}
+			\draw[flow, draw=black!\fade] ($(dpu\i) + ({\paddpu+\lenmemx/2+\i*\paddpuflow}, {\lendpuy-\padmem})$) -- +($(0, {\flowlen})$);
+			\draw[flow, draw=black!\fade] ($(dpu\i) + ({\lendpux-\padmem-\lenmramx+\lenmemx*1.5+\i*\paddpuflow}, {\lendpuy-\padmem})$) -- +($(0, {\flowlen})$);
+		}
+
+		% Controllers.
+		\draw[mem u] (\pad, {\leny-\pad})                      coordinate (csi) rectangle +({\lencontrolx}, -\lencontroly) node[midway] {Control/Status Interface};
+		\draw[mem d] ($(csi) + ({\intermem+\lencontrolx}, 0)$) coordinate (ddr) rectangle +({\lencontrolx}, -\lencontroly) node[midway] {DDR\liningnums{4} Interface};
+	\end{tikzpicture}
 
 	\caption{
 		The structure of a \ac{PIM} chip.
+		The bright components are part of a standard \ac{DDR} package, the dark components are exclusive to \ac{PIM} chips.
 	}
 	\label{fig:arch:chip}
 \end{figure}
