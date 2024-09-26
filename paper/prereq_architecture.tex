@@ -1,10 +1,12 @@
 \section{Architecture}
 \label{sec:prereq:arch}
 
-Quellen:
-HotChips,
-Whitepaper,
-Zürcher
+This \lcnamecref{sec:prereq:arch} serves as an introduction to \ac{PIM} on an \upmem{} system in terms of both hardware and software, laying the foundation for understanding the design choices in \cref{sec:tasklet,sec:mram}.
+\Cref{sec:prereq:arch:overview} provides a short conspectus of the buildup of such a system, and \cref{sec:prereq:arch:structure} presents the components of an individual \ac{PIM} chip.
+\Cref{sec:prereq:arch:pipeline} covers the instruction pipeline, which differs in key aspects from that of modern \ac{CPU}, whilst \cref{sec:prereq:arch:isa} is concerned with the instruction set architecture, as acquaintance with it helps frequently in identifying optimisation potential.
+Finally, \cref{sec:prereq:arch:code} gives an insight into developing programs for an \upmem{} system.
+The four main sources for this \lcnamecref{sec:prereq:arch} are a white paper by \upmem{}~\cite{upmem2021WhitePaper}, a talk given by \upmem{}'s founder, Fabrice Devaux, at the Hot Chips Symposium 31~\cite{upmem2019HotChips}, the official documentation~\cite{upmemSDK}, and an extensive study by \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}.
+For the sake of clarity, individual statements will not be attested to them.
 
 \input{prereq_architecture_overview}
 
