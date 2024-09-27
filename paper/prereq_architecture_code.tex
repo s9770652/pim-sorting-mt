@@ -25,10 +25,10 @@ When kernels are executed synchronously, the host cannot access the memory until
 Note that data is generally not deleted when a kernel finishes, so subsequent executions can hark back to previous results.
 Also, any communication between the host and the \acp{DPU} must be initiated by the host.
 The host program can be written in \langC{}, \langCpp{}, \langJava{}, or \langPython{}.
-Apart from a few additional functionalities provided by the UPMEM \ac{API} for communication with the \acp{DPU}, the host program is a regular executable.
+Apart from a few additional functionalities provided by the \upmem{} \ac{API} for communication with the \acp{DPU}, the host program is a regular executable.
 
 The kernel has to be written in either \langC{} or assembler, but we will focus on the former.
-The software development kit includes a simulator which allows to run kernels on machines without UPMEM \acp{DIMM}.
+The software development kit includes a simulator which allows to run kernels on machines without \upmem{} \acp{DIMM}.
 The entry point for a kernel is the \lstinline|main| function, thence one can proceed as in any \langC{} program.
 The \langC{} standard library is only partially available as some compute-intensive functionalities have been removed, for example the entire \lstinline|math| library.
 All tasklets execute the same kernel but their control flow can be changed by simply including conditionals on the tasklet identifiers.
@@ -97,5 +97,3 @@ Failing to fulfil these constraints can result in missing or corrupt data.
 The \ac{DMA} engine works sequentially, meaning data for only tasklet can be transferred at a time.
 If multiple tasklets call \lstinline|mram_read| or \lstinline|mram_write|, some of them will be suspended for longer as they wait for the other \acp{DMA} to finish.
 If \acp{DMA} are very frequent, having many active tasklets is especially important to keep the pipeline full.
-
-\todo[inline]{Schere Dich nicht darum, Kapitel 2 zu lesen. Es ist genauso unfertig wie beim letzten Male.}

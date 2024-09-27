@@ -46,7 +46,7 @@ Some examples:
 	\lstinline|jump r23, .LABEL_FUNC| stores the current program counter in Register~\lstinline|r23| and then jumps to the beginning of a function designated by the label.
 \end{itemize}
 Of particular use are the instruction to load and store 64-bit large double words, which are some of the few instructions with \enquote{real}\todo{Diese Wortwahl! :(} 64-bit capabilities.
-By invoking \lstinline|sd r22, <offset>, d22|, the content of both Registers~\lstinline|r22| and \lstinline|r23| is stored to some position relative to the current stack pointer, whence they can be loaded by invoking \lstinline|ld d22, -<offset>, r22| later on.
+By invoking \lstinline|sd r22, <offset>, d22|, the content of both Registers~\lstinline|r22| and \lstinline|r23| is stored to some position relative to the current stack pointer, whence it can be recovered by invoking \lstinline|ld d22, -<offset>, r22| later on.
 Thereby, the bandwidth of the \ac{WRAM} is effectively doubled and the instruction count is reduced.
 
 The capabilities of \ac{DPU} instructions is substantially enhanced by the plethora of \emph{conditions}, of which there are a total of 51.

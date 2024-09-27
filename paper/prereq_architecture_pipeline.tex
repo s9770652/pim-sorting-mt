@@ -1,22 +1,23 @@
-\subsection{The Pipeline}
+\subsection{The Instruction Pipeline}
 \label{sec:prereq:arch:pipeline}
 
 Instructions are executed using \emph{pipelining}, that is, instructions are divided into several steps which are performed one after another, with each step taking exactly one cycle.
 Once a step has been completed, the respective transistors are free to process the next instruction even if the previous instruction has not reached the end of the pipeline yet.
-This allows all threads to use the same pipeline such that a nominal throughput of one instruction per cycle is achieved if enough threads are active and, thus, all steps of the pipeline are continuously performed.
-\Cref{fig:arch:pipeline} shows the steps of the pipeline.
+All threads use the same pipeline such that a nominal throughput of one instruction per cycle is achieved if enough threads are active so that all steps of the pipeline are continuously performed.
+\Cref{fig:arch:pipeline} shows the individual steps of the pipeline.
 First, the instruction itself has to be loaded from the \ac{IRAM}.
 Then, its argument are loaded from the registers before the actual computation is performed while accessing the \ac{WRAM} if necessary.
+%to read \ac{MRAM} data, it has to be loaded first via a \ac{DMA} into the \ac{WRAM}, and to modify \ac{MRAM} data, \ac{WRAM} data has to be written first before writing it to the \ac{MRAM} via a \ac{DMA}.
 Although the step count is 14, the last three steps can be performed in parallel with the first three steps.
 This means that the pipeline length is effectively reduced to 11, meaning only eleven active threads are needed to fully exploit the computing capabilities of a DPU.
 
-Nevertheless, having more than eleven threads active is not detrimental to the throughput, which remains at one instruction per cycle, it only means that individual threads have to wait for some cycles.
+Nevertheless, having more than eleven threads active is not detrimental to the throughput, which remains at one instruction per cycle, it only means that individual threads are put into a queue and have to wait for some cycles.
 This not only may make a parallel task easier to program, it can result in a performance gain when \acp{DMA} are involved.
 \Acp{DMA} are mainly executed by the autonomous \ac{DMA} engine.
-Whilst a thread is performing a \ac{DMA}, it is essentially suspended and removed from the pipeline, freeing a slot up.
-Therefrom, the employment of more than eleven threads allows to hide absence by keeping the pipeline full.
+Whilst a thread is performing a \ac{DMA}, it is suspended and removed from the pipeline, freeing a slot up.
+Therefrom, the employment of more than eleven threads allows to hide \ac{DMA} latency by keeping the pipeline full.
 
-As concluding remark, it shall be mentioned that there are circumstances under which the execution of an instruction takes twelve instead of eleven cycles.
+As concluding remark, it shall be mentioned that there are circumstances under which the execution of an instruction takes twelve cycles instead of eleven.
 This is related to the identifiers of the used registers, however the compiler usually manages to avoid these situations.
 Hence, one can regard a \ac{DPU} as a \emph{uniform-cost machine} where each instruction takes eleven cycles to complete with the seldom exception of some taking twelve cycles and with the exception of \acp{DMA}.
 Counting instructions is, therefore, a valid technique to assess the performance of some piece of code.
