@@ -1,24 +1,30 @@
 \subsection{Overview}
 \label{sec:prereq:arch:overview}
 
-The \ac{PIM} capabilities are realised on, at its base, sticks of regular \ac{RAM} or, to be more precise, on \acp{DIMM} of \aclu{DDR} \aclu{SDRAM} with a transfer rate of \qty{2400}{\mega\transfer\per\second} (\acs{DDR}-2400 \acs{SDRAM}).
+\makeatletter\NewDocumentCommand{\acrolabel}{m}{\AC@placelabel{#1}}\makeatother
+
+The \ac{PIM} capabilities are realised on modules of regular \ac{RAM} or, to be more precise, on \acp{DIMM} of \acrolabel{DDR}\aclu{DDR} \acrolabel{SDRAM}\aclu{SDRAM} with a transfer rate of \qty{2400}{\mega\transfer\per\second} (\acs{DDR}-2400 \acs{SDRAM}).
 Therefore, \ac{PIM} \acp{DIMM} can act as replacement for \acp{DIMM} already present in existing systems without repercussion for tasks which do not rely on in-memory processing.
-With eight on each side, a \ac{PIM} \ac{DIMM} contains sixteen \emph{PIM chips}, that is modified \acsu{DRAM} packages, which contain the memory storage cells.
-Each \ac{PIM} chip, in turn, contains eight \emph{\aclp{DPU}}\acused{DPU} (\acsp{DPU}), so there are 128 \acp{DPU} per \ac{DIMM}.
+A \ac{PIM} \ac{DIMM} contains sixteen \emph{PIM chips}, that is modified \acrolabel{DRAM}\acsu{DRAM} packages, which contain the memory storage cells.
+Each \ac{PIM} chip, in turn, contains eight \acrolabel{DPU}\emph{\aclp{DPU}}\acused{DPU} (\acsp{DPU}), so there are 128 \acp{DPU} per \ac{DIMM}.
 Each \ac{DPU} is closely situated to one of the memory banks of size \qty{64}{\mebi\byte}.
 Due to the spatial proximity to its memory bank, a \ac{DPU} is capable of rapidly accessing data stored on a \ac{DIMM}.
 
-A \ac{DPU} possesses either 16 or 24 hardware threads, whose software abstraction are called \emph{tasklets}, depending on the model.
+Depending on the model, a \ac{DPU} possesses either 16 or 24 hardware threads\footnote{
+	There are two \ac{DPU} models, v1A and v1B.
+	The former runs at \qty{350}{\mega\hertz} and is equipped with 24 threads, whereas the latter runs at \qty{400}{\mega\hertz} and is equipped with 16 threads.
+	Measurements for this thesis were conducted on v1A.
+}, whose software abstraction are called \emph{tasklets}.
 Taklets work independently from each other, meaning programs can use different control flows to process different data.
-The orchestration of \acp{DPU} and their tasklets pose a major challenge during programming.
-To put things into perspective:
-UPMEM sells systems with up to 28 \ac{PIM} \acp{DIMM}, setting the total count of \acp{DPU} to \num{3584} and of tasklets to \num{57344} and \num{86016}, respectively.
-Hence, for a task to run well on a \ac{PIM} system, it not only needs to frequently access the \ac{RAM}, it also needs to be highly parallelisable.
-If such a highly parallelisable task is indeed on hand, speedups well in the double digits for memory-bound tasks, compared to an execution on a \ac{CPU} or \ac{GPU} are possible (compare \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}).
+An \upmem{} system can boast up to 20 \ac{PIM} \acp{DIMM}, setting the total count of \acp{DPU} to \num{2560} and of tasklets to \num{40960} or \num{61440}, respectively.
+Whereas tasklets of the same \ac{DPU} communicate using shared memory, \acp{DPU} have no direct way to communicate or even share data with each other.
+Instead, inter-\ac{DPU} communication is implemented by the host \ac{CPU} fetching data from one \ac{DPU} and sending it to another one.
+Hence, for a task to run well on a \ac{PIM} system, it not only needs to frequently access the \ac{RAM}, it also needs to consist of many, fairly independent subtasks.
+If such a task is indeed on hand, speedups well in the double digits for memory-bound tasks, compared to an execution on a \ac{CPU} or \ac{GPU}, are possible (compare \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}).
 Next to a faster execution, a gain in power efficiency is also to be expected, since data transfers between the \ac{RAM} and a host \ac{CPU} drive the energy consumption in regular systems significantly;
-UPMEM claims a tenfold increase of the power efficiency.
+\upmem{} claims a tenfold increase of the power efficiency.
 
 The retention of the general \ac{DDR} architecture comes at a price.
-A \ac{DPU} is implemented using only three layers of silicon, resulting in three times slower transistors compared to other transistors of the same process node.
+A \ac{DPU} is implemented using only three layers of silicon, resulting in transistors three times slower than other transistors of the same process node.
 Also, their density is considerably reduced.
 In consequence, \acp{DPU} are not suitable for computing-intensive tasks (compare also \citeauthor{mutlu2022Benchmarking}~\cite{mutlu2022Benchmarking}).
