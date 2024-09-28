@@ -24,7 +24,65 @@ Counting instructions is, therefore, a valid technique to assess the performance
 
 \begin{figure}
 	\centering
-	\includegraphics[page=65]{example-image-duck}
+%	\includegraphics[page=65]{example-image-duck}
+	\begin{tikzpicture}[
+		sketch,
+		scale=0.95,
+		stage/.style={ node distance=0mm, font=\addfontfeatures{RawFeature=+lnum}, inner sep=0 },
+		flow/.style={ {Straight Barb[width=1.5mm]}-{Straight Barb[width=1.5mm]} },
+		flow left/.style={ {Straight Barb[width=1.5mm]}- },
+		flow right/.style={ -{Straight Barb[width=1.5mm]} },
+	]
+		\def\stagewidth{8.25}
+		\draw[draw=none, fill=accentcolor!10] (0,  -0) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Thread Selection};                    % DISPATCH
+		\draw[draw=none, fill=accentcolor!25] (0,  -1) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH1
+		\draw[draw=none, fill=accentcolor!25] (0,  -2) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH2
+		\draw[draw=none, fill=accentcolor!25] (0,  -3) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH3
+		\draw[draw=none, fill=accentcolor!10] (0,  -4) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP1
+		\draw[draw=none, fill=accentcolor!10] (0,  -5) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP2
+		\draw[draw=none, fill=accentcolor!10] (0,  -6) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP3
+		\draw[draw=none, fill=accentcolor!25] (0,  -7) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erand Formattin\smash{g}};  % FORMAT
+		\draw[draw=none, fill=accentcolor!10] (0,  -8) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU1
+		\draw[draw=none, fill=accentcolor!10] (0,  -9) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU2
+		\draw[draw=none, fill=accentcolor!10] (0, -10) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU3
+		\draw[draw=none, fill=accentcolor!10] (0, -11) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU4
+		\draw[draw=none, fill=accentcolor!25] (0, -12) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Result Formattin\smash{g}};           % MERGE1
+		\draw[draw=none, fill=accentcolor!25] (0, -13) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Result Formattin\smash{g}};           % MERGE2
+
+		\draw[draw=none] (0,  -0) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}1};
+		\draw[draw=none] (0,  -1) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}2};
+		\draw[draw=none] (0,  -2) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}3};
+		\draw[draw=none] (0,  -3) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}4};
+		\draw[draw=none] (0,  -4) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}5};
+		\draw[draw=none] (0,  -5) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}6};
+		\draw[draw=none] (0,  -6) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}7};
+		\draw[draw=none] (0,  -7) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}8};
+		\draw[draw=none] (0,  -8) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}9};
+		\draw[draw=none] (0,  -9) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}10};
+		\draw[draw=none] (0, -10) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}11};
+		\draw[draw=none] (0, -11) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}12};
+		\draw[draw=none] (0, -12) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}13};
+		\draw[draw=none] (0, -13) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}14};
+
+		\draw (0, 0) rectangle +(\stagewidth, -14);
+		\foreach \i in {13,...,1}{
+			\draw (0, -\i) -- +(\stagewidth, 0);
+		}
+
+		% Memories.
+		\def\pad{1}
+		\draw[fill=black!5] (-\pad-1, -8.5) rectangle +(1, 5) node[stage, midway, rotate=90] {Re\smash{g}ister File};
+		\draw[fill=black!5] (\stagewidth+\pad,  -4.5) rectangle +(3, 3) node[stage, midway] {IRAM};
+		\draw[fill=black!5] (\stagewidth+\pad, -13.5) rectangle +(3, 5) node[stage, midway] {WRAM};
+
+		% Arrows.
+		\draw[flow right] (\stagewidth,  -2) -- +(\pad, 0);
+		\draw[flow left]  (\stagewidth,  -4) -- +(\pad, 0);
+		\draw[flow left]  (      -\pad,  -5) -- +(\pad, 0);
+		\draw[flow right] (      -\pad,  -7) -- +(\pad, 0);
+		\draw[flow right] (\stagewidth,  -9) -- +(\pad, 0);
+		\draw[flow left]  (\stagewidth, -13) -- +(\pad, 0);
+	\end{tikzpicture}
 
 	\caption{
 		The pipeline of a \ac{DPU}.
