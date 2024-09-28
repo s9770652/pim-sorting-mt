@@ -6,18 +6,18 @@
 	\tikzsetnextfilename{arch_chip}
 	\begin{tikzpicture}[
 		sketch,
-		dpu/.style={  },
+		dpu/.style={ },
 		mem d/.style={ fill=accentcolor!10!white },
 		mem u/.style={ fill=accentcolor!25!white },
 		flow/.style={ {Straight Barb[width=1.5mm]}-{Straight Barb[width=1.5mm]} },
 		flow left/.style={ {Straight Barb[width=1.5mm]}- },
 		flow right/.style={ -{Straight Barb[width=1.5mm]} },
 	]
-		\def\lenx{24}
+		\def\lenx{25}
 		\def\pad{0.5}
 		\def\numdpu{4}
-		\def\paddpu{0.35}
-		\def\paddpuflow{(0.75)}
+		\def\paddpu{0.45}
+		\def\paddpuflow{\paddpu}
 		\def\intermem{1}
 		\def\lendpux{(\lenx-2*\pad-\numdpu*\paddpu)}
 		\def\lendpuy{(5)}
@@ -44,31 +44,34 @@
 		\def\lenmramx{(\lenmemtotalx/2)}
 		\def\lenmemx{((\lenmemtotalx-\lenmramx)/3)}
 		\def\lenmemy{(\lendpuy-2*\padmem)}
+		\def\lenmemhalfx{((\lenmemx-\intermem)/2)}
 		\def\lenmemhalfy{((\lendpuy-2*\padmem-\intermem)/2)}
 
 		\coordinate (mem) at ($(dpu) + (\padmem, \padmem)$);
-		\draw[mem u] (mem)                                                        coordinate (pipe) rectangle +( {\lenmemx},     {\lenmemy}) node[midway] {Pipeline};
-		\draw[mem u] ($(mem) + ({\lenmemx+\intermem}, 0)$)                        coordinate (wram) rectangle +( {\lenmemx}, {\lenmemhalfy}) node[midway] {WRAM};
-		\draw[mem u] ($(mem) + ({\lenmemx+\intermem}, {\lenmemhalfy+\intermem})$) coordinate (iram) rectangle +( {\lenmemx}, {\lenmemhalfy}) node[midway] {IRAM};
-		\draw[mem u] ($(mem) + ({2*(\lenmemx+\intermem)}, 0)$)                    coordinate (dma)  rectangle +( {\lenmemx},     {\lenmemy}) node[midway, align=center] {DMA\\Engine};
-		\draw[mem d] ($(mem) + ({3*(\lenmemx+\intermem)}, 0)$)                    coordinate (mram) rectangle +({\lenmramx},     {\lenmemy}) node[midway] {MRAM};
+		\draw[mem u] ($(mem)  + (                       0,                        0)$) coordinate (regf) rectangle +({\lenmemhalfx},     {\lenmemy}) node[midway, rotate=90] {Re\smash{g}ister File};
+		\draw[mem u] ($(regf) + ({\intermem+\lenmemhalfx},                        0)$) coordinate (pipe) rectangle +({\lenmemx},         {\lenmemy}) node[midway]            {Pipeline};
+		\draw[mem u] ($(pipe) + ({\lenmemx+\intermem},                            0)$) coordinate (wram) rectangle +({\lenmemx},     {\lenmemhalfy}) node[midway]            {WRAM};
+		\draw[mem u] ($(pipe) + ({\lenmemx+\intermem},     {\lenmemhalfy+\intermem})$) coordinate (iram) rectangle +({\lenmemx},     {\lenmemhalfy}) node[midway]            {IRAM};
+		\draw[mem u] ($(wram) + ({\lenmemx+\intermem},                            0)$) coordinate (dma)  rectangle +({\lenmemhalfx},     {\lenmemy}) node[midway, rotate=90] {DMA En\smash{g}ine};
+		\draw[mem d] ($(dma)  + ({\lenmemhalfx+\intermem},                        0)$) coordinate (mram) rectangle +({\lenmramx},        {\lenmemy}) node[midway]            {MRAM};
 
 		% Data flows.
-		\draw[flow]       ($(iram) + (0, {\lenmemhalfy/2})$)          -- +(-\intermem, 0);  % Pipeline ↔ IRAM
-		\draw[flow]       ($(wram) + (0, {\lenmemhalfy/2})$)          -- +(-\intermem, 0);  % Pipeline ↔ WRAM
-		\draw[flow right] ($(pipe) + ({\lenmemx}, {\lenmemy/2})$)     -- +({2*\intermem+\lenmemx}, 0);  % Pipeline ↔ WRAM
+		\draw[flow]       ($(pipe) + (0,                  {\lenmemy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ Register File
+		\draw[flow]       ($(iram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ IRAM
+		\draw[flow]       ($(wram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ WRAM
+		\draw[flow right] ($(pipe) + ({\lenmemx},         {\lenmemy/2})$) -- +({2*\intermem+\lenmemx}, 0);  % Pipeline ↔ DMA
 
 		\draw[flow]       ($(wram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % WRAM ↔ DMA
 		\draw[flow left]  ($(iram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % IRAM → DMA
 
-		\draw[flow]       ($(dma)  + ({\lenmemx}, {\lenmemy/2})$)     -- +(\intermem, 0);  % DMA ↔ MRAM
+		\draw[flow]       ($(dma)  + ({\lenmemhalfx}, {\lenmemy/2})$) -- +(\intermem, 0);  % DMA ↔ MRAM
 
-		\draw[flow]       ($({\pad+\lencontrolx}, {\leny-\pad-\lencontroly/2})$)     -- +(\intermem, 0);  % CSI ↔ DDR
+		\draw[flow]       ($({\pad+\lencontrolx}, {\leny-\pad-\lencontroly/2})$) -- +(\intermem, 0);  % CSI ↔ DDR
 		\foreach \i in {\numdpu,...,0}{
 			\pgfmathsetmacro{\fade}{int( (\numdpu+1-\i)/(\numdpu+1) * 100 )}
 			\def\flowlen{\leny-2*\pad-\lencontroly-\i*\paddpu-\lendpuy+\padmem}
-			\draw[flow, draw=black!\fade] ($(dpu\i) + ({\paddpu+\lenmemx/2+\i*\paddpuflow}, {\lendpuy-\padmem})$) -- +($(0, {\flowlen})$);
-			\draw[flow, draw=black!\fade] ($(dpu\i) + ({\lendpux-\padmem-\lenmramx/2+\i*\paddpuflow}, {\lendpuy-\padmem})$) -- +($(0, {\flowlen})$);
+			\draw[flow, draw=black!\fade] ($(pipe) + ({\lenmemx/2},  {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % Pipeline ↔ Control/Status Interface
+			\draw[flow, draw=black!\fade] ($(mram) + ({\lenmramx/2}, {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % MRAM ↔ DDR4 Interface
 		}
 
 		% Controllers.
@@ -95,7 +98,7 @@ It is not possible for a \ac{DPU} and the host to access a \ac{DRAM} bank concur
 The memory of the \ac{DRAM} bank is also referred to as \acfi{MRAM}.
 It is by far the largest memory of a \ac{DPU} and typically holds both the input provided by the host and the output calculated by the \ac{DPU}.
 However, the \ac{MRAM} is also the slowest memory, for each \ac{DMA} comes with a latency of dozens of cycles.
-Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \acp{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
+Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \ac{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
 
 The \acfi{WRAM} is based on faster but more expensive and less dense static \ac{RAM}.
 For this reason, the \ac{WRAM} is far smaller, comprising only \qty{64}{\kibi\byte}, yet its latency is practically zero, and the measured bandwidth for a v1A \ac{DPU} reaches \qty{2688}{\mebi\byte\per\second}.
