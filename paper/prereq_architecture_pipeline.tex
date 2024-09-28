@@ -71,9 +71,10 @@ Counting instructions is, therefore, a valid technique to assess the performance
 
 		% Memories.
 		\def\pad{1}
-		\draw[fill=black!5] (-\pad-1, -8.5) rectangle +(1, 5) node[stage, midway, rotate=90] {Re\smash{g}ister File};
-		\draw[fill=black!5] (\stagewidth+\pad,  -4.5) rectangle +(3, 3) node[stage, midway] {IRAM};
-		\draw[fill=black!5] (\stagewidth+\pad, -13.5) rectangle +(3, 5) node[stage, midway] {WRAM};
+		\def\lenmemx{3}
+		\draw[fill=black!5] (-\pad-\lenmemx,    -7.5) rectangle +(\lenmemx, 3) node[stage, midway, align=center] {Register\\File};
+		\draw[fill=black!5] (\stagewidth+\pad,  -4.5) rectangle +(\lenmemx, 3) node[stage, midway]               {IRAM};
+		\draw[fill=black!5] (\stagewidth+\pad, -13.5) rectangle +(\lenmemx, 5) node[stage, midway]               {WRAM};
 
 		% Arrows.
 		\draw[flow right] (\stagewidth,  -2) -- +(\pad, 0);
