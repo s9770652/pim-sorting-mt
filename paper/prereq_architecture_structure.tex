@@ -26,7 +26,7 @@
 		\def\leny{(\lendpuy+\lencontroly+2*\pad+\numdpu*\paddpu+1)}
 
 		% DPUs.
-		%			\draw (0, 0) rectangle +(\lenx, \leny);
+%		\draw (0, 0) rectangle +(\lenx, \leny);
 
 		\coordinate (dpu) at (\pad, \pad);
 		\draw[dpu] (dpu) rectangle +({\lendpux}, {\lendpuy});
@@ -94,18 +94,19 @@ It is not possible for a \ac{DPU} and the host to access a \ac{DRAM} bank concur
 \Acp{DPU} contain several major and minor memories.
 The memory of the \ac{DRAM} bank is also referred to as \acfi{MRAM}.
 It is by far the largest memory of a \ac{DPU} and typically holds both the input provided by the host and the output calculated by the \ac{DPU}.
-However, the \ac{MRAM} is also the slowest memory, for each access comes with non-negligible latency.
+However, the \ac{MRAM} is also the slowest memory, for each \ac{DMA} comes with a latency of dozens of cycles.
+Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \acp{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
 
-The \acfi{WRAM} is far smaller, comprising only \qty{64}{\kibi\byte}, yet the latency is practically zero.
+The \acfi{WRAM} is based on faster but more expensive and less dense static \ac{RAM}.
+For this reason, the \ac{WRAM} is far smaller, comprising only \qty{64}{\kibi\byte}, yet its latency is practically zero, and the measured bandwidth for a v1A \ac{DPU} reaches \qty{2688}{\mebi\byte\per\second}.
 A typical workflow is, hence, to load input data from the \ac{MRAM} into the \ac{WRAM}, process it, and write output data back into the \ac{MRAM}.
 The \ac{WRAM} also contains the stacks of the tasklets, where their local variables are stored.
-Moreover, tasklets can dynamically allocate further space in the \ac{WRAM}.
 Global variables which are visible to every tasklet may be stored in the \ac{WRAM} or \ac{MRAM}, however, any \ac{MRAM} variable can be processed only when placing it temporarily in the \ac{WRAM} (see \cref{sec:prereq:arch:isa}).
 Unlike a \ac{CPU}, there is no multilevel cache hierarchy with a coherence protocol moving data automatically, and it is in the responsibility of the programmer to ensure that critical data are stored in the \ac{WRAM}.
-Still, there is a small number of automatically managed registers (see also \cref{sec:prereq:arch:isa}).
-The driver allows the host to access a specific section of the \ac{WRAM} only if the data has been specifically designated for this purpose, and such transfers are slower than transfers involving the \ac{MRAM}.\todo{Wirklich nur aufgrund des Treibers? Da ist ja schließlich noch eine weitere Schnittstelle dazwischen (s. Abb.)}
+Still, there is a small number of automatically managed registers.
+The driver allows the host to access a specific section of the \ac{WRAM} only if the data has been specifically designated for this purpose, and such transfers are slower than transfers involving the \ac{MRAM}.
 
-Whilst the \ac{WRAM} holds the data which is processed, the \acfi{IRAM} contains the program (also called \emph{kernel}) which a \ac{DPU} executes.
+Whilst the \ac{WRAM} typically holds the data which is processed, the \acfi{IRAM} contains the program (also called \emph{kernel}) which a \ac{DPU} executes.
 The \ac{IRAM} has a size of \qty{24}{\kibi\byte} which translates to a maximum of \num{4096} instructions out of which a kernel has to be built.%
 \footnote{
 	In fact, a v1B \ac{DPU} can hold \qty{2}{\kibi\byte} of data less in its \ac{MRAM} and 128 instructions fewer in its \ac{IRAM} since parts of those are \textquote{reserved for production and quality control purposes.}~\cite[Introduction~-- DPU chip characteristics]{upmemSDK}

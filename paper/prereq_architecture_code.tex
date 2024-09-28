@@ -44,7 +44,7 @@ Sometimes, one should explicitly save the result of a computation in a variable 
 It also seems that pointer logic tends to be compiled better than index logic.
 Lastly, we noticed during engineering that most of the time, inlining leads to a performance gain as the overhead for function calls is quite heavy.
 Even though the call itself is a mere jump taking elven cycles, several registers must be saved and reloaded which takes some time;
-for an empty function with two arguments, we determined a call overhead of \qty{144}{\cycle}, which can easily rise with heavier register usage.
+for an empty function with two arguments, we determined a call overhead of \qty{144}{\cycles}, which can easily rise with heavier register usage.
 This may also explain why turning arguments into global variables nets a performance gain in some cases as well.
 
 The biggest changes to a regular program are in relation to the memory.
@@ -71,8 +71,8 @@ As hinted before, transferring data between the \ac{MRAM} and the \ac{WRAM} is i
 When only single elements are to be accessed, \ac{MRAM} data can be handled like normal variables.
 For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
 However, this still constitutes one or more \acp{DMA} on each use, and each \ac{DMA} comes at a cost.
-According to measurements~\cite{mutlu2022Benchmarking}, reading from the \ac{MRAM} has an overhead of \qty{77}{\cycle}, whilst writing to the \ac{MRAM} has an overhead of \qty{61}{\cycle}.
-The transfer of each byte costs a further \qty{0.5}{\cycle}.
+According to measurements~\cite{mutlu2022Benchmarking}, reading from the \ac{MRAM} has an overhead of \qty{77}{\cycles}, whilst writing to the \ac{MRAM} has an overhead of \qty{61}{\cycles}.
+The transfer of each byte costs a further \qty{0.5}{\cycles}.
 This means that \acp{DMA} for about \qty{128}{\byte} of data or less are dominated by the overhead.
 Therefore, it recommended to move large blocks of \ac{MRAM} data into the \ac{WRAM}, perform calculations there, and move the modified data block back to the \ac{MRAM}.
 This way, the overhead is mitigated.
