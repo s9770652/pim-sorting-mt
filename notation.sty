@@ -196,8 +196,12 @@
 \NewDocumentCommand{\pp}{}{\nobreak pp}  % percentage points
 
 %%% Notation in texts.
+\NewDocumentCommand{\abb}{m}{\text{#1}}  % abbreviations
+\NewDocumentCommand{\code}{m}{\texttt{#1}}
+
 \NewDocumentCommand{\caseintextfont}{}{}  % actually defined in theme.sty
 \NewDocumentEnvironment{caseintext}{m m}{\par\smallskip\noindent{\caseintextfont Case #1 \Dash #2:}}{\par\smallskip}
+
 
 \NewDocumentCommand{\hairspace}{}{\hskip .125em\relax}
 \NewDocumentCommand{\itordinal}{}{\hairspace}
