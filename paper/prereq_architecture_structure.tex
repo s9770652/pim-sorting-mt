@@ -98,7 +98,7 @@ It is not possible for a \ac{DPU} and the host to access a \ac{DRAM} bank concur
 The memory of the \ac{DRAM} bank is also referred to as \acfi{MRAM}.
 It is by far the largest memory of a \ac{DPU} and typically holds both the input provided by the host and the output calculated by the \ac{DPU}.
 However, the \ac{MRAM} is also the slowest memory, for each \ac{DMA} comes with a latency of dozens of cycles.
-Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \ac{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
+Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo[info]{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \ac{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
 
 The \acfi{WRAM} is based on faster but more expensive and less dense static \ac{RAM}.
 For this reason, the \ac{WRAM} is far smaller, comprising only \qty{64}{\kibi\byte}, yet its latency is practically zero, and the measured bandwidth for a v1A \ac{DPU} reaches \qty{2688}{\mebi\byte\per\second}.

@@ -1,40 +1,26 @@
 \subsection{Instruction Set Architecture}
 \label{sec:prereq:arch:isa}
 
-Notwithstanding \acp{DPU} kernels mainly being programmed using the high-level language \langC{}, it is beneficial to take a look at the instruction set architecture to gain a deeper understanding of the inner workings of a \ac{DPU}.
-In this thesis, the investigation of the compilation is a recurring theme when identifying optimisation potential.
+Each thread owns several private \emph{general-purpose registers} labelled \lstinline|r0| to \lstinline|r23| which can hold arbitrary 32-bit values and are freely readable and writeable by the respective thread.
+Any even Register \lstinline|r|\(\mathtt{(2i)}\) and subsequent odd Register \lstinline|r|\(\mathtt{(2i+1)}\) form the 64-bit Register \lstinline|d|\(\mathtt{(2i)}\).
+Furthermore, there are the read-only Registers \lstinline|id|, \lstinline|id2|, \lstinline|id4|, and \lstinline|id8|, which hold the identifier of the respective thread, multiplied by 1, 2, 4, and 8.
+Also, there are special registers for the program counter holding the \ac{IRAM} index of the next instruction to execute, a performance counter used for measuring the time, a carry bit, and the zero flag.
+Last but not least, there are four read-only registers which are shared by all threads:
+the Registers~\lstinline|zero| and \lstinline|one| hold, as their names suggest, the constants \(0\) and \(1\), whereas the Registers~\lstinline|lneg| and \lstinline|mneg| hold the least negative and most negative 32-bit values, that is \(-1\) and \(-2^{31}\).
+
 A \ac{DPU} is a \ac{RISC} with mainly 32-bit instructions \Dash most 64-bit instructions are pieced together from several 32-bit ones, thereby taking more than eleven cycles.
 There is no hardware support for multiplication or division, so these are emulated by bitwise instructions, thereby taking even longer.
 On top of that, there is no hardware support for floating point arithmetic, requiring costly emulation as well.
-
-Each thread owns several private 32-bit registers, which can be passed as arguments to instructions.
-The Registers~\lstinline|r0| to \lstinline|r23| are referred to as \emph{general-purpose registers}, although this may be seen as misnomer as some of these registers do have specific purposes by convention.
-For example, before calling a \langC{} function, the Registers~\lstinline|r0| to \lstinline|r7| are filled with the up to eight arguments of the function.
-Additionally, when the function has a return value, this value is written to Register~\lstinline|r0| and also to Register~\lstinline|r1| if the return value is \qty{64}{\bit} large.
-Even though the Registers~\lstinline|r0| to \lstinline|r21| can be used for different purposes as well, the last two registers have practically exclusive uses:
-Register~\lstinline|r22| contains the stack pointer, that is the address of the currently last element in the stack of the respective tasklet.
-When a function is called and it needs store data on the stack, it saves the original value of the stack pointer on the stack itself before incrementing the stack pointer, therethrough allocating new memory.
-When the function terminates, it loads the original stack pointer value back into Register~\lstinline|r22|, therethrough deallocating memory.
-Register~\lstinline|r23| contains the return address, that is the \ac{IRAM} index of the instruction whither to jump back after the termination of a function.
-All general-purpose buffers have in common that they can be combined to form 64-bit registers:
-Registers~\lstinline|r0| and \lstinline|r1| form the 64-bit Register~\lstinline|d0|, Registers~\lstinline|r2| and \lstinline|r3| the Register~\lstinline|d2|, and so on.
-This feature is precisely what is used when returning 64-bit values.
-
-Next to the general-purpose registers, there are also four read-only registers which are shared by all threads:
-the Registers~\lstinline|zero| and \lstinline|one| hold, as their names suggest, the constants \(0\) and \(1\), whereas the Registers~\lstinline|lneg| and \lstinline|mneg| hold the least negative and most negative 32-bit values, that is \(-1\) and \(-2^{31}\).
-Furthermore, there are the also the private and read-only Registers \lstinline|id|, \lstinline|id2|, \lstinline|id4|, and \lstinline|id8|, which hold the identifier of the respective thread, multiplied by 1, 2, 4, and 8.
-Last but not least, there are special registers for the program counter, that is the \ac{IRAM} index of the next instruction to execute, a performance counter used for measuring the time, a carry bit, and, finally, the zero flag.
-
-Instructions follow a 3-operands design, meaning there can be up to three register arguments to an instruction, with the target register usually first.
+Instructions follow a 3-operands design, meaning there can be up to three register arguments to an instruction, with the target register coming first.
 Next to registers, it is also possible to pass \emph{immediate values}, that is constant values passed directly without a register, and \emph{labels}, which are effectively \ac{IRAM} indices of instructions.
-The compilation of a \ac{DPU} kernel is reminiscent of ordinary assembler code.
+%The usage of instructions is intuitive and similar to ordinary assembler code.
 Some examples:
 \begin{itemize}
 	\item
-	\lstinline|lw r13, r12, -8| loads the 32-bit element which is one byte away from the \ac{WRAM} address stored in Register~\lstinline|r12| into Register~\lstinline|r13|.
+	\lstinline|move r6, 4| stores the immediate value \lstinline|4| in Register~\lstinline|r6|.
 
 	\item
-	\lstinline|move r6, 4| stores the immediate value \lstinline|4| in Register~\lstinline|r6|.
+	\lstinline|lw r13, r12, -4| loads the 32-bit word which is four bytes away from the \ac{WRAM} address stored in Register~\lstinline|r12| into Register~\lstinline|r13|.
 
 	\item
 	\lstinline|add r1, r5, r11| takes the 32-bit integers in Registers~\lstinline|r5| and \lstinline|r11|, adds them, stores the result in Register~\lstinline|r1|, and sets the carry bit accordingly.
@@ -43,9 +29,16 @@ Some examples:
 	\lstinline|addc r0, r4, r10| performs an addition taking the carry bit into account, allowing to perform one 64-bit addition by invoking two 32-bit instructions.
 
 	\item
-	\lstinline|jump r23, .LABEL_FUNC| stores the current program counter in Register~\lstinline|r23| and then jumps to the beginning of a function designated by the label.
+	\lstinline|jump .LABEL| sets the program counter to the index of the labelled instruction.
 \end{itemize}
-Of particular use are the instruction to load and store 64-bit large double words, which are some of the few instructions with \enquote{real}\todo{Diese Wortwahl! :(} 64-bit capabilities.
+Despite their name, some of the general-purpose registers have conventional uses.
+The Registers~\lstinline|r0| to \lstinline|r7| are filled with the up to eight arguments of a function before it is called.
+The return value of a function is written to the Registers~\lstinline|r0| or \lstinline|d0|, depending on whether it is \qty{32}{\bit} or \qty{64}{\bit} large.
+Register~\lstinline|r22| contains the stack pointer, that is the address of the currently last element in the stack of the respective tasklet.
+When a function is called and it need store data on the stack, it saves the original value of the stack pointer on the stack itself before incrementing the stack pointer, therethrough allocating new memory.
+When the function terminates, it loads the original stack pointer value back into Register~\lstinline|r22|, therethrough deallocating memory.
+Register~\lstinline|r23| contains the return address, that is the \ac{IRAM} index of the instruction whither to jump after the termination of a function.
+Here, the instruction to load and store 64-bit large double words are of particular use.
 By invoking \lstinline|sd r22, <offset>, d22|, the content of both Registers~\lstinline|r22| and \lstinline|r23| is stored to some position relative to the current stack pointer, whence it can be recovered by invoking \lstinline|ld d22, -<offset>, r22| later on.
 Thereby, the bandwidth of the \ac{WRAM} is effectively doubled and the instruction count is reduced.
 
@@ -54,12 +47,12 @@ Conditions are binary flags which are passed as additional arguments to instruct
 A \emph{test operation} performs its usual purpose but stores the evaluation of the condition in the target register.
 For example, the instruction \lstinline|add r0, r0, -1, pl| takes the content of Register~\lstinline|r0|, decrements it, and checks the condition \lstinline|pl|.
 This condition evaluates to true if the result is greater than or equal to zero.
-Therefore, Register~\lstinline|r0| will contain the value \lstinline|1| if and only if Register~\lstinline|r0| stored the number \lstinline|1| or greater, and will contain \lstinline|0| otherwise.
+Therefore, Register~\lstinline|r0| will contain the value \(1\) if and only if Register~\lstinline|r0| used to store the number \(1\) or greater, and will contain \(0\) otherwise.
 A \emph{combo operation} takes a label as yet another argument.
-The instruction performs its usual purpose, checks whether the result fulfils the conditions, and performs a jump to a given label if yes.
+The instruction performs its usual purpose, checks whether the result fulfils the condition, and, if yes, performs a jump to the label.
 An example is the instruction \lstinline|add r0, r0, -1, pl, .LABEL_LOOP|, where Register~\lstinline|r0| holds a loop index which get decremented.
 Should Register~\lstinline|r0| now hold a value greater or equal to zero, a jump back to the beginning of the loop body marked by the label \lstinline|.LABEL_LOOP| is performed.
 Otherwise, the next line of the compilation is executed.
 This way, it takes just eleven cycles to update the loop index, check the loop condition, and perform the appropriate action.
-Such techniques of saving instructions are especially valuable because \acp{DPU} are incapable of branch prediction.
+Such techniques of saving instructions are especially valuable because \acp{DPU} are incapable of instruction level parallelism.
 Although conditions are employed automatically by the compiler for the most part, \cref{sec:mram} includes a manual use of conditions.
