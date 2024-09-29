@@ -7,8 +7,40 @@ The pipeline is \emph{scalar}, meaning there is at most one instruction per stag
 Threads can have only one scheduled instruction in the pipeline.
 However, all threads use the same pipeline, so a nominal throughput of one instruction per cycle is achieved if enough threads are active for all stages of the pipeline to be continuously performed (\cref{fig:arch:pipeline}).
 The pipeline consists of fourteen stages, amongst these the fetching of the instruction from the \ac{IRAM}, the reading of the operands from the registers, and the performing of the operation itself while accessing the \ac{WRAM} if needed.
-The last three stages can be performed in parallel with the first three stages.
+The last three stages can be interleaved, that is performed in parallel, with the first three stages.
 Thence, the pipeline length is effectively reduced to eleven, meaning only eleven active threads are needed to exploit the full computing capabilities of a DPU.
+
+\begin{figure}
+	\centering
+	\begingroup
+	\addfontfeatures{RawFeature=+tnum}
+	\NewDocumentCommand{\ins}{m}{\textcolor{accentcolor}{\underline{#1}}}
+	\setlength{\tabcolsep}{3.17pt}
+	\begin{tabular}{ccccccccccccccccccccc}
+		\toprule
+		Tasklet & \multicolumn{20}{c}{Cycle} \\
+		\cline{2-21}
+		& 21 & 22 & 23 & 24 & 24 & 25 & 26 & 27 & 28 & 29 & 30 & 31 & 32 & 33 & 34 & 35 & 36 & 37 & 38 & 39 \\
+		\midrule
+
+		0 & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| & \lstinline|G| & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| & \lstinline|G| \\
+
+		1 & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| & \lstinline|G| & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| \\
+
+		2 & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| & \lstinline|G| & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| \\
+
+		3 & \lstinline|G| & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| & \lstinline|E| & \lstinline|F| & \lstinline|G| & \lstinline|H| & \lstinline|I| & \lstinline|J| & \lstinline|K| & \lstinline|L|/\kern-1pt\lstinline|A| & \lstinline|M|/\lstinline|B| & \ins{\lstinline|N|}/\lstinline|C| & \lstinline|D| \\
+		\bottomrule
+	\end{tabular}
+	\endgroup
+
+	\caption{
+		An excerpt from cycles 21 to 39 of an exemplary pipeline with four threads which were scheduled one cycle apart.
+		The fourteen letters \lstinline|A| to \lstinline|N| represent the fourteen stages of an instruction.
+		Due to the interleave, every pair of subsequent, final stages \lstinline|N| is eleven cycles apart.
+	}
+	\label{fig:arch:pipeline}
+\end{figure}
 
 Nevertheless, having more than eleven threads active is not detrimental to the throughput, which remains at one instruction per cycle, it only means that individual threads are put into a queue and have to wait for some cycles.
 This not only may make some parallel task easier to program, it can result in a performance gain when \acp{DMA} are involved.
@@ -20,72 +52,3 @@ As concluding remark, it shall be mentioned that there are circumstances under w
 This is related to the identifiers of the registers used, however, the compiler usually manages to avoid these situations.
 Hence, one can regard a \ac{DPU} as a \emph{uniform-cost machine} where each instruction takes eleven cycles to complete with the seldom exception of some taking twelve cycles and with the exception of \acp{DMA}.
 Counting instructions is, therefore, a valid technique to assess the performance of some piece of code.
-
-\begin{figure}
-	\centering
-%	\includegraphics[page=65]{example-image-duck}
-	\begin{tikzpicture}[
-		sketch,
-		scale=0.95,
-		stage/.style={ node distance=0mm, font=\addfontfeatures{RawFeature=+lnum}, inner sep=0 },
-		flow/.style={ {Straight Barb[width=1.5mm]}-{Straight Barb[width=1.5mm]} },
-		flow left/.style={ {Straight Barb[width=1.5mm]}- },
-		flow right/.style={ -{Straight Barb[width=1.5mm]} },
-	]
-		\def\stagewidth{8.25}
-		\draw[draw=none, fill=accentcolor!10] (0,  -0) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Thread Selection};                    % DISPATCH
-		\draw[draw=none, fill=accentcolor!25] (0,  -1) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH1
-		\draw[draw=none, fill=accentcolor!25] (0,  -2) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH2
-		\draw[draw=none, fill=accentcolor!25] (0,  -3) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Instruction Fetch};                   % FETCH3
-		\draw[draw=none, fill=accentcolor!10] (0,  -4) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP1
-		\draw[draw=none, fill=accentcolor!10] (0,  -5) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP2
-		\draw[draw=none, fill=accentcolor!10] (0,  -6) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Re\smash{g}ister Access};             % READOP3
-		\draw[draw=none, fill=accentcolor!25] (0,  -7) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erand Formattin\smash{g}};  % FORMAT
-		\draw[draw=none, fill=accentcolor!10] (0,  -8) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU1
-		\draw[draw=none, fill=accentcolor!10] (0,  -9) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU2
-		\draw[draw=none, fill=accentcolor!10] (0, -10) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU3
-		\draw[draw=none, fill=accentcolor!10] (0, -11) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {O\smash{p}erators};                   % ALU4
-		\draw[draw=none, fill=accentcolor!25] (0, -12) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Result Formattin\smash{g}};           % MERGE1
-		\draw[draw=none, fill=accentcolor!25] (0, -13) rectangle +(\stagewidth, -1) node[stage, midway, xshift=2mm] {Result Formattin\smash{g}};           % MERGE2
-
-		\draw[draw=none] (0,  -0) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}1};
-		\draw[draw=none] (0,  -1) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}2};
-		\draw[draw=none] (0,  -2) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}3};
-		\draw[draw=none] (0,  -3) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}4};
-		\draw[draw=none] (0,  -4) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}5};
-		\draw[draw=none] (0,  -5) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}6};
-		\draw[draw=none] (0,  -6) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}7};
-		\draw[draw=none] (0,  -7) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}8};
-		\draw[draw=none] (0,  -8) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}9};
-		\draw[draw=none] (0,  -9) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}10};
-		\draw[draw=none] (0, -10) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}11};
-		\draw[draw=none] (0, -11) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}12};
-		\draw[draw=none] (0, -12) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}13};
-		\draw[draw=none] (0, -13) rectangle +(1, -1) node[stage, midway] {\vphantom{lg}14};
-
-		\draw (0, 0) rectangle +(\stagewidth, -14);
-		\foreach \i in {13,...,1}{
-			\draw (0, -\i) -- +(\stagewidth, 0);
-		}
-
-		% Memories.
-		\def\pad{1}
-		\def\lenmemx{3}
-		\draw[fill=black!5] (-\pad-\lenmemx,    -7.5) rectangle +(\lenmemx, 3) node[stage, midway, align=center] {Register\\File};
-		\draw[fill=black!5] (\stagewidth+\pad,  -4.5) rectangle +(\lenmemx, 3) node[stage, midway]               {IRAM};
-		\draw[fill=black!5] (\stagewidth+\pad, -13.5) rectangle +(\lenmemx, 5) node[stage, midway]               {WRAM};
-
-		% Arrows.
-		\draw[flow right] (\stagewidth,  -2) -- +(\pad, 0);
-		\draw[flow left]  (\stagewidth,  -4) -- +(\pad, 0);
-		\draw[flow left]  (      -\pad,  -5) -- +(\pad, 0);
-		\draw[flow right] (      -\pad,  -7) -- +(\pad, 0);
-		\draw[flow right] (\stagewidth,  -9) -- +(\pad, 0);
-		\draw[flow left]  (\stagewidth, -13) -- +(\pad, 0);
-	\end{tikzpicture}
-
-	\caption{
-		The pipeline of a \ac{DPU}.~\cite{upmem2019HotChips}
-	}
-	\label{fig:arch:pipeline}
-\end{figure}
