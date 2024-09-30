@@ -21,6 +21,7 @@ Some examples:
 
 	\item
 	\lstinline|lw r13, r12, -4| loads the 32-bit word which is four bytes away from the \ac{WRAM} address stored in Register~\lstinline|r12| into Register~\lstinline|r13|.
+	Note that all addresses are physical.
 
 	\item
 	\lstinline|add r1, r5, r11| takes the 32-bit integers in Registers~\lstinline|r5| and \lstinline|r11|, adds them, stores the result in Register~\lstinline|r1|, and sets the carry bit accordingly.
