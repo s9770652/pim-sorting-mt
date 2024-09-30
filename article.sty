@@ -4,6 +4,7 @@
 %\RequirePackage[regular]{newcomputermodern}  % newest version of Computer Modern (regular: display weight)
 
 \setkomafont{captionlabel}{\usekomafont{descriptionlabel}}
+\DeclareFieldFormat{labelnumberwidth}{[{\addfontfeatures{RawFeature=+tnum}#1}]\midsentence}  % numeric reference labels in bibliography
 
 \RedeclareSectionCommand[
 	tocentrynumberformat=\addfontfeatures{RawFeature=+tnum},
