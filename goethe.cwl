@@ -51,7 +51,9 @@
 \adjustfortopblockincolumn#n
 \adjustforminipage#n
 
+\abb{text}#n
 \caseintextfont{arg}#S
+\code{text}#n
 
 \dash#n
 \Dash#n
