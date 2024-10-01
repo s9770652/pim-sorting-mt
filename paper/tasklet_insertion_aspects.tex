@@ -1,0 +1,15 @@
+\subsection{Presentation of Key Aspects}
+
+\paragraph{Sentinel Values}
+When moving an element to the left, two checks are needed:
+Does the left neighbour exist and is it less than the element to move?
+The first check can be omitted through the use of \emph{sentinel values}~\cite[93]{wirth1975algorithmen}:
+If the element with index \(-1\) is permanently set to the least possible value of the chosen data type, it is at least as little as any element in the input array, and the leftwards motion stops there at the latest.
+Since a \ac{DPU} lacks branch prediction, the slowdown from performing twice as many checks as needed is quite high and goes up to \qty{30}{\percent} for short inputs with 24 uniformly distributed 32-bit elements.
+
+Setting such an \emph{explicit} sentinel value can be omitted by using \emph{implicit} sentinel values.
+At the start of round~\(i\), one can check whether the element with index \(0\) is at least as little as the element with index~\(i\).
+If so, the former is a sufficient sentinel value, and \IS{} can proceed as normal.
+If not, the latter must be the minimum of the first \(i + 1\) elements.
+Therefore, one can shift the first \(i\) elements one position backwards and place the minimum in the front.
+For simplicity, the words \enquote{explicit} and \enquote{implicit} are, henceforth, applied to the word \enquote{\IS{}} directly to imply the type of the sentinel value used.

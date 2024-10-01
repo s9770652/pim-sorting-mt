@@ -27,6 +27,11 @@
 				\plotpernn{#1}{tableSmallSorts_32almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
+				\plotpernn{#1}{tableSmallSorts_32zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_32uniform}
@@ -36,15 +41,11 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_32zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
-				\plotpernn{#1}{tableSmallSorts_32normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
 		The date size is 32 bit.
@@ -82,6 +83,11 @@
 				\plotpernn{#1}{tableSmallSorts_64almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
+				\plotpernn{#1}{tableSmallSorts_64zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_64uniform}
@@ -91,15 +97,11 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_64zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
-				\plotpernn{#1}{tableSmallSorts_64normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
 		The date size is 64 bit.

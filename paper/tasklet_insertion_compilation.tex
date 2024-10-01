@@ -1,31 +1,28 @@
-\subsection*{Investigation of the Compilation}
+\subsection{Investigation of the Compilation}
 \label{sec:tasklet:insertion:compilation}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:insertion:compilation}}
 
-A common theme when developing for DPUs is a nosediving quality of the compilation.
-This is no different for \IS{} upon which shall be shed some light in this \lcnamecref{sec:tasklet:insertion:compilation}.
-
-A naïve implementation of \IS{} begins sorting at the very start of the input and is shown in \cref{fig:insertion:impl:pred_first}.
-Obviously, the first element alone is already sorted, so it is algorithmically sound to let \IS{} begin at the second element.
+\Cref{fig:insertion:impl:pred_first} shows a naïve implementation of \IS{} which begins at the very start of the input.
+Obviously, nothing happens in the first round as a lone element is already sorted, so it is algorithmically sound to let \IS{} begin at the second element.
 This optimisation is accomplished in \cref{fig:insertion:impl:pred_sec}.
-Surprisingly, it leads to a nine instructions longer runtime at 16 integers!
-The same happens if, in \cref{fig:insertion:impl:pred_sec}, one keeps \lstinline|*i = start| and instead uses \lstinline|curr = ++i|.
+Surprisingly, it leads to a longer runtime!
+For instance with sixteen 32-bit integers, the runtime is increased by nine instruction.
+The same increase happens if one keeps \lstinline|*i = start| and uses \lstinline|curr = ++i| instead to begin at the second element.
 
 Looking at the compilation reveals the reason:
-In the naïve version, the pointer \lstinline|pred| is optimised away and, in its stead, the pointer \lstinline|curr| is passed to all load operations together with a constant offset as second argument.
-In the optimised version, the pointer \lstinline|pred| is used with an offset to fetch the values of \lstinline|to_sort| and \lstinline|*pred| at the beginning of each iteration of the outer loop.
-Then, the pointer \lstinline|curr| is initialised using the pointer \lstinline|pred| before being used in the inner loop as in the naïve version.
-This initialisation is done through one additional \lstinline|move| instruction.
+In the naïve version, the pointer \lstinline|pred| is optimised away and, in its stead, the pointer \lstinline|curr| is passed to all load instructions together with a constant offset of \lstinline|-4|.
+In the optimised version, the pointer \lstinline|pred| is used together with offsets of \lstinline|+4| and \lstinline|0| to fetch the values of \lstinline|to_sort| and \lstinline|*pred| at the beginning of each round.
+Only then, the pointer \lstinline|curr| is initialised before being used in the inner loop as in the naïve version.
+Effectively, this initialisation introduces one more instruction.
 % This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into another register.
 
-These changes fully explain the prolongation of the runtime by nine instructions:
-The optimised version loops 15 times in total, each time laboriously initialising the pointer \lstinline|curr|, and executes one \lstinline|add| instruction at the beginning of the function to advance the starting position.
-The naïve version loops 16 times, the first time executing seven instructions for naught.
+These changes fully explain the extension of the runtime by nine instructions:
+The optimised version invokes one \lstinline|add| instruction at the beginning of the function to advance the starting position and loops 15 times in total, each time initialising the pointer \lstinline|curr|.
+The naïve version loops 16 times, invoking seven instructions for naught in the first iteration.
 
 \begin{figure}
 	\lstset{basicstyle=\ttfamily\small}
-	\def\iscodewidth{0.47\linewidth}
-	\begin{subfigure}{\iscodewidth}
+	\def\codewidth{0.47\linewidth}
+	\begin{subfigure}{\codewidth}
 		\begin{lstlisting}
 void InsertionSort(int *start, int *end) {
 	int *curr, *i = start;
@@ -46,7 +43,7 @@ void InsertionSort(int *start, int *end) {
 		\label{fig:insertion:impl:pred_first}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}{\iscodewidth}
+	\begin{subfigure}{\codewidth}
 		\begin{lstlisting}
 void InsertionSort(int *start, int *end) {
 	int *curr, *i = start + 1;
@@ -67,7 +64,9 @@ void InsertionSort(int *start, int *end) {
 		\label{fig:insertion:impl:pred_sec}
 	\end{subfigure}
 
-	\begin{subfigure}{\iscodewidth}
+	\smallskip
+
+	\begin{subfigure}{\codewidth}
 		\begin{lstlisting}
 void InsertionSort(int *start, int *end) {
 	int *curr, *i = start;
@@ -86,8 +85,8 @@ void InsertionSort(int *start, int *end) {
 		}
 		\label{fig:insertion:impl:offset_first}
 	\end{subfigure}
-	\hfill
-	\begin{subfigure}{\iscodewidth}
+	\hfil
+	\begin{subfigure}{\codewidth}
 		\begin{lstlisting}
 void InsertionSort(int *start, int *end) {
 	int *curr, *i = start + 1;
@@ -111,6 +110,7 @@ void InsertionSort(int *start, int *end) {
 		\Cref{fig:insertion:impl:pred_first,fig:insertion:impl:offset_first} are compiled the same.
 		\Cref{fig:insertion:impl:pred_sec,fig:insertion:impl:offset_sec} are compiled differently.
 	}
+	\label{fig:insertion:impl}
 \end{figure}
 
 Multiple workarounds exist to sidestep this problem.
@@ -118,7 +118,7 @@ One workaround is to take the unoptimised code and change the starting position 
 This is trivial for the explicit \IS{} since one can simply inject an \lstinline|add| instruction at the beginning of the function to increment the pointer \lstinline|start|.
 The implicit and the sentinel-less \IS*{} need to know the original starting address \lstinline|start| later on, though, and initialise the actual starting point rather late;
 injecting inline assembler proves more difficult as a consequence.
-Moreover, as \IS{} is to be used as fallback algorithm by other functions which might also need to keep the original value of \lstinline|start|, inline assembler is a bad choice even for the explicit \IS{}.
+Moreover, as \IS{} is to be used as fallback algorithm by other sorting algorithms which might also need to keep the original value of \lstinline|start|, inline assembler is a bad choice even for the explicit \IS{}.
 
 Another workaround is the usage of a wrapper function calling \IS{} with the arguments \lstinline|start + 1| and \lstinline|end|.
 This works quite well:
@@ -134,13 +134,14 @@ This workaround is clearly the best of the three and, hence, the one used in the
 Alas, the eternal struggle with the compiler endeth not herewith.
 A deeper look into the compilation reveals the following sequence:
 \begin{center}
+	\lstset{language={[DPU]Assembler}}
 	\begin{tabular}{ll}
-		\lstinline|move r3, r0| & \makebox[0pt][l]{\textit{// copy content of register \lstinline|r0| to \lstinline|r3|}}
-		\\ \lstinline|jleu r4, r2, .LABEL| & \makebox[0pt][l]{\textit{// jump to \lstinline|.LABEL| if \lstinline|r4| \(\le\) \lstinline|r2|}}
-		\\ \lstinline|move r3, r0| &
+		\lstinline|move r3, r0| & \makebox[0pt][l]{\textit{// copy content of register \lstinline|r0| to \lstinline|r3|}} \\
+		\lstinline|jleu r4, r2, .LABEL| & \makebox[0pt][l]{\textit{// jump to \lstinline|.LABEL| if \lstinline|r4| \textnormal{≤} \lstinline|r2|}} \\
+		\lstinline|move r3, r0| &
 	\end{tabular}
 \end{center}
 Without delving further into its significance \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it nor to return via \lstinline|jleu|.
-Also, \lstinline|move| does not set any flags like the zero flag or carry flag, as some other instructions do, so such a side effect can be excluded as justification.
-Copying the whole assembler code and injecting it as inline assembler but with this second \lstinline|move r3, r0| removed pushes the runtime even further down whilst still sorting correctly.
+Also, \lstinline|move| does not set the zero or carry flag, so such a side effect as justification can be ruled out.
+Copying the whole assembler code and injecting it as inline assembler but without this second \lstinline|move r3, r0| pushes the runtime even further down whilst maintaining the correctness of the output.
 New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.
