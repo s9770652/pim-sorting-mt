@@ -36,6 +36,12 @@
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
@@ -47,19 +53,14 @@
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\pgfplotsset{cycle list shift=1}
-			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
-		Instead of total runtimes, the speedups with respect to \IS{} are given for better clarity.
+		Instead of total runtimes, the speedups over \IS{} are given for better clarity.
 		The date size is 32 bit.
 	}
 	\label{fig:shell:two-tier_uint32}
@@ -96,6 +97,12 @@
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\pgfplotsset{cycle list shift=1}
+			\pgfplotsinvokeforeach{2,...,9}{
+				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\pgfplotsset{cycle list shift=1}
 			\pgfplotsinvokeforeach{2,...,9}{
@@ -107,19 +114,14 @@
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\pgfplotsset{cycle list shift=1}
-			\pgfplotsinvokeforeach{2,...,9}{
-				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
-		Instead of total runtimes, the speedups with respect to \IS{} are given for better clarity.
+		Instead of total runtimes, the speedups with over \IS{} are given for better clarity.
 		The date size is 64 bit.
 	}
 	\label{fig:shell:two-tier_uint64}
@@ -143,7 +145,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The date size is 32 bit.
@@ -170,7 +172,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		A repetition of \cref{fig:shell:three-tier}.
 		The date size is 32 bit.
@@ -197,7 +199,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The date size is 64 bit.
@@ -224,7 +226,7 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
 		The date size is 64 bit.
