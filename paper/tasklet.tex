@@ -1,18 +1,18 @@
-\chapter{Sorting Sequentially in WRAM}
+\chapter[Sorting in the \abb{WRAM}]{Sorting in the \acs*{WRAM}}
 \label{sec:tasklet}
 
-This \lcnamecref{sec:tasklet} is concerned with the very first phase where each tasklet sorts on its own, that is sequentially, solely in WRAM.
+This \lcnamecref{sec:tasklet} is concerned with sequentially sorting data which fits into the \ac{WRAM} entirely.
 \Cref{sec:tasklet:insertion} discusses \IS{} which is a component of all algorithms presented thereafter as it is lightweight and performant on short inputs.
 \Cref{sec:tasklet:shell} covers \ShS{} which is a generalisation of \IS{}.
 \hyperref[sec:tasklet:heap]{\nameCrefs{sec:tasklet:heap} }\labelcref{sec:tasklet:heap}, \labelcref{sec:tasklet:quick}, and \labelcref{sec:tasklet:merge} deal with \HS{}, \QS{}, and \MS{}, respectively, which are more elaborate algorithms suitable for long inputs.
 These \lcnamecrefs{sec:tasklet:insertion} give a short presentation of their respective algorithm at the beginning, ensued by a discussion of key parameters in their designs.
-There follows usually an insight into non-algorithmic challenges faced during development caused by the compiler.
+This is usually followed by an insight into non-algorithmic challenges faced during development caused by the compiler whose optimisations are often of suboptimal quality.
 Finally, an evaluation of the performance of the respective algorithm completes each \lcnamecref{sec:tasklet:insertion}.
 \Cref{sec:tasklet:conclusion} summarises the findings on the presented algorithms and gives a brief outlook on future improvements.
 
 \Cref{apx:tasklet} contains a comprehensive collection of measurements but the ones essential for following the content of this \lcnamecref{sec:tasklet} are also presented in figures herein.
 Every measurement was repeated a thousand times with the sorting algorithms in their default configuration unless explicitly noted otherwise.
-The meaning behind and reasoning for the individual parameters in the configurations are subject in \crefrange{sec:tasklet:insertion}{sec:tasklet:merge} but shall be already mentioned for ease of reference:
+The meaning behind and reasoning for the individual parameters in the configurations are subject in \crefrange{sec:tasklet:insertion}{sec:tasklet:merge} but shall be mentioned already for ease of reference:
 \begin{description}
 	\item[\IS{}]
 	explicit sentinel value
@@ -38,10 +38,10 @@ The meaning behind and reasoning for the individual parameters in the configurat
 	starting run length of 16 elements
 \end{description}
 
-The measurements were confined to at most 1024 elements.
-The reason is that 64 kibibytes of WRAM are available and that the DPU pipeline throughput is saturated at 11 tasklets when ignoring secondary effects through MRAM accesses and synchronisation.
-This alots 5957 bytes, that is space for about 1489 32-bit integers, to each tasklet.
-That number is further reduced by a few hundred of those bytes serving as stack for their respective tasklet.
+The measurements were confined to at most \num{1024} elements.
+The reason is that \qty{64}{\kibi\byte} of \ac{WRAM} are available and that most kernels will run with at least 11 tasklets to saturate the instruction pipeline.
+In consequence, at most \qty{5957}{\byte} are allotted to each tasklet.
+To account for the tasklet stack, this number is reduced by \qty{600}{\byte}, leaving space for about \num{1339} 32-bit elements.
 On that score, 1024 elements is a reasonable cutoff.
 
 \input{tasklet_insertion}
