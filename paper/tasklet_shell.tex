@@ -8,7 +8,7 @@ These subarrays then get sorted individually through \IS{}.
 The final step size is \(\stepsizes_0 = 1\) such that a regular \IS{} is performed.
 Intuitively, early \IS*{} are fast as they touch only few elements and little elements in the back are brought forward in large strides.
 Later \IS*{} are also fast as elements are close to being sorted.
-Like regular \IS{}, \ShS{} also works in-place but loses the stability property.
+Like regular \IS{}, \ShS{} also works in place but loses the stability property.
 
 Finding the right balance between the heightened overhead through multiple \IS{} passes and the shortened runtime of each \IS{} pass is subject to research to this day \cite{skean2023optimization,lee2021empirically} and depends on the cost of the operation types (comparing, swapping, looping).
 Traditionally, step sizes were constructed mathematically, allowing to determine \ShS{}'s runtime to be, for example, \(\bigoh[\big]{n^{1.2}}\)~\cite[106]{wirth1975algorithmen} or \(\bigoh[\big]{n \log^2 n}\)~\cite[Section 2]{skean2023optimization}, that is better than \IS{}.
