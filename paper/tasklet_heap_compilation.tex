@@ -1,38 +1,36 @@
-\subsection*{Investigation of the Compilation}
+\subsection{Investigation of the Compilation}
 \label{sec:tasklet:heap:compilation}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:heap:compilation}}
 
-Under zero-based indexing, the indices of the sons of a vertex with index \(i\) are \(\twoi + 1\) and \(\twoi + 2\), whilst the one of its father is \((i - 1) \div 2\).
-Under one-based indexing, the indices of the sons of a vertex with index \(i\) are \(\twoi\) and \(\twoi + 1\), whilst the one of its father is \(i \div 2\).
+Under zero-based indexing, the indices of the children of a vertex with index \(i\) are \(\twoi + 1\) and \(\twoi + 2\), whilst the one of its parent is \((i - 1) \div 2\).
+Under one-based indexing, the indices of the children of a vertex with index \(i\) are \(\twoi\) and \(\twoi + 1\), whilst the one of its parent is \(i \div 2\).
 The formula \(i \div 2\) is computable through a bitwise shift one place to the right, whereas \((i - 1) \div 2\) requires a subtraction before the bitwise shift.
-Since the bottom-up \HS*{} rely heavily on finding fathers during backtracking, one-based indexing is clearly superior.
+Since the bottom-up \HS*{} rely heavily on finding parents during backtracking, one-based indexing is clearly superior.
 
 Consistency alone would suggest one-based indexing for all types of \HS{}.
 However, the first \HS{} implemented was the top-down \HS{}, which only ever sifts down.
 The picture is not so clear if focussing only on that version of \HS{}.
 The compiler automatically turns multiplications by \(2\) into a bitwise shift by one place to the left.
-Next to a regular \lstinline|lsl| instruction for such bitwise shifts to the left, DPUs also possess an instruction called \lstinline|lsl_add| which first shifts to the left and then adds a number.
-This way, the formulas \(\twoi + 1\) and \(\twoi\) take the same amount of time to compute.
-
-Notwithstanding \lstinline|lsl_add| being indeed employed in the compilation, the zero-based indexing is about 7\% slower than one-based indexing.
+Next to a regular \lstinline|lsl| instruction for such bitwise shifts to the left, \acp{DPU} also possess an instruction called \lstinline|lsl_add| which first shifts to the left and then adds a number.
+This way, the formulæ \(\twoi + 1\) and \(\twoi\) take the same amount of time to compute.
+Notwithstanding \lstinline|lsl_add| being indeed employed in the compilation, the zero-based indexing is about \qty{7}{\percent} slower than one-based indexing.
 The reason is that \lstinline|lsl_add| takes four arguments:
-the target register, the addend, the number to shift, the number of places to shift.
-The reason is that only the number of places to shift can be passed as immediate value, that is, as plain number, whereas all other arguments have to be passed through a register, including the addend.
-Whilst DPUs have a read-only register permanently storing the number~\(1\) at disposal, read-only registers can only ever be the first register to be passed, not the second one.
-As a consequence, the compiler moves the number \(1\) to a register whenever \(\twoi + 1\) is to be computed, only to immediately overwrite it with the result from \lstinline|lsl_add|.
+the target register, the addend, the integer to shift, and the number of places to shift.
+Whilst \acp{DPU} have a read-only register permanently storing the number~\(1\) at disposal, read-only registers can only ever be the first register to be passed, not the second one.
+As a consequence, the compiler has to move the number~\(1\) to a general-purpose register before implementing the calculation of \(\twoi + 1\).
+However, this general-purpose buffer is immediately overwritten with the result from \lstinline|lsl_add|, raising the need to move the number~\(1\) the next time again.
 Hence, the calculation of \(\twoi + 1\) does take twice as long as \(\twoi\) after all.
 
-There are plenty of other curious observations.
+There are a number of other curious observations.
 For example, the runtime difference between stopping \HS{} when one element remains in the heap and stopping \HS{} when only three elements remain (which then get sorted by \IS{}) reduces the runtime by tens of thousand of cycles.
 Stopping \HS{} even earlier has comparatively little effect.
-For comparison, sorting just three elements solely with \HS{} barely takes one thousand cycles at worst and that runtime includes building the heap.
+For comparison, sorting just three elements solely with \HS{} barely takes one thousand cycles at worst, including the time to build the heap.
 
-The undisputedly strangest observation was the following:
+Another oddity was the following:
 Building a heap uses downwards-sifting, so a single sentinel leaf must be inserted beforehand if the input length is even.
 Adding this leaf if the input length is odd makes no difference algorithmically, as it would be a left leaf never to be accessed due to the bounds checks.
-However, adding an if-statement determining whether the sentinel leaf has to be placed has dramatic effects compared to placing the sentinel leaf unconditionally.
-Since the parity of the input length is needed later anyway when actually sorting, the conditional version is expected to gain one instruction.
-Yet, when measuring the runtimes on 1024 elements, one can observe anything from a reduction by 5000 cycles over changes within the margin of error to increases by 25\,000 cycles, depending on the sifting direction and the input distribution.
-Adding one or more sentinel leaves outside of the \HS{} functions has no impact on this behaviour.
-A comparison of the compilations reveals minute differences at the beginnings of the \HS{} functions, none of which affect anything repeatedly executed.
-The register usage does also not change in such a manner that the execution time of instructions is prolonged to 12 cycles, as described in the DPU SDK documentation \cite[Instruction Set Architecture -- Efficient scheduling]{upmemSDK}.
+However, adding an if statement determining whether the sentinel leaf has to be placed has dramatic effects compared to placing the sentinel leaf unconditionally.
+Since the parity of the input length is needed again later on, the conditional version is expected to gain one instruction.
+Yet, when measuring the runtimes on 1024 elements, one can observe anything from a reduction by \num{5000} cycles over changes within the margin of error to increases by \num{25000} cycles, depending on the sifting direction and the input distribution.
+Adding the sentinel leave outside of the \HS{} functions has no impact on this behaviour.
+Comparing the compilations reveals minute differences at the beginnings of the \HS{} functions, none of which affecting anything repeatedly executed.
+The register usage does also not change in such a manner that the execution time of instructions would be prolonged to twelve cycles.

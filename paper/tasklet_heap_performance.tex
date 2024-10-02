@@ -1,8 +1,7 @@
-\subsection*{Evaluation of the Performance}
+\subsection{Evaluation of the Performance}
 \label{sec:tasklet:heap:performance}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:heap:performance}}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablereadnamed{data/heap/uint32/#1.txt}{tableHeap_32#1}
 	\pgfplotstablereadnamed{data/heap/uint64/#1.txt}{tableHeap_64#1}
 }
@@ -34,27 +33,38 @@
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil\tikzexternalenable
 	\caption{
-		Comparison of the runtimes of three different \HS{} implementations on uniformly distributed integers.
+		Mean runtimes of all \HS{} implementations on uniformly distributed integers.
 	}
 	\label{fig:heap:runtime}
 \end{figure}
 
 The measurements are visualised in \cref{fig:heap:runtime,fig:heap:runtime_uint32,fig:heap:runtime_uint64}.
-In general, the performance of \HS{} is hardly volatile and barely depends on the input distribution.
-Reverse sorted inputs are sorted the fastest since they are already max-heaps so the heap-building phase is brief, whereas sorted inputs are sorted the slowest since they are min-heaps essentially needing inversion.
-Nonetheless, the reverse sorted inputs get sorted at most 10\% faster than the sorted ones.
+In general, the performance of \HS{} is hardly volatile and mostly independent from the input distribution.
+Reverse sorted inputs are sorted faster than most since they are already max-heaps so the heap-building phase is brief, whereas sorted inputs are sorted the slowest since they are min-heaps essentially needing inversion.
+Nonetheless, the reverse sorted inputs get sorted at most \qty{10}{\percent} faster than the sorted ones.
+An extraördinary outlier are zero-one inputs on which the top-down \HS{} achieves a speedup of \num{1.8} over the bottom-up \HS{}.
+With zero-one inputs, roughly half of the elements are zeroes and roughly half are ones.
+After building the min-heap, the first half of the array consists of ones and the second half of zeroes.
+About half of the ones and about half of the zeroes are already in these respective halves of the input, so the heap-building phase is somewhat brief, too.
+More importantly, however, is the foreshortening of the downwards-sifting.
+After about \(n/2\) many rounds, only zeroes remain in the heap.
+Therefore, no last leaf violates the heap order when moved to the top, so the downwards-sifting terminates immediately.
+But the downwards-sifting becomes briefer even earlier as many ones turn into leaves once the zeroes which are their children have been moved to the top and were sifted down to somewhere else.
+Such ones do not violate the heap order when moved to the top at a later point, too.
 
-The normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas that of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends.
-The exception are reverse sorted inputs, where bottom-up \HS{} also shows a slight upwards trend.
+
+Ignoring this outlier, the normalised runtimes of the top-down \HS{} and the bottom-up \HS{} with swap parity show a slight upwards trends, whereas that of the bottom-up \HS{} with swap disparity mostly shows a slight downwards trends.
+The exception are reverse sorted inputs, where the latter also shows a slight upwards trend.
 Of interest is their ranking:
 Value checks on 64-bit integers take two instructions, so that the savings of the bottom-up \HS{} with swap disparity allow it to outperform the top-down \HS{} even for short inputs.
-Its advantage grows with the input length which makes sense as roughly 50\% of the vertices are leaves and 25\% are fathers of leaves, no matter the total size.
+Its advantage grows with the input length.
+This makes sense as roughly \qty{50}{\percent} of the vertices are leaves and \qty{25}{\percent} are parents of leaves, no matter the total heap size.
 Therefore, the percentage of former last leaves being sifted down from the top to the bottom remains steady but the travelled distance increases.
-Value checks on 32-bit integers, on the other hand, take only one instruction, so that the reduction of these is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting, whence the lead of the top-down \HS{}.
-Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead stays meagre even at 6000 elements.
-However, these long inputs are uninteresting due to the limited WRAM and the multiple tasklets used in most applications.
+Value checks on 32-bit integers, on the other hand, take only one instruction, so that the reduction of these is overshadowed by the increased overhead from the longer downwards-sifting and the added upwards-sifting.
+Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtakes the top-down \HS{} because of their inverse trends, but the lead stays meagre even at \num{6000} elements.
+%However, these long inputs are uninteresting due to the limited \ac{WRAM} and the multiple tasklets used in most applications.
 
 The bottom-up \HS{} with swap parity consistently trails behind.
 This comes as no surprise since the overhead of its considerably prolonged upwards-sifting bears no proportion to the few swaps saved.

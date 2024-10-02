@@ -26,6 +26,11 @@
 				\plotpernlognwitherrors{#1}{tableHeap_32almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}, ymin=80]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
+				\plotpernlognwitherrors{#1}{tableHeap_32zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_32uniform}
@@ -35,18 +40,15 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_32zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlognwitherrors{#1}{tableHeap_32normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
 		The date size is 32 bit.
+		Beware of the different \(y\) axis for the zero-one input distribution.
 	}
 	\label{fig:heap:runtime_uint32}
 \end{figure}
@@ -78,6 +80,11 @@
 				\plotpernlognwitherrors{#1}{tableHeap_64almost}
 			}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}, ymin=90, ytick={90,110,...,190}]
+			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
+				\plotpernlognwitherrors{#1}{tableHeap_64zeroone}
+			}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_64uniform}
@@ -87,18 +94,15 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_64zipf}
 			}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
-				\plotpernlognwitherrors{#1}{tableHeap_64normal}
-			}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
 		The date size is 64 bit.
+		Beware of the different \(y\) axis for the zero-one input distribution.
 	}
 	\label{fig:heap:runtime_uint64}
 \end{figure}

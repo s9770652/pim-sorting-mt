@@ -48,7 +48,7 @@ This not only may make some parallel task easier to program, it can result in a 
 Whilst a thread is performing a \ac{DMA}, it is suspended and removed from the pipeline, freeing a slot up.
 Therefrom, the employment of more than eleven threads allows to hide \ac{DMA} latency by keeping the pipeline full.
 
-As concluding remark, it shall be mentioned that there are circumstances under which the execution of an instruction takes twelve cycles instead of eleven.
+As concluding remark, it shall be mentioned that there are circumstances under which the execution of an instruction takes twelve cycles instead of eleven.~\cite[Instruction Set Architecture -- Efficient scheduling]{upmemSDK}
 This is related to the identifiers of the registers used, however, the compiler usually manages to avoid these situations.
 Hence, one can regard a \ac{DPU} as a \emph{uniform-cost machine} where each instruction takes eleven cycles to complete with the seldom exception of some taking twelve cycles and with the exception of \acp{DMA}.
 Counting instructions is, therefore, a valid technique to assess the performance of some piece of code.

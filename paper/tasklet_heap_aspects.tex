@@ -1,0 +1,67 @@
+\subsection{Presentation of Key Aspects}
+\label{sec:tasklet:heap:aspects}
+
+\paragraph{Sifting Direction}
+Once the heap is built, the \emph{top-down} \HS{} proceeds as follows:
+At the start of each round, the root and the rightmost leaf in the bottom layer (\enquote{last leaf}) swap places.
+The root is now in the correct output position, but the former last leaf may violate the heap order, that is, the root may be less than one or both of its children.
+The greater of the two children is determined, and the root and the greater child swap places.
+This downwards-sifting of the former last leaf continues iteratively until the heap order is restored.
+
+In contrast, the \emph{bottom-up} \HS{}~\cite{wegener1993heapsort} works as follows:
+At the start of each round, the root is removed so that a hole sits now at the top of the heap.
+Then, the hole and the greater of its two children swap places.
+This downwards-sifting of the hole continues iteratively until it becomes a leaf.
+Now, the last leaf is moved to the position of the hole.
+Should this former last leaf be greater than its new parent, then the heap order is now violated.
+It needs to be sifted upwards by iteratively swapping positions with its respective parent until the heap order is restored.
+At last, the original root element can be put where the former last leaf used to be.
+
+The motivation behind these variants is at follows:
+In each step where the top-down \HS{} sifts a former last leaf downwards, two value checks (Which child is greater? Is the parent less than the greater child?) need to be done.
+The leaves of a heap tend to be little so the downwards-sifting normally lasts awhile.
+As opposed to this, each step of the bottom-up \HS{} needs only one value check (Which child is greater?).
+Both \HS*{} sift downwards similarly long so many checks can be saved.
+Since the last leaf effectively takes the place of another leaf and since both are likely little, the upwards-sifting should be short-lived and not eat the gain up.
+
+The upwards-sifting reverts some of the changes done by the downwards-sifting.
+The bottom-up \HS{} can be brought to swap parity with the top-down \HS{} by the following change:
+The downwards-sifting is traced but the vertices are not actually moved.
+Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost vertex which is greater than the last leaf.
+The position found is where the last leaf would end up after the upwards-sifting, so all vertices below can stay put and all vertices above move to their parents' positions, that is, thither the swaps from the downwards-sifting would have put them.
+This implementation variant makes the downwards-sifting even cheaper, but the upwards-sifting must now go all the way up to the root.
+
+
+\paragraph{Sentinel Values}
+When \HS{} sifts a vertex downwards, it needs to determine the greater of its two children before deciding whether and whither to move.
+If and only if the heap has an even number of vertices, there is a left child without a right sibling:
+the rightmost leaf in the bottom layer.
+Instead of adding some check on whether the right sibling exists, one can rather add the missing leaf and set it to the least possible value each time the heap reaches an even size.
+Thus, if it has been confirmed that a left child exists, a right one does also exist.
+%It is necessary now that if two siblings are equal, the left one should be considered greater, lest the sentinel leaf be touched.
+Bounds checks on whether a left child exists are still required lest \HS{} loses its in-place property, since there are about \(n/2\) leaves of which all would need sentinel children.
+
+Likewise, whenever \HS{} sifts upwards and considers the parent \(i \div 2\) of a vertex \(i\), it will only proceed if the parent is less.
+Since the parentless root has index \(1\), the formula \(i \div 2\) yields~\(0\), so it makes sense to set the element with index \(0\) to the greatest possible value to stop any upwards-sifting.
+The speedup from using sentinel values is about \num{1.15}.
+
+
+\paragraph{Code Duplication}
+A strategy particularly useful for \HS{}, although also employed in other sorting algorithms, is \emph{code duplication}.
+Downwards-sifting can be broken down into two steps:
+\begin{enumerate*}
+	\item
+	Find the greater child.
+
+	\item
+	Perform some operations on said child.
+\end{enumerate*}
+A natural, low-maintenance implementation would determine the greater child and, then, store it in a variable on which the operations are performed afterwards.
+However, the quality of the compilation improves if the operations are implemented twice, once for either child, and executed conditionally.
+This approach led to a speedup of about \num{1.07}.
+
+
+\paragraph{Base Cases}
+When 15 elements or fewer remain in the heap, \IS{} is used to sort them.
+Admittedly, the impact of this one-time use is rather negligible, and \ShS{} would not make much of a difference.
+%However, it serves as reminder to the fragility of the quality of the compilation, as shown in the following part.
