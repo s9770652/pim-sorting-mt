@@ -1,6 +1,8 @@
 % Maths & Algorithms.
 \lb#m
 \stepsizes#m
+\twoi#m
+\twotoi#m
 
 % Figures.
 \plotruntime{column}{table}
