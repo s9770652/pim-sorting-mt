@@ -44,7 +44,7 @@
 #include:libertinus-otf
 
 # General page styles.
-\mybibliography
+\mybibliography#n
 
 # Textual notation.
 \adjustfortopblock#n
@@ -58,7 +58,7 @@
 \dash#n
 \Dash#n
 
-\hairspace
+\hairspace#n
 
 # environments
 \begin{acknowledgment}%\\end{acknowledgment}#n
@@ -100,8 +100,8 @@
 \liffsh{xshift}#m
 \liffsh{xshift}[symbol]#m
 
-\mperiod
-\mperiod[symbol]
+\mperiod#m
+\mperiod[symbol]#m
 
 \mybar{scale}{xshift}{symbol}#m
 
