@@ -1,17 +1,16 @@
-\subsection*{Evaluation of the Performance}
+\subsection{Evaluation of the Performance}
 \label{sec:tasklet:quick:performance}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:quick:performance}}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablereadnamed{data/quick/matrix/iterative/Median_of_random/right/uint32/#1.txt}{tableQuickRand_32#1}
 	\pgfplotstablereadnamed{data/quick/matrix/recursive/Median_of_random/right/uint64/#1.txt}{tableQuickRand_64#1}
 }
 
-Before turning to the performance of \QS{} on specific input distributions, the ratio between costs and benefits of the pivot selection methods shall be evaluated.
-Looking again at \cref{fig:quick:implementations,fig:heap:runtime_uint64} shows that a median gets more beneficial, the longer the input becomes, achieving small pay-offs for the longest ones.
+Before turning to the general performance of \QS{}, we evaluate the ratio between costs and benefits of the pivot selection methods.
+Looking again at \cref{fig:quick:implementations,fig:heap:runtime_uint64} shows that the longer the input becomes, the more beneficial a median becomes, achieving small pay-offs for the longest inputs.
 Moreover, the standard deviations of the runtimes, although not shown in the figures for reasons of clarity, are cut roughly in half.
 Randomisation slows down noticeably, so random pivots are disadvantageous if the input is known to be fairly random.
-However, the decrease remains in the single digits percentage-wise, supporting the findings by \citeauthor{lukas_geis}~\cite{lukas_geis} that drawing random numbers is quite cheap.
+However, the decrease remains in the single digits percentagewise, supporting the findings by \citeauthor{lukas_geis}~\cite{lukas_geis} that drawing random numbers on \acp{DPU} is quite cheap.
 For this reason, the random median is used as default method throughout this thesis.
 
 \begin{figure}
@@ -24,36 +23,52 @@ For this reason, the random median is used as default method throughout this the
 			ytick distance=10,
 		]
 			\nextgroupplot[title/.add={}{32-bit}, ymin=30, ymax=80]
-			\pgfplotsset{legend to name=leg:quick:runtime, legend entries={Sorted, Reverse S., Almost S., Uniform, Zipf's, Normal}}
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+			\pgfplotsset{legend to name=leg:quick:runtime, legend entries={Sorted, Reverse S., Almost S., Zero-One, Uniform, Zipf's}}
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 				\plotpernlogn{TrivialBC}{tableQuickRand_32#1}
 			}
 			%
 			\nextgroupplot[title/.add={}{64-bit}, ymin=40,ymax=90]
-			\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 				\plotpernlogn{TrivialBC}{tableQuickRand_64#1}
 			}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:quick:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:runtime}\hfil\tikzexternalenable
 	\caption{
-		Mean runtime of \QS{} on all tested input distributions and data types.
+		Mean runtimes of \QS{} on all benchmarked input distributions and data types.
 	}
 	\label{fig:quick:runtime}
 \end{figure}
 
-\Cref{fig:quick:runtime} shows the runtime of \QS{} in it default configuration, that is, with random medians.
+\Cref{fig:quick:runtime} shows the runtime of \QS{} in it default configuration.
 \Cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} additionally contain the runtimes with deterministic medians as well as the standard errors of the measurements.
-The mean runtimes are rather close across all input distributions, a consequence of using random medians and of considering elements equal to the pivot as different.
-In fact, it is \IS{} that primarily causes the discrepancies, as setting the threshold to one element proves.
-This also explains why \QS{} performs so well on large inputs with Zipf's distribution:
-This distributions generates many duplicates, which are put into the same partitions, so \IS{} performs many simple scans.
+The mean runtimes are rather close across all input distributions, a consequence of using random medians and of swapping elements equal to the pivot.
+In fact, it is \IS{} that primarily causes the discrepancies, as measurements with the threshold set to one element do prove.
+This also explains why \QS{} performs better, the longer an input following Zipf's law becomes:
+Zipf's law generates many duplicates, and the longer the total input becomes, the more partitions contain only one or two different values, speeding \IS{} up significantly.
 
-One might expect \QS{} to perform even better on sorted and reverse sorted input, since everything is either already in the correct position or because the two pointers quickly invert large swaths of the inputs.
-However, a side effect of swapping the pivot twice can be that many elements are displaced by one position from where they should be in the sorted input.
-Take reverse sorted inputs and the deterministic median as an example:
-The element \(n/2\) is selected as pivot out of the elements \(n\), \(n/2\), and \(0\) and then gets swapped with the last element, that is, with \(0\).
-Thereupon, the pointers invert the rest of the input such that the start of the input looks something like \(1, 2, \dots, n/2-1, 0, n/2, \dots\) after the first partitioning step.
-Indeed, this pattern makes \QS{} with deterministic medians degrade and eventually overflow the call stack, which is why the respective plots in \cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} leave the charts.
-An implementation without swapping the pivot promises better performance for such cases, but in exploratory ones, the performance on more random input distributions suffered drastically.
+One might expect \QS{} to perform even better on sorted and reverse sorted input, since everything is either already in the correct position or because the two pointers quickly invert large portions of the inputs.
+However, a side effect of swapping the pivot twice can be that many elements are displaced by one position from where they should be in the sorted output.
+Take reverse sorted inputs (starting with element \(n\) for easier notation) as an example:
+Assume that the element \(n/2\) is selected as pivot out of the elements \(n\), \(n/2\), and \(1\).
+The pivot gets swapped with the last element, that is with \(1\).
+The array equals now the sequence
+\begin{equation*}
+	n, \: n - 1, \: \dots, \: n/2 + 1, \: 1, \: n/2 - 1, \: \dots, \: 3, \: 2, \: n/2 \mperiod
+\end{equation*}
+Thereupon, the two pointers invert the rest of the input, producing
+\begin{equation*}
+	2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2 + 1, \: \dots, \: n - 1, \: n, \: n/2 \mperiod
+\end{equation*}
+Swapping the pivot with the first element of the right-hand partition turns the array into
+\begin{equation*}
+	2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2, \: n/2 + 2, \: \dots, \: n - 1, \: n, \: n/2 + 1 \mperiod
+\end{equation*}
+If the median is selected from random elements, subsequent partitioning will continue to roughly halve the partitions, bringing \(1\) and \(n/2 + 1\) closer to their output locations, so \IS{} will not need too many elements.
+Still, an implementation without swapping the pivot delivers better performance for such cases, but in exploratory benchmarks, the performance on more random input distributions suffered drastically.
+However, if the median is selected from deterministic elements, the performance now degrades, which is why the respective plots in \cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} leave the charts.
+The pivot for the right-hand partition will be selected out of the elements \(n/2 + 2\), \(3/4n\), and \(n/2 + 1\).
+Obviously, the pivot \(n/2 + 2\) barely reduces the problem size, and subsequent pivots exhibit essentially the same behaviour.
+Indeed, this leads to an eventual overflow of the call stack.

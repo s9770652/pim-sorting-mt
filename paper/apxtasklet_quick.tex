@@ -1,7 +1,7 @@
 \section{\texorpdfstring{\QS{}}{QuickSort}}
 \label{apx:tasklet:quick}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablereadnamed{data/quick/matrix/iterative/Median/right/uint32/#1.txt}{tableQuickDet_32#1}
 	\pgfplotstablereadnamed{data/quick/matrix/recursive/Median/right/uint64/#1.txt}{tableQuickDet_64#1}
 }
@@ -40,6 +40,10 @@
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32almost}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32almost}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32zeroone}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32zeroone}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32uniform}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32uniform}
@@ -47,16 +51,12 @@
 			\nextgroupplot[title/.add={}{Zipf's}]
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32zipf}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32zipf}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_32normal}
-			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil\tikzexternalenable
 	\caption{
-		An extension to \cref{fig:quick:runtime} with two different pivot choices.
+		An extension to \cref{fig:quick:runtime} with two different methods to selects pivots.
 		The date size is 32 bit.
 	}
 	\label{fig:quick:runtime_uint32}
@@ -88,6 +88,10 @@
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64almost}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64almost}
 			%
+			\nextgroupplot[title/.add={}{Zero-One}]
+			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64zeroone}
+			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64zeroone}
+			%
 			\nextgroupplot[title/.add={}{Uniform}]
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64uniform}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64uniform}
@@ -95,16 +99,13 @@
 			\nextgroupplot[title/.add={}{Zipf's}]
 			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64zipf}
 			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64zipf}
-			%
-			\nextgroupplot[title/.add={}{Normal}]
-			\plotpernlognwitherrors{TrivialBC}{tableQuickDet_64normal}
-			\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64normal}
+
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:runtime_32}\hfil\tikzexternalenable
 	\caption{
-		An extension to \cref{fig:quick:runtime} with two different pivot choices.
+		An extension to \cref{fig:quick:runtime} with two different methods to selects pivots.
 		The date size is 64 bit.
 	}
 	\label{fig:quick:runtime_uint64}
@@ -233,9 +234,7 @@
 		}
 	\end{subfigure}
 
-	\tikzexternaldisable
-	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
-	\tikzexternalenable
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil\tikzexternalenable
 	\caption{
 		A repetition of \cref{fig:quick:implementations}.
 		The date size is 32 bit.
@@ -368,9 +367,7 @@
 		}
 	\end{subfigure}
 
-	\tikzexternaldisable
-	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
-	\tikzexternalenable
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:quick:implementations}.
 		The date size is 64 bit.

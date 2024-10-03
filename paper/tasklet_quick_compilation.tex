@@ -1,6 +1,5 @@
-\subsection*{Investigation of the Compilation}
+\subsection{Investigation of the Compilation}
 \label{sec:tasklet:quick:compilation}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:quick:compilation}}
 
 \def\quickpivots{Last,Median,Random,Median_of_random}
 \expandafter\pgfplotsinvokeforeach\expandafter{\quickpivots}{
@@ -14,18 +13,17 @@
 }
 \def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 
-The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots! \Dash one implementation variant may see a reduction of 25\% from another one where none should logically be.
+The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots \Dash one implementation variant may see a runtime reduction of \qty{25}{\percent} from another one where none would be expected.
 There are small details influencing the runtime.
-By way of example, storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changes the runtime by a few percentage points in both directions, depending on the rest of implementation.
-But as hinted at in the preceding part of this \lcnamecref{sec:tasklet:quick}, there are four major parameters to examine:
+For instance, storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changes the runtime by a few percentage points in both directions, depending on the rest of implementation.
+But as hinted at in \cref{sec:tasklet:quick:aspects}, there are four major parameters to examine:
 \lcnamecref{imp:normal} of the base cases, recursion/iteration, pivot selection, and partition prioritisation.
 Before the findings are discussed, the first parameter shall be explained in more depth.
 
-Besides falling back to \IS{} if 18 elements remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
-Realistically speaking, it should not be needed to check for trivial lengths because even though it is doable with just one additional instruction, such tiny partitions are rare, and \IS{} would terminate after a few instructions anyway.
+Besides falling back to \IS{} if 18 elements or fewer remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
+Realistically speaking, it should not be needed to check for trivial lengths because even though it would take just one additional instruction, such tiny partitions are rare, and \IS{} would terminate after a few instructions anyway.
 Nonetheless, its inclusion or exclusion can have significant impacts as does the position at which the checks for the two base cases happen.
-The following \lcnamecrefs{imp:normal} were tested:
-
+The following \lcnamecrefs{imp:normal} were benchmarked:
 \begin{enumerate}[label=(\liningnums{\arabic*})]
 	\item\label[implementation]{imp:normal}
 	If the length is trivial, terminate immediately.
@@ -58,19 +56,19 @@ The following \lcnamecrefs{imp:normal} were tested:
 %	\textcolor{red}{[ThreshThenTriv]}
 	\begin{itemize}
 		\item
-		This \lcnamecref{imp:threshold_then_triviality} is nonsensical from a logical point of view, since if the threshold is not undercut, the length cannot be trivial.
-		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately, eliminating a possible cause for the compiler's behaviour.
+		This \lcnamecref{imp:threshold_then_triviality} is nonsensical from a logical point of view, since the length cannot be trivial if the threshold is not undercut.
+		However, it gives the compiler an explicit guarantee that the loop for partitioning does not end immediately, eliminating a possible reason for the varying quality of the compilation.
 	\end{itemize}
 
 	\item\label[implementation]{imp:triviality_before_call}
 	If the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, partition the input.
-	Then check for either partition if its length is trivial and use \QS{} on it if not.
+	Then, check for either partition if its length is trivial and use \QS{} on it if not.
 %	\textcolor{red}{[TrivialBC]}
 	\begin{itemize}
 		\item
-		This \lcnamecref{imp:triviality_before_call}, as well as the next two, gets rid of some unneeded uses of \QS{}.
-		In the recursive case, these \lcnamecrefs{imp:triviality_before_call} lose the property of being tail-recursive.
+		This \lcnamecref{imp:triviality_before_call}, as well as the next two, eliminates some unneeded uses\todo[info]{Ich kann nicht entfziffern, was Du hierzu schriebst.} of \QS{}.
+%		In the recursive case, these \lcnamecrefs{imp:triviality_before_call} lose the property of being tail-recursive.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
@@ -94,8 +92,8 @@ The following \lcnamecrefs{imp:normal} were tested:
 		For example, the other \lcnamecrefs{imp:normal} use \IS{} roughly 91 times on 1024 uniformly distributed elements.
 	\end{itemize}
 \end{enumerate}
-The performances of all tested implementation for 32-bit integers are shown in \cref{fig:quick:implementations}.
-The measurements were done on uniform input distributions so the deterministic pivots are, in expectation, of the same quality as the random ones.
+The performances of all benchmarked implementation on 32-bit integers are shown in \cref{fig:quick:implementations}.
+The measurements were conducted on uniform input distributions so the deterministic pivots are, in expectation, of the same quality as the random ones.
 
 \pgfplotsset{
 	quick matrix/.style={
@@ -108,7 +106,7 @@ The measurements were done on uniform input distributions so the deterministic p
 		ymin=55,
 		ymax=80,
 		/tikz/mark repeat=2,
-	}
+	},
 }
 
 \begin{figure}[p]
@@ -235,9 +233,7 @@ The measurements were done on uniform input distributions so the deterministic p
 		}
 	\end{subfigure}
 
-	\tikzexternaldisable
-	\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil
-	\tikzexternalenable
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:quick:implementations}\hfil\tikzexternalenable
 	\caption{
 		Mean runtimes of \QS*{} using \crefrange{imp:normal}{imp:one_insertion} and different pivot selection methods on uniformly distributed 32-bit integers.
 		Left-hand partitions are prio\-ri\-tised in the first rows, right-hand ones in the second rows, and shorter ones in the third~rows.
@@ -245,34 +241,32 @@ The measurements were done on uniform input distributions so the deterministic p
 	\label{fig:quick:implementations}
 \end{figure}
 
-Even when ignoring the differences between specific \lcnamecrefs{imp:normal} for now, the high fluctuations between the plots leap to the eye.
+Even when ignoring the differences between specific \lcnamecrefs{imp:normal} for now, the high fluctuations between the plots become immediately apparent.
 Plots within the same column share the same method to select pivots, plots within the same row share the same prioritisation of partitions.
 In general, it would be expected that plots within the same column are fairly similar, yet prioritising the shorter partition is almost universally associated with an increase in runtime.
-When focussing on the top-performing \lcnamecrefs{imp:normal}, the increase can reach more than 15\%.
+When focussing on the top-performing \lcnamecrefs{imp:normal}, the speedup can fall below \num{1} down to \num{0.87}.
 There is no clear trend between the consistent prioritisations of either side, although the difference can be huge in individual cases as well.
-However, recursion is more susceptible to the partition prioritisation than iteration.
+However, recursive implementations are more susceptible to the partition prioritisation than iterative ones.
 
 The correlation of recursive and iterative performance is weak.
-On one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
+On the one hand, there is, for example, \cref{imp:triviality_before_call} with deterministic medians and prioritisation of shorter partitions where the runtimes are essentially the same.
 On the other hand, there is \cref{imp:one_insertion} with deterministic medians and prioritisation of right-hand partitions where recursion is slower by more than a third.
 All in all, iterative implementations usually perform better, though, especially when focussing on the top-performers of each pivot selection method.
 
 The ranking of the different \lcnamecrefs{imp:normal} is rather incoherent.
-\Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, decidedly fares the best out of all \lcnamecrefs{imp:normal}, being amongst the top performers across all tested implementations.
+\Cref{imp:triviality_before_call}, which does not call \QS{} on trivial partitions, fares the best out of all \lcnamecrefs{imp:normal} decidedly, being amongst the top performers across all benchmarked implementations.
 \Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call}, which call \QS{} even less often than \cref{imp:triviality_before_call}, are the polar opposite and bring up the rear of the ranking every single time.
 Recursive implementations of \cref{imp:triviality_within_threshold}, where triviality is checked for only if the threshold is undercut, are often worse than recursive implementations of \cref{imp:normal}, where triviality is always checked for, whilst it is the other way around for iterative implementations.
-Interestingly, for all investigated implementations, the compiler is capable of eliminating the last possible recursive calls by turning them into jumps back to the beginning of their respective function, regardless of whether these were properly tail recursive or not.
+Interestingly, for all investigated implementations, the compiler turns tail-recursive calls into jumps back to the beginning of the function, no matter how convoluted the logic surrounding the call is.
 
 These observations, however, only apply to 32-bit integers.
 \Cref{fig:quick:implementations_64} shows the same measurements for 64-bit integers.
 Whilst the general trend for pivots, partition prioritisation, and recursion/iteration hold true, the rankings are vastly different.
 \Cref{imp:triviality_before_call} is not undisputedly the best anymore.
 \Cref{imp:threshold_before_call,imp:threshold_and_triviality_before_call} switch back and forth between being the worst and the best \lcnamecrefs{imp:normal}.
-Even the nonsensical \cref{imp:threshold_then_triviality} manages to take the lead sometimes!
+Even the nonsensical \cref{imp:threshold_then_triviality} manages to take the lead in a few cases.
 Most notably, the two top-performing implementations using deterministic and random medians, respectively, are actually recursive.
-Luckily, both use \cref{imp:triviality_before_call} so we decided to make the only difference between the default configurations of 32-bit and 64-bit \QS{} be the usage of recursion (64-bit) and iteration (32-bit).
-
-\medbreak
+Luckily, both use \cref{imp:triviality_before_call} so we decided to make the only difference between the default configurations of 32-bit and 64-bit \QS{} be the usage of iteration (32-bit) and recursion (64-bit).
 
 What is causing these huge disparities?
 There is a great variety in the compilations but some of the common occurrences are \dots{}
@@ -287,10 +281,10 @@ There is a great variety in the compilations but some of the common occurrences 
 	\dots{} one instruction more after the left pointer has stopped, \dots{}
 
 	\item
-	\dots{} more stores and loads when entering and leaving the function.
+	\dots{} more stores and loads when entering and exiting the function.
 \end{itemize}
 This focus on the left pointer \lstinline|i| is partially explainable by it being used to calculate the final position of the pivot and, thus, the inner boundaries of both new partitions.
-As explained earlier in \enquote{\nameref{sec:tasklet:quick:imp:sentinels}}, the right pointer \lstinline|j| halts ultimately either on the left pointer directly (\lstinline|j == i|) or on the element behind it (\lstinline|j == (i - 1)|).
+As explained earlier under \enquote{\nameref{sec:tasklet:quick:imp:sentinels}}, the right pointer \lstinline|j| stops ultimately either on the left pointer \lstinline|i| directly (\lstinline|j == i|) or on the element behind it (\lstinline|j == (i - 1)|).
 Since the pivot is moved to address \lstinline|i|, the inner boundaries of the partitions are \lstinline|i - 1| and \lstinline|i + 1|.
 Implementations using the right pointer alone or both of them to calculate the boundaries were spot-checked to see whether it alleviates the problems but the results were mixed:
 from betterment over indifference to worsening, everything was observable.
