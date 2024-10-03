@@ -25,6 +25,7 @@
 #include:tikz
 #include:tikzpagenodes
 #include:pgfplots
+#include:pgfplotslibrarygroupplots
 #include:pgfplotstable
 
 #include:algorithm2e
@@ -44,7 +45,7 @@
 #include:libertinus-otf
 
 # General page styles.
-\mybibliography#n
+\mybibliography
 
 # Textual notation.
 \adjustfortopblock#n
@@ -58,7 +59,11 @@
 \dash#n
 \Dash#n
 
-\hairspace#n
+\hairspace
+
+#keyvals:\todo,\setuptodonotes,\todostyle
+info
+#endkeyvals
 
 # environments
 \begin{acknowledgment}%\\end{acknowledgment}#n
@@ -100,8 +105,8 @@
 \liffsh{xshift}#m
 \liffsh{xshift}[symbol]#m
 
-\mperiod#m
-\mperiod[symbol]#m
+\mperiod
+\mperiod[symbol]
 
 \mybar{scale}{xshift}{symbol}#m
 
@@ -181,7 +186,7 @@
 \addplotnamedtable{table}#n
 \pgfplotstablenewnamed[options]{columns}{table}#n
 \pgfplotstablereadnamed{file}{tableName}#n
-\pgfplotstablevertcatnamed{existingTable}{file path}#n
+\pgfplotstablevertcatnamed{existingTable}{file}#n
 
 # Algorithm.
 \nonl#n
@@ -209,3 +214,15 @@
 \conti
 
 \supervisor
+
+
+# Plotting.
+#keyvals:\begin{tikzpicture}#c
+plot
+#endkeyvals
+
+#keyvals:\begin{axis}#c,\begin{loglogaxis}#c,\begin{semilogxaxis}#c,\begin{semilogyaxis}#c,\addplot#c,\addplot3#c,\addplot+#c,\pgfplotsset#c,\begin{groupplot}#c,\nextgroupplot#c
+adaptive group=%<rows%> by %<columns%>
+groupplot xlabel
+groupplot ylabel
+#endkeyvals

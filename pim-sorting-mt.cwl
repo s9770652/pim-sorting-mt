@@ -44,3 +44,21 @@
 \unrollfactor{}#n
 \unrollfactor*{}#n
 \upmem{}#n
+
+# Plotting.
+#keyvals:\begin{tikzpicture}#c
+sketch
+#endkeyvals
+
+#keyvals:\begin{axis}#c,\begin{loglogaxis}#c,\begin{semilogxaxis}#c,\begin{semilogyaxis}#c,\addplot#c,\addplot3#c,\addplot+#c,\pgfplotsset#c,\begin{groupplot}#c,\nextgroupplot#c
+bar cycle list
+x from 16 to 1024
+x from 16 to 1024 minor
+horizontal sep for labels
+horizontal sep for ticks
+horizontal sep for naught
+vertical sep for ticks
+vertical sep for yticks
+vertical sep for naught
+sketch
+#endkeyvals
