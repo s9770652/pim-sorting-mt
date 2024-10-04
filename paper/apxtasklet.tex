@@ -1,4 +1,4 @@
-\chapter{Further Measurements on Sorting Sequentially in WRAM}
+\chapter[Further Measurements on Sorting in the \texorpdfstring{\abb{WRAM}}{WRAM}]{Further Measurements on \\ Sorting in the \acs*{WRAM}}
 \label{apx:tasklet}
 
 This \lcnamecref{apx:tasklet} contains a comprehensive collection of measurements expanding the content of \cref{sec:tasklet}.
@@ -9,7 +9,7 @@ Every measurement was repeated a thousand times with the sorting algorithms in t
 
 	\item[\ShS{}]
 	explicit sentinel values;
-	step sizes \(\stepsizes = (1, 6)\) for inputs with at most 64 elements and \(\stepsizes = (1, 4, 17)\) for longer ones
+	step sizes \(\stepsizes = \paren{1, 6}\) for inputs with at most 64 elements and \(\stepsizes = \paren{1, 4, 17}\) for longer ones
 
 	\item[\HS{}]
 	top-down for 32-bit integers;
@@ -25,10 +25,10 @@ Every measurement was repeated a thousand times with the sorting algorithms in t
 
 	\item[\MS{}]
 	half-space;
-	starting run length of 16 elements
+	starting run length of 14 elements
 \end{description}
 Some figures include tinted areas around the plots.
-These denote the three-sigma range, that is the 99.7\% confidence intervals.
+These denote the three-sigma range, that is the \qty{99.7}{\percent} confidence intervals.
 
 \input{apxtasklet_insertion}
 
