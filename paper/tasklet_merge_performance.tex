@@ -1,22 +1,22 @@
-\subsection*{Evaluation of the Performance}
+\subsection{Evaluation of the Performance}
 \label{sec:tasklet:merge:performance}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:merge:performance}}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablereadnamed{data/merge/uint32/#1.txt}{tableMerge_32#1}
 	\pgfplotstablereadnamed{data/merge/uint64/#1.txt}{tableMerge_64#1}
 }
 
-Three implementations using \IS{} on starting runs of length 16 have been tested:
+Three implementations using \IS{} on starting runs of length 14 have been benchmarked:
 full-space \MS{} without write-backs, full-space \MS{} with write-backs, and half-space \MS{}.
 The results are shown in \cref{fig:merge:runtime,fig:merge:runtime_uint32,fig:merge:runtime_uint64}.
-Besides the mean runtimes on all tested input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard error of the measurements.
-Note that the tested input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
-The merging process can be visualised as binary tree, with the starting runs as leaves and two vertices being brothers if the corresponding runs get merged together;
+Besides the mean runtimes on all benchmarked input distributions, \cref{fig:merge:runtime_uint32,fig:merge:runtime_uint64} additionally contain the standard error of the measurements.
+Note that the benchmarked input lengths have been chosen in such a way that the plots exhibit \MS{}'s characteristic zigzagging to the full extent:
+The merging process can be visualised as binary tree, with the starting runs as leaves and all other runs being inner vertices.
+Two vertices are siblings if the corresponding runs get merged together;
 the root contains the final sorted run.
 This way, the height of the tree is equal to the number of rounds of merging.
 For \(n = \twotoi\) input elements, the tree is complete, and the normalised runtime is locally minimal.
-For \(n = \twotoi + 1\) input elements, the root has a leaf with one element as son, and the normlised runtime is locally maximal, as the number of rounds increased to accommodate for just one element.
+For \(n = \twotoi + 1\) input elements, the root has a leaf with one element as child, and the normalised runtime is locally maximal, as the number of rounds increases by one to accommodate for just a single element.
 
 \pgfplotsset{
 	merge/.style={
@@ -53,31 +53,31 @@ For \(n = \twotoi + 1\) input elements, the root has a leaf with one element as 
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:runtime}\hfil\tikzexternalenable
 	\caption{
 		Mean runtimes of the full-space \MS*{} with and without write-backs and the half-space \MS{} on 32-bit integers, for \(n = \twotoi\) and \(n = \twotoi + 1\) with \(i = 1, \dots, 10\).
 	}
 	\label{fig:merge:runtime}
 \end{figure}
 
-The measurements show that \MS{} guarantees a runtime of \(\bigtheta{n \log n}\) for the tested input distributions as expected.
-The differences in runtime between the different input distributions get smaller with increasing input length and are ascribable to \IS{} and to the differing suitability of the unrolling.
-Especially because of \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
+The measurements show that any \MS{} guarantees a runtime of \(\bigtheta{n \log n}\) for the benchmarked input distributions as expected.
+The differences in runtime between the different input distributions get smaller with increasing input length and are ascribable to \IS{} and to the differing effectiveness of unrolling flushes.
+Mainly because of \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
 cases where the usage of \IS{} worsened the runtime are unbeknown.
 The differences across the input distributions become smaller with increasing input length but remain large even for \(n \approx 1000\) elements.
-For the full-space \MS*{}, reverse sorted inputs get sorted 60\%--90\% slower than sorted inputs of 32-bit integers and 80\%--110\% slower of 64-bit integers with \(n \approx 1000\).
-For the half-space \MS{}, these ranges climb to 120\%--140\% and 130\%--155\%, respectively.
+For the full-space \MS*{} and with \(n \approx 1000\), reverse sorted inputs get sorted \qty{85}{\percent} slower than sorted inputs of 32-bit integers and \qty{100}{\percent} slower than sorted inputs of 64-bit integers.
+For the half-space \MS{}, these disparities climb to \qty{125}{\percent} and \qty{140}{\percent}, respectively.
 
-The half-space \MS{} delivers a strong performance despite its vastly lower memory footprint.
-On sorted and almost sorted 32-bit inputs of length \(n \approx 1000\), it takes the lead over the full-space \MS*{}, since the second runs need not be flushed and the additional copying of the first runs is unrolled.
-For other inputs, the half-space \MS{} does not take even 10\% longer than the full-space \MS{} without write-backs.
-The leeway to the full-space \MS{} with write-backs is even smaller.
-This slowdown, albeit small, is likely because of most elements of the second runs being moved forwards anyway and the elements of the first runs being both copied and moved.
-With 64-bit inputs, the half-space \MS{} surpasses the full-space \MS*{} on \emph{all} input distributions in the local maxima, and the leeway in local minima is minuscule.
+The half-space \MS{} delivers a strong performance despite its smaller memory footprint.
+On sorted and zero-one inputs of length \(n \approx 1000\), it takes the lead over the full-space \MS{} without write-backs for both 32-bit and 64-bit integers, since the second runs need not be flushed and the additional copying of the first runs is unrolled.
+On almost sorted inputs, they are essentially on par.
+For the other inputs, the speedup of half-space \MS{} over the full-space \MS{} does not drop below \num{0.89}.
+The gap to the full-space \MS{} with write-backs is even smaller.
+This slowdown, albeit small, is likely because of the elements of the first runs being both copied and moved and of most elements of the second runs being moved forwards anyway.
 
 \Cref{apx:tasklet:merge} contains further measurements on \MS{}, showing why a starting run length of 16 is a good choice.
 \Cref{fig:merge:starting_runs_is_uint32,fig:merge:starting_runs_is_uint64} show the average runtimes of starting runs of lengths 12 to 16, all sorted with \IS{}.
-Overall, the differences are small, yet a length of~16 delivers a solid performance throughout all tested input distributions.
+Overall, the differences are small, yet a length of~14 delivers a solid performance throughout all benchmarked input distributions.
 \Cref{fig:merge:starting_runs_shs_uint32,fig:merge:starting_runs_shs_uint64} include longer starting runs of lengths between 24 and 96 in order to see whether giving up stability by using \ShS{} can yield substantial gains.
-The disparities between the runtimes of the different starting run lengths are strikingly small despite the wide range tested.
-By and large, however, the speedups, if any, are not big enough to warrant consideration of two different \MS{} configurations \Dash stable and unstable \Dash in this thesis.
+The disparities between the runtimes of the different starting run lengths are strikingly small despite the wide range of lengths.
+By and large, however, the speedups, if any, are not big enough to warrant consideration of both a stable and an unstable \MS{} configuration in this thesis.

@@ -1,11 +1,10 @@
-\subsection*{Investigation of the Compilation}
+\subsection{Investigation of the Compilation}
 \label{sec:tasklet:merge:compilation}
-\addcontentsline{toc}{subsection}{\nameref{sec:tasklet:merge:compilation}}
 
-\begin{figure}
+\begin{figure}[p]
 	\lstset{basicstyle=\ttfamily\small}
 	\def\codewidth{0.34\linewidth}
-	\def\assemblerwidth{0.61\linewidth}
+	\newlength\assemblerwidth \setlength\assemblerwidth{0.595\linewidth}
 	\begin{subfigure}{\textwidth}
 		\begin{minipage}{\codewidth}
 			\begin{lstlisting}[belowskip=3\baselineskip+\medskipamount]
@@ -21,28 +20,63 @@ for (int k = 0; k < 16; k++) {
 		\end{minipage}
 		\hfill
 		\begin{minipage}{\assemblerwidth}
-			\begin{lstlisting}[language={[DPU]Assembler}]
-// iteration k
-	lw r*i, ri, 0  // load *(i + 0)
-	lw r*j, rj, 0  // load *(j + 0)
-	add rtmp, rj, 4  // tmp ← j + 1
-	jleu r*i, r*j, .LABEL_k_i  // jump if val_i <= val_j
-	move r*i, r*j  // overwrite with *j
-	move rj, rtmp, true, .LABEL_k_out  // j ← temp; jump
+			\begin{minipage}{ \widthof{\lstinline|	move rj, rtmp, true, .LABEL_k_out|} }
+				\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
+$\textnormal{\textit{// iteration \texttt{k}}}$
+	lw ri${}_{*}$, ri, 0
+	lw rj${}_{*}$, rj, 0
+	add rtmp, rj, 4
+	jle ri${}_{*}$, rj${}_{*}$, .LABEL_k_i
+	move ri${}_{*}$, rj${}_{*}$
+	move rj, rtmp, true, .LABEL_k_out
 .LABEL_k_i:
-	add ri, ri, 4  // i ← i + 1
+	add ri, ri, 4
 .LABEL_k_out:
-	sw rout, 4 * k, r*i  // out[k] ← *i
-			\end{lstlisting}
+	sw rout, 4${}×{}$k, ri${}_{*}$
+\end{lstlisting}
+			\end{minipage}
+			\hfill
+			\begin{minipage}{ \widthof{\itshape// jump if \lstinline|*i| ≤ \lstinline|*j|} }
+				\itshape\small
+				\phantom{lg}
+
+				// load \lstinline|*(i + 0)|
+
+				// load \lstinline|*(j + 0)|
+
+				// \lstinline|tmp| ← \lstinline|j| + \lstinline|1|
+
+				// jump if \lstinline|*i| ≤ \lstinline|*j|
+
+				// overwrite \lstinline[mathescape]|ri${}_{*}$|
+
+				// \lstinline|j| ← \lstinline|tmp|; jump
+
+				\phantom{lg}
+
+				// \lstinline|i| ← \lstinline|i| + \lstinline|1|
+
+				\phantom{lg}
+
+				// \lstinline|out[k]| ← \lstinline|*i|
+			\end{minipage}
 		\end{minipage}
-		\caption{
+		\caption[]{
 			This code takes 8 instructions per iteration.
-			Note the two loads per iteration (ln.~2, 3), because the result of the first one may be overwritten with the second one (ln.~6).
-			Also note that pointer \lstinline|j| is always incremented temporarily (ln.~4).
-			This incrementation is applied in a second instruction (ln.~7) if \lstinline|*j| is greater than \lstinline|*i|, and ignored otherwise.
+			First, the pointers are dereferenced (lns.~2, 3).
+			Then, the resulting address from incrementing pointer \lstinline|j| is calculated (ln.~4).
+			If the first run contains the less current element, it is jumped to line~9, where pointer \lstinline|i| is incremented.
+			Lastly, the less element \lstinline|*i| is written to the output (ln.~11).
+			If the second run contains the less current element, the register holding \lstinline|*i| is overwritten with~\lstinline|*j| (ln.~7).
+			Then, a combo operation (ln.~7) finally applies the result from incrementing pointer \lstinline|j| and jumps to the line where the output is set.
+
+			\hspace*{1em}
+			We do not know why pointer \lstinline|j| gets temporarily incremented.
+			According to the documentation, an \lstinline|add| instruction is compatible with the \lstinline|true| flag, meaning the \lstinline|add| instruction in line~4 and the \lstinline|move| instruction in line~7 could be fused.
 		}
 		\label{fig:merge:load:twice}
 	\end{subfigure}
+
 	\begin{subfigure}{\textwidth}
 		\begin{minipage}{\codewidth}
 			\begin{lstlisting}[belowskip=2\baselineskip+\medskipamount+\smallskipamount]
@@ -61,137 +95,106 @@ for (int k = 0; k < 16; k++) {
 		\end{minipage}
 		\hfill
 		\begin{minipage}{\assemblerwidth}
-			\begin{lstlisting}[language={[DPU]Assembler}]
-// iteration k (val_i <= val_j in previous round)
-	jgtu r*i, r*j, .LABEL_k_j  // jump if val_i > val_j
+			\begin{minipage}{ \widthof{\lstinline|	jgt ri*, rj*, .LABEL_k_j|~} }
+				\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
+$\textnormal{\textit{// iteration \texttt{k} (\texttt{val\_i} ≤ \texttt{val\_j})}}$
+	jgt ri${}_{*}$, rj${}_{*}$, .LABEL_k_j
 .LABEL_k_i:
-	sw rout, 4*k, r*i  // out[k] ← val_i
-	add ri, ri, 4  // i ← i + 1
-	lw r*i, ri, 0  // val_i ← *(i + 0)
-			\end{lstlisting}
+	sw rout, 4${}×{}$k, ri${}_{*}$
+	add ri, ri, 4
+	lw ri${}_{*}$, ri, 0
+\end{lstlisting}
+			\end{minipage}
+			\hfill
+			\begin{minipage}{ \widthof{\itshape// jump if \lstinline|val_i| > \lstinline|val_j|} }
+				\itshape\small
+				\phantom{lg}
+
+				// jump if \lstinline|val_i| > \lstinline|val_j|
+
+				\phantom{lg}
+
+				// \lstinline|out[k]| ← \lstinline|val_i|
+
+				// \lstinline|i| ← \lstinline|i| + \lstinline|1|
+
+				// \lstinline|val_i| ← \lstinline|*(i + 0)|
+			\end{minipage}
 			\smallskip
-			\begin{lstlisting}[language={[DPU]Assembler}]
-// iteration k (val_i > val_j in previous round)
-	jgtu r*i, r*j, .LABEL_k_i  // jump if val_i > val_j
+			\begin{minipage}{ \widthof{\lstinline|	jgt ri*, rj*, .LABEL_k_j|~} }
+				\begin{lstlisting}[language={[DPU]Assembler}, mathescape, keepspaces]
+$\textnormal{\textit{// iteration \texttt{k} (\texttt{val\_i} > \texttt{val\_j})}}$
+	jle ri${}_{*}$, rj${}_{*}$, .LABEL_k_i
 .LABEL_k_j:
-	sw rout, 4 *×· k, r*j  // out[k] ← val_j
-	add rj, rj, 4  // j ← j + 1
-	lw r*j, rj, 0  // val_j ← *(j + 0)
-			\end{lstlisting}
+	sw rout, 4${}×{}$k, rj${}_{*}$
+	add rj, rj, 4
+	lw rj${}_{*}$, rj, 0
+\end{lstlisting}
+			\end{minipage}
+			\hfill
+			\begin{minipage}{ \widthof{\itshape// jump if \lstinline|val_i| > \lstinline|val_j|} }
+				\itshape\small
+				\phantom{lg}
+
+				// jump if \lstinline|val_i| ≤ \lstinline|val_j|
+
+				\phantom{lg}
+
+				// \lstinline|out[k]| ← \lstinline|val_j|
+
+				// \lstinline|j| ← \lstinline|j| + \lstinline|1|
+
+				// \lstinline|val_j| ← \lstinline|*(j + 0)|
+			\end{minipage}
 		\end{minipage}
 		\caption{
 			This code takes 4 instructions per iteration.
-			The jump labels \lstinline|.LABEL_k_i| and \lstinline|.LABEL_k_j| allow to switch between the two assembler code parts.
+			There are 16 cascaded iterations in the assembler code, all of them writing the elements of the first run to the output (top).
+			There is an analogue cascade writing only elements of the second run to the output (bottom).
+			Labels allow to switch between the cascades.
+			First, it is checked whether the cascade should be changed (ln.~2).
+			Then, the output is set (ln.~4), the respective pointer incremented (ln.~5), and the new value from dereferencing loaded (ln.~6).
 		}
 		\label{fig:merge:load:once}
 	\end{subfigure}
 	\caption{
-		Two C implementations of an unrolled loop which merges two runs, contrasted with the compilation.
-		Only the assembler codes of one iteration is shown, as all iterations follow the same scheme;
-		a sixteenfold cascade of the given assembler codes yields the whole assembler codes of all iterations.
-		The pointers \lstinline|i| and \lstinline|j| point initially to the head of either run.
+		Two \langC{} implementations of an unrolled loop which merges 16 elements, contrasted with their compilations.
+		Only the assembler codes of one iteration are shown, as all iterations follow the same scheme;
+		a sixteenfold cascade of the given assembler codes yields the whole assembler codes of the loops.
+		The pointers \lstinline|i| and \lstinline|j| point initially to the first elements of the runs.
 		The serially numbered registers (\enquote{\lstinline|r|\dots}) and jump labels (\enquote{\lstinline|.LABEL|\dots}) were renamed to aid understanding.
-		\todo{I.\ O.\ so?}
-		Note that the data type \lstinline|int| is 4 bytes large, which is why all offsets are multiples of four.
-		\todo{Alles so ausführlich? Vlt.\ noch mehr in Beschreibung packen?}
+		Note that the data type \lstinline[keywords={}]|int| is \qty{4}{\byte} large, which is why all offsets are multiples of four.
 	}
 	\label{fig:merge:load}
 \end{figure}
 
 \noindent
 A significant portion of the runtime is spent on the repeated comparison of elements in a pair of runs, followed by a write of the less element to the output.
-\Cref{fig:merge:load:twice} shows an implementation of an unrolled loop performing such comparisons and writes.
-The code makes use of two pointers \lstinline|i| and \lstinline|j| which are initially set to the heads of the first and the second run.
-Whenever an element is written to the output, the respective pointer is incremented.
+\Cref{fig:merge:load:twice} shows a straightforward implementation of an unrolled loop performing such comparisons and writes.
+The code makes use of two pointers \lstinline|i| and \lstinline|j| which are initially set to the first elements of the runs.
+To get their values, they are simply dereferenced.
+After the output \lstinline|out[k]| has been set in iteration \lstinline|k|, the respective pointer of the less element is incremented.
 
-Despite the succinctness of the C code, the resulting assembler code is of subpar quality.
-At the beginning of each iteration, the elements to compare are loaded and stored in the registers \lstinline|r*i| and \lstinline|r*j|, respectively (ln.~2, 3).
-Afterwards, the result of an incrementation of pointer \lstinline|j| is calculated and stored but not applied (ln.~4).
-Only then is it checked which element is the less one (ln.~5).
-If it is the element of the second run, no jump occurs and the next two lines are executed.
-This element of the second run is stored to register \lstinline|r*i| (ln.~6), overwriting the element of the first run thereby.
-Then, the pointer of the second run is actually incremented (ln.~7), using the previously stored result.
-In the same instruction, it is jumped to the last line of the iteration.
-If it was the element of the first run which was less, the lines 6 and 7 are skipped so that the second pointer is not actually incremented and the content of register \lstinline|r*i| is not overwritten.
-Instead, the pointer \lstinline|i| is incremented (ln.~9).
-Finally, line 11 is reached in either case, where the (possibly overwritten) content of register \lstinline|r*i| is written to the output.
-This assembler code takes either seven or eight instructions per iteration, depending on which run contains the less element.
-
-Obviously, the overwriting is harmful since one of the elements is known from the previous round.
+Despite the succinctness of the \langC{} code, the resulting assembler code is of subpar quality.
+Depending on the run from which an element got merged in the previous iteration, an iteration takes either 7 or 8 instructions.
+This is a consequence of loading the values of both dereferenced pointers at the beginning of each iteration despite one of the values not having changed since the last iteration.
 \Cref{fig:merge:load:once} shows an alternative implementation, whose compilation results in four instructions per iteration.
-This was achieved by dereferencing the pointers \lstinline|i| and \lstinline|j| before the loop begins and storing the result in dedicated variables.
-The comparisons and writes use only these variables, of which only one gets updated per iteration.
+This was achieved by dereferencing the pointers \lstinline|i| and \lstinline|j| before the loop begins and storing the values in dedicated variables.
+The comparisons and writes use only these dedicated variables, of which only one gets updated per iteration.
+A more detailed description of the compilations is given in the caption of \cref{fig:merge:load}.
 
-The compilation is of an entirely different structure.
-There are 16 cascaded iterations, all writing the elements of the first run to the output.
-There is an analogue cascade writing only element of the second run to the output.
-Both versions are implemented the same with adjusted registers and jump labels, allowing to switch between them.
-First, it is checked which run currently has the less element (ln.~2).
-If it is not the same run as in the previous iteration, a jump to the other assembler part occurs.
-Otherwise, the current element of the respective run is written to the output (ln.~4), the pointer incremented (ln.~5) and the new element loaded (ln.~6).
-Without the reduction of pointer incrementations as discussed in \cref{sec:tasklet:merge:unrolled merging}, this is likely the fastest possible assembler implementation.
+It can only be speculated as to the reason for the poor compilation of the simpler implementation.
+Perhaps the constant reloads are related to the ability of tasklets to write to any \ac{WRAM} address.
+Theoretically, it could be that the value obtained by dereferencing the non-incremented pointer changes between two subsequent iterations.
+This explanation is not fully satisfactory as it would imply yet another load instruction before writing \lstinline|out[k]|.
 
-It follows a collocation of some others issues found while engineering \MS{}.
-They will not be discussed in detail here but still provide a point of reference for future work:
-\begin{itemize}
-	\item
-	In case of the half-space \MS{}, some merging iterations take 5 instructions instead of 4.
-	The reason is that the second pointer \lstinline|j| is never incremented directly.
-	Instead, whenever an element of the second run is merged, a counter is incremented and, then, the new address of pointer \lstinline|j| is calculated by taking the address of the head of the second run and adding the counter.
-	\todo{Warum???}
-	\todo[inline]{Ab hier veraltete Zahlen (und vlt. veraltete Formulierungen) zu \MS{}! Grafiken aber aktuell}
+Unluckily, only with the full-space \MS{} does this change to dedicated variables make iterations take 4 instructions unanimously.
+With the half-space \MS{}, some merge iterations take 5 instructions.
+The reason is that the second pointer \lstinline|j| is never incremented directly.
+Instead, whenever an element of the second run is merged, a counter is incremented and, then, the new address of pointer \lstinline|j| is calculated by taking the address of the first element of the second run and adding the counter.
+The fix is to change the loop which iterates over the pairs of runs to merge.
+Instead of using the ends of the second runs as natural loop index, it has to be iterated over the ends of the first runs.
 
-	\item
-	As already mentioned, sorting the starting runs via \IS{} or \ShS{} requires the placement and later removal of temporary sentinel values.
-	For the very first starting run, one can omit storing and restoring the overwritten elements by using permanent sentinel values;
-	this optimisation was active when measuring runtimes.
-	On the downside, this leads to a bigger compilation as \IS{} or \ShS{} is inlined twice.
-	If the size of the whole compilation is already close to the maximum, one might be inclined to handle the first starting run just like the others.
-	Realistically, this should slow down the total runtime by just a few hundreds of cycles, yet the real slowdown is in the thousands.
-
-	\item
-	If the input is so short that it fits entirely within the first starting run, one can immediately end the execution after \IS{} or \ShS{} is done.
-	Several implementations were tested, with unsatisfactory results:
-	Some increased the runtime for longer inputs, others decreased it for them but also increased it for shorter inputs.
-	The settled-on implementation is of the former variety since the increases hit shorter inputs harder relatively and a more thorough solution would not further the purpose of this \lcnamecref{sec:tasklet:merge}.
-
-	\item
-	Concerning the half-space \MS{}:
-	Passing the copied run as second argument and the uncopied run as the first one to the merger function nets a noticeably decrease in runtime compared to an implementation with flipped arguments and, of course, flipped logic.
-	Even worse, only with the former order does unrolling improve the speed, being an impairment with the latter!
-	This behaviour occurs with both immediate and deferred copying of the first runs.
-	An inspection of the issue unearthed marvels like 5\% longer runtimes with code of the form
-	{  % The following is a construction straight from hell.
-		\par
-		\centering
-		\begin{minipage}{10cm}
-			\centering
-			\begin{minipage}{ \widthof{\ttfamily a = b - i;} }
-				\ttfamily
-				*i++ = *j;
-
-				a = b - i;
-
-				c = i;
-
-				i = d;
-			\end{minipage}
-			\begin{minipage}{ \widthof{\quad compared to\quad} }
-				\quad compared to\quad
-			\end{minipage}
-			\begin{minipage}{ \widthof{\ttfamily a = b - (i + 1);} }
-				\ttfamily
-				*i = *j;
-
-				a = b - (i + 1);
-
-				c = i + 1;
-
-				i = d;
-			\end{minipage}
-		\end{minipage}
-		\vspace{\baselineskip}
-		\par
-	}
-	although executed at most once per merger, but we could sadly not pinpoint the fundamental cause for the behaviour.
-\end{itemize}
+An honourable mention shall be given to the merge function used by the half-space \MS{}.
+Passing the copied run as second argument and the uncopied run as the first one nets a noticeably decrease in runtime compared to an implementation with flipped arguments and, of course, flipped logic.
+Sadly, we could not pinpoint the fundamental cause for this phenomenon.

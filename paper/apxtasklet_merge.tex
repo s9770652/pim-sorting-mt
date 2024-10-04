@@ -5,16 +5,16 @@
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/sorted.txt}{tableMergeStart#1_32sorted}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/reverse.txt}{tableMergeStart#1_32reverse}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/almost.txt}{tableMergeStart#1_32almost}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/zeroone.txt}{tableMergeStart#1_32zeroone}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/uniform.txt}{tableMergeStart#1_32uniform}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/zipf.txt}{tableMergeStart#1_32zipf}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint32/normal.txt}{tableMergeStart#1_32normal}
 
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/sorted.txt}{tableMergeStart#1_64sorted}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/reverse.txt}{tableMergeStart#1_64reverse}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/almost.txt}{tableMergeStart#1_64almost}
+	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/zeroone.txt}{tableMergeStart#1_64zeroone}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/uniform.txt}{tableMergeStart#1_64uniform}
 	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/zipf.txt}{tableMergeStart#1_64zipf}
-	\pgfplotstablereadnamed{data/merge/threshold=#1/uint64/normal.txt}{tableMergeStart#1_64normal}
 }
 
 \def\mergealgos{Merge,MergeWriteBack,MergeHalfSpace}
@@ -53,15 +53,15 @@
 \NewDocumentCommand{\addmergerow}{m m m}{
 	\addmergeplot{#1}{#2}{Merge}
 	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{Without Write-Backs}} }{}
-	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+	\ifstrequal{#2}{zipf}{}{ \pgfplotsset{xticklabels={}} }
 
 	\addmergeplot{#1}{#2}{MergeWriteBack}
 	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{With Write-Backs} }}{}
-	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+	\ifstrequal{#2}{zipf}{}{ \pgfplotsset{xticklabels={}} }
 
 	\addmergeplot{#1}{#2}{MergeHalfSpace}
 	\ifstrequal{#2}{sorted}{ \pgfplotsset{title/.add={}{Half-Space} }}{}
-	\ifstrequal{#2}{normal}{}{ \pgfplotsset{xticklabels={}} }
+	\ifstrequal{#2}{zipf}{}{ \pgfplotsset{xticklabels={}} }
 	\pgfplotsset{with dist name={#3}}
 }
 
@@ -73,22 +73,22 @@
 			sorted/.style={ymin=15, ymax=55, ytick={15,25,...,55}},
 			reverse/.style={ymin=60, ymax=140},
 			almost/.style={ymin=25, ymax=85, ytick={25,45,...,85}},
+			zeroone/.style={almost},
 			uniform/.style={ymin=45, ymax=105, ytick={45,65,...,105}},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{32}{sorted}{Sorted}
 			\addmergerow{32}{reverse}{Reverse S.}
 			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{zeroone}{Zero-One}
 			\addmergerow{32}{uniform}{Uniform}
 			\addmergerow{32}{zipf}{Zipf's}
-			\addmergerow{32}{normal}{Normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\caption{
 		An extension to \cref{fig:merge:runtime}.
-		The date size is 32 bit.
+		The date size is 32 bits.
 	}
 	\label{fig:merge:runtime_uint32}
 \end{figure}
@@ -104,22 +104,22 @@
 			sorted/.style={ymin=20, ymax=60},
 			reverse/.style={ymin=75, ymax=180, ytick={75,110,...,180}},
 			almost/.style={ymin=30, ymax=110, ytick={30,50,...,110}},
+			zeroone/.style={almost},
 			uniform/.style={ymin=50, ymax=140, ytick={50,80,...,140}},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{64}{sorted}{Sorted}
 			\addmergerow{64}{reverse}{Reverse S.}
 			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{zeroone}{Zero-One}
 			\addmergerow{64}{uniform}{Uniform}
 			\addmergerow{64}{zipf}{Zipf's}
-			\addmergerow{64}{normal}{Normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\caption{
 		An extension to \cref{fig:merge:runtime}.
-		The date size is 64 bit.
+		The date size is 64 bits.
 	}
 	\label{fig:merge:runtime_uint64}
 \end{figure}
@@ -150,25 +150,25 @@
 			sorted/.style={ymin=25, ymax=55, ytick={25,35,...,55}},
 			reverse/.style={ymin=65, ymax=110, ytick={65,80,...,110}},
 			almost/.style={ymin=45, ymax=75, extra y ticks={45,75}},
+			zeroone/.style={almost},
 			uniform/.style={ymin=60, ymax=80},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{32}{sorted}{Sorted}
 			\addmergerow{32}{reverse}{Reverse S.}
 			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{zeroone}{Zero-One}
 			\addmergerow{32}{uniform}{Uniform}
 			\addmergerow{32}{zipf}{Zipf's}
-			\addmergerow{32}{normal}{Normal}
 			\pgfplotsset{legend to name=leg:merge:starting_runs_is, legend entries={12,...,16}}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil\tikzexternalenable
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were tested.
-		The date size is 32 bit.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were benchmarked.
+		The date size is 32 bits.
 	}
 	\label{fig:merge:starting_runs_is_uint32}
 \end{figure}
@@ -181,24 +181,24 @@
 			sorted/.style={ymin=30, ymax=70, extra y ticks={}},
 			reverse/.style={ymin=90, ymax=160},
 			almost/.style={ymin=50, ymax=90},
+			zeroone/.style={almost},
 			uniform/.style={ymin=75, ymax=100},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{64}{sorted}{Sorted}
 			\addmergerow{64}{reverse}{Reverse S.}
 			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{zeroone}{Zero-One}
 			\addmergerow{64}{uniform}{Uniform}
 			\addmergerow{64}{zipf}{Zipf's}
-			\addmergerow{64}{normal}{Normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:starting_runs_is}\hfil\tikzexternalenable
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were tested.
-		The date size is 64 bit.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 4\) were benchmarked.
+		The date size is 64 bits.
 	}
 	\label{fig:merge:starting_runs_is_uint64}
 \end{figure}
@@ -229,25 +229,25 @@
 			sorted/.style={ymin=30, ymax=50},
 			reverse/.style={ymin=45, ymax=100, ytick distance=15},
 			almost/.style={ymin=40, ymax=70},
+			zeroone/.style={almost},
 			uniform/.style={ymin=60, ymax=90},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{32}{sorted}{Sorted}
 			\addmergerow{32}{reverse}{Reverse S.}
 			\addmergerow{32}{almost}{Almost S.}
+			\addmergerow{32}{zeroone}{Zero-One}
 			\addmergerow{32}{uniform}{Uniform}
 			\addmergerow{32}{zipf}{Zipf's}
-			\addmergerow{32}{normal}{Normal}
 			\pgfplotsset{legend to name=leg:merge:starting_runs_shs, legend entries={14,24,32,48,64,96}}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil\tikzexternalenable
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were tested.
-		The date size is 32 bit.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were benchmarked.
+		The date size is 32 bits.
 	}
 	\label{fig:merge:starting_runs_shs_uint32}
 \end{figure}
@@ -260,24 +260,24 @@
 			sorted/.style={ymin=30, ymax=70},
 			reverse/.style={ymin=75, ymax=135, ytick distance=15},
 			almost/.style={ymin=50, ymax=90},
+			zeroone/.style={almost},
 			uniform/.style={ymin=75, ymax=110},
 			zipf/.style={uniform},
-			normal/.style={uniform},
 		]
 			\addmergerow{64}{sorted}{Sorted}
 			\addmergerow{64}{reverse}{Reverse S.}
 			\addmergerow{64}{almost}{Almost S.}
+			\addmergerow{64}{zeroone}{Zero-One}
 			\addmergerow{64}{uniform}{Uniform}
 			\addmergerow{64}{zipf}{Zipf's}
-			\addmergerow{64}{normal}{Normal}
 		\end{groupplot}
 	\end{tikzpicture}
 
-	\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:starting_runs_shs}\hfil\tikzexternalenable
 	\caption{
 		\MS{} with different starting run lengths.
-		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were tested.
-		The date size is 64 bit.
+		For starting run length \startingrun{}, the input lengths \(n = 4^i \cdot \startingrun + 1\) with \(i = 0, \dots, 3\) were benchmarked.
+		The date size is 64 bits.
 	}
 	\label{fig:merge:starting_runs_shs_uint64}
 \end{figure}

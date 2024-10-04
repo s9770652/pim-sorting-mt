@@ -1,0 +1,84 @@
+\subsection{Presentation of Key Aspects}
+\label{sec:tasklet:merge:aspects}
+
+\paragraph{Starting Runs}
+Instead of starting by merging runs of length 1, that is individual elements, it is beneficial in practice to first subdivide the input and use either \IS{} or \ShS{} on the individual subdivisions.
+These larger \emph{starting runs} allow to skip a few of the early rounds of merging.
+For simplicity, all starting runs have the same, predefined length with possible exception of the last one which can be shorter.
+A substantial downside to \ShS{} is that whilst it does allow to sort bigger starting runs quicker, it is not stable unlike \IS{}.
+If \MS{} is supposed to sort stably, then we use \IS{}.
+
+Unlike \QS{}, where each partition naturally acts as sentinel for the subsequent one, it is necessary to temporarily place sentinels values in front of each starting run and later restore the overwritten values of the preceding run.
+The step sizes used for \ShS{} \Dash namely \(\stepsizes = \paren{1, 6}\) for up to 48 elements, and \(\stepsizes = \paren{1, 5, 12}\) for more \Dash have been chosen based on the findings in \cref{sec:tasklet:shell}, according to which these step sizes offer top performance for uniformly distributed inputs and medial performance for reverse sorted inputs.
+Spot-check inspection suggest no deterioration of \IS{}'s and \ShS{}'s compilation due to inlining.
+
+
+\paragraph{Memory Footprint}
+A simple implementation of \MS{} (termed \emph{full-space}) writes all merged runs to an auxiliary array, raising the need for space for \(n\) additional elements.
+After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles and the merging begins anew.
+If the final sorted elements are supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed if the number of rounds is odd.
+
+A slightly more sophisticated implementation (termed \emph{half-space}) needs space for only \(n/2\) additional elements~\cite[Chapter~2.5]{lang2009algorithmen}:
+When two adjacent runs are to be merged, the first one is copied to an auxiliary array.
+Then, the copy and the second run are merged to the beginning of the first run.
+As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
+To guarantee that the auxiliary array does indeed hold only \(n/2\) elements in the worst case, one needs to make sure that the first runs are never longer than the respective second runs.
+There can only ever be at most one run shorter than the others, namely the last one.
+For this reason, the formation of starting runs now begins at the end of the input array and proceeds to the front.
+Likewise, merging pairs of runs also begins with the last pair and works its way forward to the front.
+
+Further optimised, half-space \MS{} would not need to copy the first runs immediately.
+It suffices to search for the foremost element of the first run which is greater than the first element of the second element.
+All previous elements are already in the correct position so only the following elements need to be copied to the auxiliary array.
+This \emph{deferred} copying, although examined during development, was not in use when measuring runtimes since it unfortunately complicates the next optimisation.
+
+
+\paragraph{Unrolled Flushing}
+There are four common reasons for \emph{flushing}, that is writing consecutive elements unconditionally:
+\begin{enumerate}
+	\item
+	When two runs are merged and the end of one of them is reached, that is, when one run is depleted, the remaining elements of the non-depleted run can be moved safely to the output location.
+	Especially with the sorted, reverse sorted, and almost sorted input distributions, the number of remaining elements will be high.
+
+	\item
+	The number of runs is odd, so the full-space \MS{} moves the last run to the output location unconditionally.
+
+	\item
+	The full-space \MS{} may have to write all elements from the auxiliary array back to the input array if the former contains the final sorted sequence.
+
+	\item
+	Before each merge of a pair of runs, the half-space \MS{} copies the first run to the auxiliary array.
+\end{enumerate}
+Therefore, flushing accounts for a considerable part of the runtime, and reducing the loop overhead caused by variable incrementations and bounds checking is helpful.
+This can be done via \emph{unrolling} by a certain \emph{unroll factor} \(x\):
+As long as at least \(x\) elements still need to be flushed, a loop with step size \(x\) is executed, and in each iteration, \(x\) elements are moved.
+Making \(x\) a compile-time constant enables the compiler to implement this moving through \(x\) instruction which use constant, pre-calculated offsets.
+Once fewer than \(x\) elements remain, an ordinary loop with step size~\(1\), which moves elements individually, is used.
+In good cases, this approach reduces the loop overhead to an \(x\itordinal\)th, whilst in bad cases, where fewer than \(x\) elements are to be flushed, the overhead is increased by only one additional check.
+
+Due to time reasons, we refrained from doing automatic and extensive benchmarks and relied on manual and exploratory benchmarks to come up with the following strategy:
+When the full-space \MS{} performs a write-back or when the half-space \MS{} copies the first run, the unroll factor is set to the starting run length.
+In all other cases, the unroll factor is set to 24, which proved to be a sweet spot.
+This strategy, albeit not optimal, makes the \MS*{} significantly faster.
+Sorting sorted, reverse sorted, and almost sorted inputs experiences a speedup of up to \num{1.4}, and sorting more random inputs still experiences a speedup above \num{1} on the whole.
+In the few cases where unrolling is harmful and the speedup drops below \num{1}, the speedup stays close to \num{1} nonetheless.
+
+
+\paragraph{Unrolled Merging}
+The following simple and easily scalable technique, which significantly reduces bounds checks, was employed:
+Before merging two runs, check whose last element is less, that is, determine which run will be depleted first.
+This run is referred to as \emph{less run}, whilst the other one is referred to as \emph{greater run} henceforward.
+As longs as at least \(x\) unmerged elements remain in the less run, execute an unrolled loop which merges the next \(x\) elements of both runs.
+Once fewer than \(x\) elements remain in the less run, do the same with \(x \div 2\) many elements.
+Once fewer than \(x \div 2\) many remain in the run, execute an ordinary loop with step size~\(1\) which checks after each merge of an element from the less run whether the run gets depleted therethrough.
+
+We found an unroll factor of \(\min\{ \startingrun, 16 \}\), where \startingrun{} is the starting run length, to be a good choice.
+A drawback of unrolling is the increased kernel size, since the instruction count of an unrolled loop is increased roughly \(x\itordinal\)fold.
+Larger unroll factors lead to an \ac{IRAM} overflow.
+
+A more refined unrolled merging can be deduced from \IS{} not using a dedicated pointer to access a preceding element.
+Instead, \IS{} utilised the pointer to the current element together with an offset of \lstinline|-4|.
+A similar technique can be used with \MS{}, which maintains two pointers \lstinline|i| and \lstinline|j|, each pointing the current element of a run to merge.
+If, for example, it holds \lstinline|*i <= *j|, then the next element can be loaded via \lstinline|*(i + 1)|.
+Finally, depending on whether \lstinline|*(i + 1) <= *j| holds, either both pointers \lstinline|i| and \lstinline|j| are incremented by~\lstinline|1| or pointer \lstinline|i| is incremented by \lstinline|2|.
+Unluckily, the quality of the compilation suffers from this technique, leading to its dismissal.
