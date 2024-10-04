@@ -4,6 +4,8 @@
 \twoi#m
 \twotoi#m
 
+\hexa{number}#n
+
 % Figures.
 \plotruntime{column}{table}
 \plotruntime[options]{column}{table}

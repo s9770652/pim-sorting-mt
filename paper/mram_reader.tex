@@ -1,71 +1,52 @@
 \section{The Sequential Reader}
 \label{sec:mram:seq_reader}
 
-It is technically feasible to access data in the MRAM in the same way as data in the WRAM.\todo{überarbeiten, sobald Grundlagen stehen}
-For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
-Such \emph{direct memory accesses} (DMAs) to the MRAM are translated into the assembler instructions \lstinline|ldma| and \lstinline|sdma|, which load and store the particular pieces of data.
-However, each DMA comes with an overhead, and accessing MRAM data in the same way as WRAM data means an execution of \lstinline|ldma| or \lstinline|sdma| on each access.
-For this reason, the preferred way to load contiguous data from the MRAM is through the function \lstinline|mram_read|.
-This function takes the MRAM address of the first byte to load, the WRAM address of a buffer where the data are to be stored, and the number of consecutive bytes to load.
-Likewise, there is the function \lstinline|mram_write| for writing contiguous WRAM data to the MRAM.
-Internally, these two \langC{} functions also make use of the assembler functions \lstinline|ldma| and \lstinline|sdma| but pass them the number of bytes to load, so that the overhead occurs only once and is spread amongst many bytes.
-The effect is so high that, according to \citeauthor{mutlu2022Benchmarking}~\cite[11]{mutlu2022Benchmarking}, using \lstinline|mram_read| and \lstinline|mram_write| remains beneficial even if only an eighth of the transferred data is actually of interest.
-
+A \ac{DMA} takes half a cycle per transferred byte.
+On top of that, each reading \ac{DMA} comes with an additional overhead of  \qty{77}{\cycles} and each writing \ac{DMA} with an overhead of \qty{61}{\cycles}.
+To dilute this overhead, \ac{MRAM} data is preferably processed in blocks using the functions \lstinline|mram_read| and \lstinline|mram_write|.
+The benefit of blockwise processing is so high that, according to \citeauthor{mutlu2022Benchmarking}~\cite[11]{mutlu2022Benchmarking}, using \lstinline|mram_read| and \lstinline|mram_write| remains beneficial compared to accessing single \ac{MRAM} elements even if only an eighth of the transferred data are actually of interest.
 However, the functions \lstinline|mram_read| and \lstinline|mram_write| do come with some constraints.
-Both the target and the source address must be aligned on 8 bytes.
+Both the target and the source address must be aligned to 8 bytes.
 Also, the number of transferred bytes must be at least 8, at most 2048, and a multiple of 8.
-Failing to fulfil these constraints can result in missing or corrupt data.
-Furthermore, programmers are tasked with maintaining the WRAM buffer and transferring data at appropriate times, which, given that the WRAM is more than a thousand times smaller than the MRAM, is likely frequent.
+Furthermore, programmers are tasked with maintaining a buffer in the \ac{WRAM} and transferring data at appropriate times, which, given that the \ac{WRAM} is more than a thousand times smaller than the \ac{MRAM}, is likely frequent.
 
-Since processing MRAM data consecutively is a common occurrence, UPMEM provides a data structure called \emph{sequential reader}.
-Through a set of \langC{} functions, these sequential readers automate the read-in process and, thereby, remove any need to care for the alignment of addresses or the loading of new data.
-On top of that, UPMEM claims that \textquote{[\dots] this abstraction implementation has been optimized and will provide better performance than a standard \langC{} check of the cache boundaries.}~\cite[Memory management -- Sequential readers]{upmemSDK}
+Since processing \ac{MRAM} data consecutively is a common occurrence, \upmem{} provides a data structure called \emph{sequential reader}.
+Through a set of \langC{} functions, a sequential reader automates the read-in process and, thereby, removes any need to care for the alignment of addresses or the loading of new data.
+On top of that, \upmem{} claims that \textquote{\bibellipsis{} this abstraction implementation has been optimized and will provide better performance than a standard \langC{} check of the cache boundaries.}~\cite[Memory management -- Sequential readers]{upmemSDK}
 
-The size of the sequential-read buffer within the WRAM is determined by the compile-time constant \seqreadcachesize{}, which can be set to either 32, 64, 128, 256, 512, or 1024.
-The initialisation of the buffer happens through the function \lstinline|seqread_alloc| and is worth a closer look.
+Of course, a sequential reader still requires a \ac{WRAM} buffer.
+Its size in bytes is determined by the compile-time constant \seqreadcachesize{}, which can be set to either 32, 64, 128, 256, 512, or 1024.
+The allocation of the buffer on the heap happens through the function \lstinline|seqread_alloc| and is worth a closer look.
 Remember that the heap is actually implemented as a never-decreasing stack.
-This means that new memory is only ever allocated behind the \emph{stack pointer}, which stores the end of the stack.
-For \(\seqreadcachesize{} = 2^i\), the \(i\) least significant bits of the first byte in the buffer are required to be zero, for reasons explained shortly.
-Therefore, the stack pointer skips to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
-Due to the nature of a stack, this has the drawback that the skipped WRAM memory can never be allocated by something else.
-Eventually, a total of 2 × \seqreadcachesize{} many bytes are allocated, also for reasons explained shortly.
-All in all, the memory footprint of a sequential-read buffer is at least 2 × \seqreadcachesize{} many bytes but less than 3 × \seqreadcachesize{} many.
+This means that new memory is only ever allocated behind the heap pointer, which stores the end of the heap.
+With \(\seqreadcachesize{} = \twotoi\), the \(i\) least significant bits of the first byte address in the buffer are required to be zero, for reasons explained shortly.
+Therefore, the heap pointer skips to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
+Due to the nature of a stack, this has the drawback that the skipped \ac{WRAM} memory can never be allocated for something else.
+After the skip of the heap pointer, a total of \(2 × \seqreadcachesize{}\) many bytes are allocated, also for reasons explained shortly.
+All in all, the memory footprint of a sequential-read buffer is at least \(2 × \seqreadcachesize{}\) many bytes and less than \(3 × \seqreadcachesize{}\) many.
 
-The function \lstinline|seqread_init| instructs a sequential reader to load data from a specified MRAM address into its buffer.
-In addition, the function returns a pointer to the corresponding position of said MRAM address within the buffer, to which we will refer as pointer to the \emph{current element}.
-Conceptually, the whole MRAM is divided into \emph{pages} of size \seqreadcachesize{}.
-To load data from the specified MRAM address, the address is rounded down the the next multiple of \seqreadcachesize{}, which yields the beginning of the page containing the MRAM address.
+The function \lstinline|seqread_init| instructs a sequential reader to load data from a specified \ac{MRAM} address into its buffer.
+Conceptually, the whole \ac{MRAM} is divided into \emph{pages} of size \seqreadcachesize{}.
+To load data from the specified \ac{MRAM} address, the address is rounded down the the next multiple of \seqreadcachesize{}, which yields the beginning of the page containing the \ac{MRAM} address.
 Then, 2 × \seqreadcachesize{} many bytes are loaded so that the buffer holds two pages.
 This way, data of some long, compound type at the end of the first page are fully loaded even if extending into the other page.
 
-To access the current element, one simply dereferences the pointer to the current element.
+The function \lstinline|seqread_init| also returns a pointer to the corresponding position of the specified \ac{MRAM} address within the sequential-read buffer, to which we will refer as pointer to the \emph{current element}.
+Due to the page model, this pointer may not be set to the beginning of the buffer.
+To access the current element, one simply dereferences the pointer.
 Calling the function \lstinline|seqread_get| advances this pointer by a given number of bytes, which cannot be greater than \seqreadcachesize{};
 this way of specifying bytes allows the sequential reader to support arbitrary data types.
 Once the pointer to the current element ends up in the second half of the buffer, it is set \seqreadcachesize{} many bytes back so that it points to an address in the first half again.
-Also, the MRAM address stored within the sequential reader is increased by \seqreadcachesize{} many bytes, and the next two subsequent pages are loaded.
-This means that the page which was stored in the second half of the buffer so far is loaded from the MRAM again but stored in the first half this time.
+In addition, the \ac{MRAM} address from which to read is increased by \seqreadcachesize{} many bytes, and the next two subsequent pages are loaded.
+This means that the page stored in the second half of the buffer is loaded from the \ac{MRAM} again but stored in the first half this time.
 \Cref{fig:merge:reader} visualises an intermediate state of a sequential reader, showcasing its characteristic read behaviour.
 
-% taken from: https://tex.stackexchange.com/a/511203
-\ExplSyntaxOn
-\NewDocumentCommand{\hexa}{m}{\int_to_hex:n {#1}}
-\ExplSyntaxOff
-
-\tikzset{
-	reader figure/.style={scale=0.523, thick, line cap=round},
-	address/.style={node font=\ttfamily},
-	curr/.style={accentcolor},
-	excess/.style={gray, fill opacity=0.1},
-	ptr/.style={latex-, node font=\small}
-}
-\def\mramlen{20}
-\def\mramfirst{10}
-\def\ptrdist{0.65}
 \begin{figure}
 	\centering
 	\tikzsetnextfilename{sequential_reader}
-	\begin{tikzpicture}[reader figure]
+	\begin{tikzpicture}[sketch, curr/.style={accentcolor}]
 		% MRAM.
+		\def\mramlen{20}
 		\def\mramstart{-2}
 		\def\mramend{6}
 
@@ -90,16 +71,18 @@ This means that the page which was stored in the second half of the buffer so fa
 		\draw[               name path=M2Bl] (1.5*\buflen+\mramstart, 0) to[out=-90, in=90] (            \bufxoffset+\mramstart, 1+\buffyoffset);
 		\draw[line cap=butt, name path=M2Br] (2.5*\buflen+\mramstart, 0) to[out=-90, in=90] (    \buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
 		\draw[                       dashed] (2.0*\buflen+\mramstart, 0) to[out=-90, in=90] (0.5*\buflen+\bufxoffset+\mramstart, 1+\buffyoffset);
-		\tikzfillbetween[of=M2Bl and M2Br, split=false] {gray, ultra nearly transparent};
+		\tikzfillbetween[of=M2Bl and M2Br, split=false] {gray, ultra nearly transparent}
 
 		% Current item.
 		\def\currindex{2}
 
-		\fill[curr, fill opacity=.1]   (\currindex+\bufxoffset+\mramstart, \buffyoffset) rectangle (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
-		\draw[curr, ultra thick, fill] (\currindex+\bufxoffset+\mramstart, \buffyoffset)      grid (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
-		\draw[curr, -{Straight Barb[width=1.5mm]}] (\currindex+\bufxoffset+\mramstart, 1.25+\buffyoffset)--+(0:1);
+		\fill[curr, fill opacity=.1]   (\currindex+\bufxoffset+\mramstart,      \buffyoffset) rectangle (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[curr, ultra thick, fill] (\currindex+\bufxoffset+\mramstart,      \buffyoffset)      grid (1+\currindex+\bufxoffset+\mramstart, 1+\buffyoffset);
+		\draw[curr, flow, ->]          (\currindex+\bufxoffset+\mramstart, 1.25+\buffyoffset)       --+ (0:1);
 
 		% Item identifiers.
+		\def\mramfirst{10}
+
 		\pgfmathsetmacro{\looplastindex}{int(\mramlen+\mramend-1)}
 		\foreach \i in {\mramstart,...,\looplastindex}{
 			\pgfmathsetmacro{\itemindex}{int( 4*(\mramfirst+\i) )}
@@ -113,19 +96,21 @@ This means that the page which was stored in the second half of the buffer so fa
 		}
 
 		% Pointers.
-		\draw[ptr] (1.5*\buflen+\mramstart+0.5, 1) --+ (90:\ptrdist) node[above] {\lstinline|from|};
+		\def\ptrdist{0.65}
 
-		\draw[ptr] (\bufxoffset+\mramstart+0.5, \buffyoffset) --+ (-90:\ptrdist) node[below] {\lstinline|buffer|};
+		\draw[ptr, <-] (1.5*\buflen+\mramstart+0.5, 1) -- +(90:\ptrdist) node[above] {\lstinline|from|};
 
-		\draw[ptr] (\currindex+\bufxoffset+\mramstart+0.5, \buffyoffset) --+ (-90:\ptrdist) node[below] {\lstinline|curr|\vphantom{\lstinline|f|}};
+		\draw[ptr, <-] (\bufxoffset+\mramstart+0.5, \buffyoffset) -- +(-90:\ptrdist) node[below] {\lstinline|buffer|};
+
+		\draw[ptr, <-] (\currindex+\bufxoffset+\mramstart+0.5, \buffyoffset) -- +(-90:\ptrdist) node[below] {\lstinline|curr|\vphantom{\lstinline|f|}};
 	\end{tikzpicture}
 
 	\caption{
-		An exemplary sequential reader with \(\seqreadcachesize{} = 16\) being used to transfer 32-bit elements from the MRAM (top row) into the WRAM (bottom row).
-		The hexadecimal numbers denote the addresses of the respective elements within the MRAM.
+		An exemplary sequential reader with \seqreadcachesize{} set to 16 being used to transfer 32-bit elements from the \ac{MRAM} (top row) into the sequential-read buffer (bottom row).
+		The hexadecimal numbers denote the addresses of the respective elements within the \ac{MRAM}.
 		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| are also loaded at some point.
 		The pointer \lstinline|buffer| constantly points to the beginning of the sequential-read buffer.
-		The pointer \lstinline|from| points to the MRAM address of the first byte within the buffer.
+		The pointer \lstinline|from| points to the \ac{MRAM} address of the first byte within the buffer.
 		The pointer \lstinline|curr| moves from left to right, 4 bytes at a time.
 		No byte of the second half of the buffer is ever read as the elements fit perfectly within the first half.
 	}
@@ -133,9 +118,9 @@ This means that the page which was stored in the second half of the buffer so fa
 \end{figure}
 
 The acclaimed speedup through more performant bounds checks happens within the function \lstinline|seqread_get|, which in turn calls the function \lstinline|__builtin_dpu_seqread_get|.
-An inspection of the compilation of \lstinline|__builtin_dpu_seqread_get| reveals the use of \emph{carry bits}.
-The instruction \lstinline|add| which is used to advance the pointer by the specified number of bytes is capable of checking whether bit \(i\) generated a carry bit.
-To be more precise, carry bit \(i\) is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the two involved operands, in this case the pointer and the number of bytes.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
-Due to the alignment of the buffer on a power of two and due to page sizes being also a power of two, the generation of such a carry bit signifies that the pointer to the current element has left the first buffer half.
-Next to detecting the generation of carry bit \(i\), the instruction \lstinline|add| is also capable of performing a conditional jump dependant on the generation of the carry bit.
-This means that it takes just one instruction to advance the pointer, check the cache boundaries and skip \Dash if needed \Dash the subsequent instruction responsible for loading the next pages and resetting the pointer.
+An inspection of its compilation with \(\seqreadcachesize{} = \twotoi\) reveals the use of a combo operation.
+The pointer to the current element is advanced by invoking an \lstinline|add| instruction to increase the stored address.
+This \lstinline|add| instruction uses a condition to detect the generation of the \(i\)th carry bit.
+To be more precise, this carry bit is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the involved operands, in this case the pointer and the number of bytes to advance.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
+Thanks to the carefully chosen size and alignment of the buffer, the generation of such a carry bit signifies that the pointer to the current element has left the first buffer half.
+This means that it takes just one instruction to advance the pointer, check the buffer boundaries and skip \Dash if needed \Dash the subsequent instruction responsible for updating the whole reader.

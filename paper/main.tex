@@ -95,7 +95,13 @@
 	every axis plot/.append style={thick},
 }
 \tikzset{
-	sketch/.style={scale=0.525, thick, line cap=round, line join=round, rounded corners=1pt,},
+	sketch/.style={ scale=0.523, thick, line cap=round, line join=round, rounded corners=1pt },
+	brace/.style={ decorate, decoration={calligraphic brace, amplitude=5.5pt, raise=2pt}, line width=1.1pt, rounded corners=0pt },
+	brace down/.style={ brace, decoration={mirror} },
+	excess/.style={ gray, fill opacity=0.1 },
+	address/.style={ node font=\ttfamily },
+	ptr/.style={ >=latex, node font=\small },
+	flow/.style={ >={Straight Barb[width=1.5mm]} },
 }
 
 % Automatic export and import of every TikZ picture as PDF.

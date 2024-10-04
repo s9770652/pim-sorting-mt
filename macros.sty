@@ -4,6 +4,12 @@
 \NewDocumentCommand{\twoi}{}{2 \mspace{1mu} i}
 \NewDocumentCommand{\twotoi}{}{2\mspace{1mu}^i}
 
+% Prints a number as hexadecimal value.
+% taken from: https://tex.stackexchange.com/a/511203
+\ExplSyntaxOn
+\NewDocumentCommand{\hexa}{m}{\int_to_hex:n {#1}}
+\ExplSyntaxOff
+
 %%% Figures.
 \pgfplotsset{
 	select row/.style={
