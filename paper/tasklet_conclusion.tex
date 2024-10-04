@@ -1,70 +1,74 @@
 \section{Interim Conclusion}
 \label{sec:tasklet:conclusion}
 
-\pgfplotsinvokeforeach{sorted,reverse,almost,uniform,zipf,normal}{
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
 	\pgfplotstablereadnamed{data/shell/ciura/uint32/#1.txt}{tableShellCiura_32#1}
 	\pgfplotstablereadnamed{data/shell/ciura/uint64/#1.txt}{tableShellCiura_64#1}
 }
 
-This \lcnamecref{sec:tasklet:conclusion} offers a summary of the algorithms presented in this \lcnamecref{sec:tasklet} and the findings on them.
+This \lcnamecref{sec:tasklet:conclusion} offers a summary of the findings on the algorithms presented in this \lcnamecref{sec:tasklet}.
 It also gives an outlook on future improvements.
-\Cref{fig:tasklet:conclusion:runtime} serves as succinct overview of the runtimes on all tested input distributions and data types.
+\Cref{fig:tasklet:conclusion:runtime} serves as succinct overview of the runtimes on all benchmarked input distributions and data types.
 
 
 \paragraph{\IS{}}
-This algorithm is arguably the best for small inputs with up to 16 elements as it offers the best performance on the tested input distributions and, additionally, sorts stable and in-place.
+This algorithm works in place and is stable.
+It is arguably the best for short inputs with up to 16 elements as it offers the best performance on the benchmarked input distributions and, additionally, sorts stable and in place.
 Sentinel values enabled significant speedups \Dash a theme shared with most sorting algorithms.
 However, there is still room for improvement as its compilation is suboptimal, especially in case of the \IS{} with implicit sentinel values.
 
-Last but not least, a strong contender to \IS{} shall be mentioned, namely sorting networks~\cites{codish2017sortingnetworks}[Chapter~13]{lang2009algorithmen}.
+As a last point, a strong contender to \IS{} shall be mentioned, namely sorting networks~\cites{codish2017sortingnetworks}[Chapter~13]{lang2009algorithmen}.
 These algorithms work for a fixed input length and swap elements according to a series of predefined comparisons.
-Testing various code snippets~\cites[9]{codish2017sortingnetworks}{m2015fastestway}{paulr2010fastestsort} suggests a large potential for further savings.
+Testing various code snippets~\cites[9]{codish2017sortingnetworks}{m2015fastestway}{paulr2010fastestsort} suggests a large potential for further speedup.
 
 
 \paragraph{\ShS{}}
-This  algorithm offers a significant speedup over \IS{} as long as the input is fairly distant from being sorted.
+This algorithm works in place but is not stable.
+It offers a significant speedup over \IS{} as long as the input is fairly distant from being sorted.
 Optimising it for long inputs will take some effort, though.
 
 
 \paragraph{\HS{}}
-This algorithm works in-place but is not stable.
-The runtime is guaranteed to be in \(\bigoh{n \log n}\) and also proved to be rather indifferent to the tested input distributions.
-Nevertheless, it is utterly outpaced by \QS{} and \MS{}, as becomes quite clear in \cref{fig:tasklet:conclusion:runtime}.
-Unless the runtime guarantee is absolutely needed, \HS{} should not be used.
+This algorithm works in place but is not stable.
+The runtime is guaranteed to be in \(\bigoh{n \log n}\) and also proved to be mostly oblivious to the benchmarked input distributions.
+Nevertheless, it is severely outpaced by \QS{} and \MS{}, as becomes quite clear in \cref{fig:tasklet:conclusion:runtime}.
+Unless the runtime guarantee is absolutely needed and \MS{} is not an option because of its memory footprint, \HS{} should not be used.
 Its implementation is complicated by the optimal sifting direction being dependent on the data type.
 Eyebrow-raising observations during development suggest that its compilation can still be improved.
 
-All implemented \HS*{} use a binary heap so an obvious endeavour would be to switch to tertiary heaps.
+All benchmarked \HS*{} use a binary heap so an obvious endeavour would be to switch to tertiary heaps.
 Exploratory implementations, however, show that the performance suffers from this change.
 
 
 \paragraph{\QS{}}
-Neither does this algorithm work in-place nor is it stable.
+This algorithm does not work in place and is not stable.
 Its runtime is in \(\bigoh{n \log n}\) only in expectation, but the worst-case runtime of \(\bigoh*{n^2}\) is, thanks to random medians being selected as pivots, highly unlikely.
-\QS{} generally delivers top performance which could be even better with deterministic medians as pivots if the input is known to be random enough.
-There is serious work needed to be done, however, as there is no prioritisation of shorter partitions yet, which is needed to prevent an overflow of the call stack, due to problems in the compilation.
+\QS{} generally delivers top performance which becomes even better with deterministic medians as pivots if the input is known to be random enough.
+There is serious work needed to be done, however.
+So far, there is no prioritisation of shorter partitions, which is needed to prevent an overflow of the call stack, due to problems in the compilation.
 These problems currently also make both recursion and iteration necessary, depending on the data type, and we cannot rule out other impairments hidden in the compilation.
 
 Besides fixing these issues, future work could revolve around different partitioning patterns similar to those of dual-pivot~\cite{wild2012averagecase} or patter-defeating \QS{}~\cite{peters2021patterndefeatingquicksort}.
 The latter makes use of \HS{} as fallback algorithm in worst cases.
-Since the maximum input length is limited on DPUs, perhaps a carefully tuned \ShS{} may be used instead.
-For this reason, \cref{fig:tasklet:conclusion:runtime} includes also a \ShS{}, which starkly contrasts \HS{} despite its yet unsuited step sizes.
+Since the maximum input length is limited on \acp{DPU}, perhaps a carefully tuned \ShS{} may be used instead.
+For this reason, \cref{fig:tasklet:conclusion:runtime} includes also \ShS{}, which starkly contrasts \HS{} despite its yet unoptimised step sizes.
 
 
 \paragraph{\MS{}}
-This algorithm is stable but does not work in-place.
+This algorithm does not work in place but is stable.
 The runtime is guaranteed to be in \(\bigoh{n \log n}\) although it fluctuates somewhat, depending on the input distribution and input length.
 Having said that, the leeway to \QS{} is not too big most of the time, making it unlikely that a stabilised \QS{} with likewise increased memory footprint would be much of a benefit.
-Deferred copying of runs and fine-tuned unrolling could make the runtime drop even further.
+Deferred copying of runs and fine-tuned unrolling could make the runtime of \MS{} drop even further.
 
-As shown, some allowance on the starting run lengths does not affect the average runtime too much, so the zigzagging of the runtime could be dampened by dynamically adjusting the starting run length.
-A strategy to speed up flushing is interpreting two consecutive 32-bit integers as one 64-bit integer, which then gets loaded and stored away in just two 64-bit instructions instead of four 32-bit ones.
-The compiler can be prescribed to do so by simply casting the involved 32-bit integer pointers to their 64-bit counterparts.
-Special care, however, is required for the alignment, as the addresses of 32-bit integers are aligned on 4 bytes, whereas those of 64-bit integers are aligned on 8 bytes~\cite[DPU ABI -- Data types]{upmemSDK}.
-A trivial implementation of such a flushing yielded both gains and losses in the single-digits percentagewise, depending on the \MS{} and the input length.
-A feature, last but not least, worthwhile to implement should be the detection of natural runs~\cites[Chapter~2.6]{lang2009algorithmen}[Chapter~2.3.2]{wirth1975algorithmen}, that is sorted runs already present in the input.
+Some allowance on the starting run lengths does not affect the average runtime too much, so the zigzagging of the runtime could be dampened by dynamically adjusting the starting run length.
+A not-yet-implemented strategy to speed up flushing is the interpretation of two consecutive 32-bit integers as one 64-bit integer which then gets loaded and stored away in just two 64-bit instructions instead of four 32-bit ones.
+The compiler can be prescribed to do so by casting the involved 32-bit integer pointers to their 64-bit counterparts.
+Special care, however, is required with regards to the alignment, as the addresses of 32-bit integers are aligned on four bytes, whereas those of 64-bit integers are aligned on eight bytes~\cite[DPU ABI -- Data types]{upmemSDK}.
+A trivial implementation of such a flushing yielded both gains and losses for the runtime in the single-digits percentagewise, depending on the \MS{} and the input length.
+A feature, last but not least, worthwhile to implement should be the detection of natural runs~\cites[Chapter~2.6]{lang2009algorithmen}[Chapter~2.3.2]{wirth1975algorithmen}, that is runs already present in the input.
 
 \begin{figure}[p]
+	\captionsetup[subfigure]{aboveskip=0mm, belowskip=1mm}
 	\pgfplotsset{
 		height=2.925cm,
 		adaptive group=2 by 3,
@@ -76,7 +80,7 @@ A feature, last but not least, worthwhile to implement should be the detection o
 	\NewDocumentCommand{\allalgos}{m}{
 		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMerge_32#1}
+		\plotpernlognwitherrors{MergeHalfSpace}{tableMerge_32#1}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_32#1}
 		\plotpernlognwitherrors{Ciura}{tableShellCiura_32#1}
 	}
@@ -97,26 +101,25 @@ A feature, last but not least, worthwhile to implement should be the detection o
 				\nextgroupplot[title/.add={}{Almost Sorted}]
 				\allalgos{almost}
 				%
+				\nextgroupplot[title/.add={}{Zero-One}]
+				\allalgos{zeroone}
+				%
 				\nextgroupplot[title/.add={}{Uniform}]
 				\allalgos{uniform}
 				%
 				\nextgroupplot[title/.add={}{Zipf's}]
 				\allalgos{zipf}
-				%
-				\nextgroupplot[title/.add={}{Normal}]
-				\allalgos{normal}
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			32-bit
+			32-bit integers
 		}
-		\medskip
 	\end{subfigure}
 
 	\RenewDocumentCommand{\allalgos}{m}{
 		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors[x filter/.expression={\thisrow{n} <= 1024 ? \pgfmathresult : nan}]{MergeHalfSpace}{tableMerge_64#1}
+		\plotpernlognwitherrors{MergeHalfSpace}{tableMerge_64#1}
 		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_64#1}
 		\plotpernlognwitherrors{Ciura}{tableShellCiura_64#1}
 	}
@@ -136,26 +139,25 @@ A feature, last but not least, worthwhile to implement should be the detection o
 				\nextgroupplot[title/.add={}{Almost Sorted}]
 				\allalgos{almost}
 				%
+				\nextgroupplot[title/.add={}{Zero-One}]
+				\allalgos{zeroone}
+				%
 				\nextgroupplot[title/.add={}{Uniform}]
 				\allalgos{uniform}
 				%
 				\nextgroupplot[title/.add={}{Zipf's}]
 				\allalgos{zipf}
-				%
-				\nextgroupplot[title/.add={}{Normal}]
-				\allalgos{normal}
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			64-bit
+			64-bit integers
 		}
-		\bigskip
 	\end{subfigure}
 
-	\hfil\pgfplotslegendfromname{leg:tasklet:conclusion:runtime}\hfil
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:tasklet:conclusion:runtime}\hfil\tikzexternalenable
 	\caption{
 		Mean runtimes of the main algorithms presented in this \lcnamecref{sec:tasklet}.
-		The tinted areas denote the three-sigma range, that is the 99.7\% confidence intervals.
+		The tinted areas denote the three-sigma range, that is the \qty[reset-text-shape=false]{99.7}{\percent} confidence intervals.
 	}
 	\label{fig:tasklet:conclusion:runtime}
 \end{figure}
