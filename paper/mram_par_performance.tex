@@ -1,0 +1,167 @@
+\subsection{Evaluation of the Performance}
+\label{sec:mram:par:performance}
+
+The parallel speedup of \MS{} for \qty{32}{\mebi\byte} of data is shown in \cref{fig:par:speedup}.
+The optimal parallel speedup is linear in the number of tasklets but is capped at 11 or, rather, slightly above because of \ac{DMA} latency hiding.
+For uniformly distributed inputs and inputs following Zipf's law, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit integers.
+This is owed to workloads tending to be balanced naturally and tasklets being removed from the pipeline once they are finished.
+For all other inputs, the parallel speedup is roughly between 7 and 9 with 32-bit integers and between~6 and~8 with 64-bit integers \Dash a consequence of workloads becoming more unbalanced.
+This shall be illustrated by sorted inputs:
+In the last round, two runs remain.
+When Tasklet 0 performs the first partitioning step, the longer run is cut exactly in half because of the pivot being the median.
+However, the pivot is strictly less or greater than any element in the shorter run, meaning the shorter run keeps its size of about \(n/2\) many elements as the division point is at one of its ends.
+The ratio between the least and the greatest number of assigned elements in the last round of parallel merging is about 2.3 for zero-one inputs and 4 for the three kinds of sorted inputs.
+A modified binary search as described previously would probably help bringing these little parallel speedups on par with those of the uniform and Zipf's input distribution.
+
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	% 32-bit | Instabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParUnstable_32#1}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=2/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=4/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=8/STABLE=false/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_32#1}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint32/#1.txt}
+
+	% 64-bit | Instabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParUnstable_64#1}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=1/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=2/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=false/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParUnstable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint64/#1.txt}
+}
+
+\NewDocumentCommand{\speeduppar}{m}{
+	\pgfplotstablegetelem{0}{µ_MergePar}\of#1
+	\pgfmathsetmacro{\messlatte}{\pgfplotsretval}
+	\addplot+ table[
+		create on use/tasklets/.style={create col/set list={1,2,4,8,16}},
+		create on use/factor/.style={create col/expr={\messlatte / \thisrow{µ_MergePar}}},
+		x=tasklets, y=factor
+	] {#1};
+}
+
+\begin{figure}
+	\tikzsetnextfilename{speedup}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=1 by 2,
+			groupplot xlabel={Tasklets},
+			groupplot ylabel={Parallel Speedup},
+			xtick={1,2,4,8,16},
+			xmode=log,
+			ymin=0,
+			ymax=12,
+			ytick distance=2,
+		]
+			\nextgroupplot[title/.add={}{32-bit}]
+			\pgfplotsset{legend to name=leg:par:speedup, legend entries={Sorted, Reverse S., Almost S., Zero-One, Uniform, Zipf's}}
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
+			}
+			%
+			\nextgroupplot[title/.add={}{64-bit}]
+			\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+			\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+				\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
+			}
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil\tikzexternalenable
+	\caption{
+		Mean parallel speedup of \MS{} on all benchmarked input distributions and data types with \qty{32}{\mebi\byte} of data.
+		The grey line indicates an idealistic, linear speedup which is capped at 11.
+	}
+	\label{fig:par:speedup}
+\end{figure}
+
+\Cref{fig:par:shares} shows the total runtimes of the parallel \MS{}.
+The measurements are subdivided into the three phases of the parallel \MS{}, that is the sequential \ac{WRAM} phase, the sequential \ac{MRAM} phase, and the parallel \ac{MRAM} phase.
+For the most part, the results are unsurprising.
+The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to a short first and second phase, whilst the uniform and Zipf's input distribution lead to longer runtimes as these two phases are longer.
+The third phase always takes roughly the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
+The greater parallel speedup of the uniform and Zipf's input distribution shines through by the third phase being shorter compared to the relatively long first and second phase.
+
+Almost sorted inputs, on the other hand, are clear outsiders because of the remarkably long third phase, making them the worst case amongst all six benchmarked ones.
+Despite the long runtime, the parallel speedup is about the same as for sorted and reverse sorted inputs.
+Indeed, they all share equal or nearly equal workload imbalances.
+The explanation for the third phase being so long is the same as the one given in \cref{sec:mram:merge:performance} with respect to the second phase.
+A few great elements placed in a run of mostly little elements delays flushes, and the longer the runs become, the likelier it is for a run to contain an overly great element.
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=false/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint32/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=false/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/NR_TASKLETS=16/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=false/uint64/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParLxiv}
+
+\begin{figure}
+	\tikzsetnextfilename{shares}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			adaptive group=1 by 2,
+			barplot,
+			ybar=-\pgfkeysvalueof{/pgf/bar width},
+%			ytick scale label code/.code={},
+		]
+			\nextgroupplot[ymax=1.5e9, title/.add={}{32-bit}]
+			\pgfplotsset{legend to name=leg:par:shares, legend entries={Third Phase,Second Phase,First Phase}, legend reversed}
+			\pgfplotsset{cycle list shift=2}
+			\addplot+ table[x=dist, y=third] {\tableMergeParXxxii};
+			\pgfplotsset{cycle list shift=0}
+			\addplot+ table[x=dist, y=second] {\tableMergeParXxxii};
+			\pgfplotsset{cycle list shift=-2}
+			\addplot+ table[x=dist, y=first] {\tableMergeParXxxii};
+			%
+			\nextgroupplot[ymax=1e9, title/.add={}{64-bit}]
+			\pgfplotsset{cycle list shift=2}
+			\addplot+ table[x=dist, y=third] {\tableMergeParLxiv};
+			\pgfplotsset{cycle list shift=0}
+			\addplot+ table[x=dist, y=second] {\tableMergeParLxiv};
+			\pgfplotsset{cycle list shift=-2}
+			\addplot+ table[x=dist, y=first] {\tableMergeParLxiv};
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:par:shares}\hfil\tikzexternalenable
+	\caption{
+		Mean runtimes of the parallel \MS{}, broken down into its three phases, on all benchmarked input distributions and data types with \qty{32}{\mebi\byte} of data.
+		The first phase comprises sequential sorting in the \ac{WRAM}, the second one sequential sorting in the \ac{MRAM}, and the third one parallel sorting in the \ac{MRAM}.
+	}
+	\label{fig:par:shares}
+\end{figure}
