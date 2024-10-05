@@ -7,11 +7,14 @@ We restrict ourselves to varieties of \MS{} since it allow for stable sorting an
 
 A challenge in designing an algorithm for \ac{MRAM} data is the management of data transfers between the large \ac{MRAM} and the small \ac{WRAM}.
 A key aspect of the transfer management is the use of the sequential reader, that is a software abstraction provided by \upmem{} which simplifies moving data from the \ac{MRAM} to the \ac{WRAM}.
-\Cref{sec:mram:seq_reader} presents the advantages of the sequential reader and explains its usage and inner workings.
+\Cref{sec:mram:seq_reader} 0 the advantages of the sequential reader and explains its usage and inner workings.
 \Cref{sec:mram:triple} addresses the segmentation of the \ac{WRAM} into several buffers which are needed by both sequential readers and \MS{} itself.
 \Cref{sec:mram:merge} deals with the sequential \ac{MRAM} \MS{}, shows how the sequential reader can be improved upon, and concludes with an analysis of the performance.
-Finally, \cref{sec:par} covers the parallel \ac{MRAM} \MS{}.
-Every measurement shown in this \lcnamecref{sec:mram} was repeated ten times, which is a sufficient number given the large inputs and the low runtime variance of the \MS*{}.
+Finally, the parallel \ac{MRAM} \MS{} is built from the sequential one in \cref{sec:par}.
+
+In some instances, we employ \lstinline|T| to denote the data type of the input and \lstinline[keywords={}]|sizeof(T)| to denote the size of an element of type \lstinline|T| in bytes.
+Every measurement presented in this \lcnamecref{sec:mram} was repeated ten times, which is a sufficient number given the large inputs and the low runtime variance of the \MS*{}.
+\Cref{apx:mram} contains further measurements.
 
 \input{mram_reader}
 

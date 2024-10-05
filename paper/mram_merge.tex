@@ -1,14 +1,13 @@
-\section{A \texorpdfstring{\MS{}}{MergeSort} for MRAM Data}
+\section{Sequential \texorpdfstring{\MS{}}{MergeSort}}
 \label{sec:mram:merge}
 
-The MRAM \MS{} is based on the full-space WRAM \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations of the merge process to the two-tier memory hierarchy are discussed.
-As precondition for the presented algorithm to work, it is demanded that the sizes of the runs be multiples of~8 and that the runs and the output location be aligned on 8 bytes.
-This precondition simplifies DMAs and is trivially met for 64-bit elements.
-To meet them for 32-bit elements, the parallel \MS{} (\cref{sec:par}) divides the work amongst tasklets accordingly and, if need be, introduces dummy elements.
-First, the general MRAM merge process with basic optimisations is presented and, thereafter, several optimisations concerning sequential readers.
+The \ac{MRAM} \MS{} is based on the full-space \ac{WRAM} \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations of the merging to the two-tier memory hierarchy are discussed.
+As precondition for the presented algorithm to work, it is demanded that run sizes be multiples of~8 and that the runs and the output location be aligned to 8 bytes.
+This precondition simplifies \acp{DMA} and is trivially met for 64-bit elements.
+To meet it for 32-bit elements, one can insert a single dummy element set to the maximum possible value into the input and discard the last element of the sorted output.
 
 \input{mram_merge_presentation}
 
-\input{mram_merge_faster}
+\input{mram_merge_compilation}
 
 \input{mram_merge_performance}

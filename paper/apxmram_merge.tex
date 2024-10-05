@@ -1,0 +1,194 @@
+\section{Sequential \texorpdfstring{\MS{}}{MergeSort}}
+\label{apx:mram:merge}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeHS/.style={}, create on use/σ_MergeHS/.style={}, columns={n,µ_MergeHS,σ_MergeHS}]{0}{\tableMergeMramHalf}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeMramHalf}{data/merge_mram/half-space/STABLE=true/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramFull}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeMramFull}{data/merge_mram/stable/uint32/#1.txt}
+}
+
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/half/.style={create col/copy column from table={\tableMergeMramHalf}{µ_MergeHS}},
+	create on use/full/.style={create col/copy column from table={\tableMergeMramFull}{µ_MergeFS}},
+	columns={dist,half,full}
+]{6}{\tableMergeMramHalfFullStableXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeHS/.style={}, create on use/σ_MergeHS/.style={}, columns={n,µ_MergeHS,σ_MergeHS}]{0}{\tableMergeMramHalf}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeMramHalf}{data/merge_mram/half-space/STABLE=true/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramFull}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeMramFull}{data/merge_mram/stable/uint64/#1.txt}
+}
+
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/half/.style={create col/copy column from table={\tableMergeMramHalf}{µ_MergeHS}},
+	create on use/full/.style={create col/copy column from table={\tableMergeMramFull}{µ_MergeFS}},
+	columns={dist,half,full}
+]{6}{\tableMergeMramHalfFullStableLxiv}
+
+\begin{figure}[!ht]
+	\captionsetup[subfigure]{aboveskip=-2mm, belowskip=1mm}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_mram_uint32}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				barplot,
+				ymax=1.2e9,
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\pgfplotsset{legend to name=leg:merge:mram, legend entries={Full-Space, Half-Space}}
+				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullXxxii};
+				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullXxxii};
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableXxxii};
+				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableXxxii};
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			32-bit integers
+		}
+	\end{subfigure}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{merge_mram_uint64}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				barplot,
+				ymax=1e9,
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\pgfplotsset{legend to name=leg:merge:mram, legend entries={Full-Space, Half-Space}}
+				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullLxiv};
+				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullLxiv};
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableLxiv};
+				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableLxiv};
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			64-bit integers
+		}
+	\end{subfigure}
+
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:mram}\hfil\tikzexternalenable
+	\caption{
+		An extension to \cref{fig:merge:mram} with \QS{} (stable) and \MS{} (unstable) used during the run formation.
+	}
+	\label{fig:merge:mram_unstable}
+\end{figure}
+
+\clearpage
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramCxxviii}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramCclvi}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramDxii}
+\pgfplotsinvokeforeach{11,12,16}{
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=128/uint32/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=256/uint32/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint32/uniform.txt}
+}
+
+\pgfplotstablenew[
+	create on use/tasklets/.style={create col/set list={11,,,12,,,16,,}},
+	create on use/cache size/.style={create col/set list={256,512,1024,256,512,1024,256,512,1024}},
+	create on use/seqread 128/.style={create col/copy column from table={\tableMergeMramCxxviii}{µ_MergeFS}},
+	create on use/seqread 256/.style={create col/copy column from table={\tableMergeMramCclvi}{µ_MergeFS}},
+	create on use/seqread 512/.style={create col/copy column from table={\tableMergeMramDxii}{µ_MergeFS}},
+	columns={tasklets,cache size,seqread 128,seqread 256,seqread 512},
+]{9}{\tableMergeMramXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivCxxviii}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivCclvi}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeMramLxivDxii}
+\pgfplotsinvokeforeach{11,12,16}{
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCxxviii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=128/uint64/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivCclvi}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=256/uint64/uniform.txt}
+
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=256/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=512/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+	\pgfplotstablevertcat{\tableMergeMramLxivDxii}{data/merge_mram/same_n/NR_TASKLETS=#1/CACHE_SIZE=1024/SEQREAD_CACHE_SIZE=512/uint64/uniform.txt}
+}
+
+\pgfplotstablenew[
+	create on use/tasklets/.style={create col/set list={11,,,12,,,16,,}},
+	create on use/cache size/.style={create col/set list={256,512,1024,256,512,1024,256,512,1024}},
+	create on use/seqread 128/.style={create col/copy column from table={\tableMergeMramLxivCxxviii}{µ_MergeFS}},
+	create on use/seqread 256/.style={create col/copy column from table={\tableMergeMramLxivCclvi}{µ_MergeFS}},
+	create on use/seqread 512/.style={create col/copy column from table={\tableMergeMramLxivDxii}{µ_MergeFS}},
+	columns={tasklets,cache size,seqread 128,seqread 256,seqread 512},
+]{9}{\tableMergeMramLxiv}
+
+\begin{table}
+	\centering
+	\sisetup{
+		table-alignment-mode=format,
+		table-format=4.0,
+		round-precision=0,
+		round-mode=places,
+		exponent-mode=fixed,
+		fixed-exponent=6,
+		text-font-command=\addfontfeatures{RawFeature=+tnum}
+	}
+	\pgfplotstableset{
+		every head row/.style={
+			before row=\toprule Tasklets & \lstinline|CACHE| & \multicolumn{6}{c}{4 × \lstinline|SEQREAD_CACHE|} \\ \cmidrule{3-5},
+			after row=\midrule,
+		},
+		every last row/.style={after row=\bottomrule},
+		every nth row={3}{before row=\addlinespace},
+		column type={c c S S S},
+		columns/tasklets/.style={column name={}, string type},
+		columns/cache size/.style={column name={}, string type},
+		seqread/.style={column name={#1}, string type},
+		columns/seqread 128/.style={seqread={512}},
+		columns/seqread 256/.style={seqread={1024}},
+		columns/seqread 512/.style={seqread={2048}},
+		multicolumn names,
+	}
+	\begin{subtable}{0.49\textwidth}
+		\centering
+		\pgfplotstabletypeset{\tableMergeMramXxxii}
+		\caption{
+			32-bit integers (\(n = 2^{19}\) per tasklet)
+		}
+	\end{subtable}
+	\hfil
+	\begin{subtable}{0.49\textwidth}
+		\centering
+		\pgfplotstabletypeset{\tableMergeMramLxiv}
+		\caption{
+			64-bit integers (\(n = 2^{18}\) per tasklet)
+		}
+	\end{subtable}
+
+	\caption{
+		An extension to \cref{tab:mram:sizes}.
+		The input size per tasklet is fixed to \qty[exponent-mode=input]{2}{\mebi\byte}.
+	}
+	\label{tab:mram:sizes_same_n}
+\end{table}

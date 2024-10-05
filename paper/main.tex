@@ -79,6 +79,23 @@
 		xticklabels={\(16\), \(64\), \(256\), \(1024\)},
 		minor xtick={32, 128, 512},
 	},
+	barplot/.style={
+		groupplot xlabel={},
+		groupplot ylabel={Cycles},
+		enlarge x limits={abs=6mm},
+		xtick style={draw=none},
+		symbolic x coords={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's},
+		x tick label style={
+			rotate=45,
+			anchor=east,
+		},
+		ybar,
+		ymin=0,
+		ytick distance=2e8,
+		scaled y ticks=base 10:-9,
+		tick scale binop=\times,
+		xmajorgrids=false,
+	},
 	log ticks with fixed point,  % uses 0.1, 0.001, … on logarithmix axes instead of 10^-1, 10^-2, …
 	horizontal sep for labels/.style={group/horizontal sep=18mm},  % padding between groupplots (with ticks + labels)
 	horizontal sep for ticks/.style={group/horizontal sep=10mm},  % padding between groupplots (with ticks)
@@ -201,6 +218,8 @@
 	\appendix
 
 	\include{apxtasklet}
+
+	\include{apxmram}
 
 	\input{acronyms}
 
