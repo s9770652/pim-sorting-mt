@@ -20,8 +20,8 @@ The allocation of the buffer on the heap happens through the function \lstinline
 Remember that the heap is actually implemented as a never-decreasing stack.
 This means that new memory is only ever allocated behind the heap pointer, which stores the end of the heap.
 With \(\seqreadcachesize{} = \twotoi\), the \(i\) least significant bits of the first byte address in the buffer are required to be zero, for reasons explained shortly.
-Therefore, the heap pointer skips to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
-Due to the nature of a stack, this has the drawback that the skipped \ac{WRAM} memory can never be allocated for something else.
+Therefore, padding is introduced by having the heap pointer skip to the next higher multiple of \seqreadcachesize{} if not already on such a multiple.
+Due to the nature of a stack, this has the drawback that the padding can never be allocated for something else.
 After the skip of the heap pointer, a total of \(2 × \seqreadcachesize{}\) many bytes are allocated, also for reasons explained shortly.
 All in all, the memory footprint of a sequential-read buffer is at least \(2 × \seqreadcachesize{}\) many bytes and less than \(3 × \seqreadcachesize{}\) many.
 
@@ -123,4 +123,4 @@ The pointer to the current element is advanced by invoking an \lstinline|add| in
 This \lstinline|add| instruction uses a condition to detect the generation of the \(i\)th carry bit.
 To be more precise, this carry bit is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the involved operands, in this case the pointer and the number of bytes to advance.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
 Thanks to the carefully chosen size and alignment of the buffer, the generation of such a carry bit signifies that the pointer to the current element has left the first buffer half.
-This means that it takes just one instruction to advance the pointer, check the buffer boundaries and skip \Dash if needed \Dash the subsequent instruction responsible for updating the whole reader.
+This means that it takes just one instruction to advance the pointer, check the buffer boundaries and jump over \Dash if needed \Dash the subsequent instructions responsible for updating the whole reader.
