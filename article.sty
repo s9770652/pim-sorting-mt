@@ -89,6 +89,10 @@
 \flushbottom  % the last line of all non-final pages flushed to bottom margin
 
 \captionsetup{format=plain, textfont+=it}
+\SetAlCapFnt{\accentcolor\maybesffamily}  % print algorithm label like a caption label
+\SetAlCapNameFnt{\itshape}
+\SetAlCapHSkip{0em}  % no skip in front of algorithm label
+\SetAlCapSkip{0ex}  % skip between caption and body
 \makeatletter
 \@ifclassloaded{scrbook}{
 	\captionsetup{labelsep=space}
@@ -194,10 +198,7 @@
 \SetNlSty{texttt}{}{}
 \SetAlgoNlRelativeSize{-1}  % size of line numbers
 \setlength{\algomargin}{0pt}  % removes margin so that line numbers extend outwards
-\SetAlCapHSkip{0em}  % no skip in front of algorithm label
-\SetAlCapSkip{0ex}  % skip between caption and body
 \SetAlgoSkip{}  % remove extra skip above and below algorithm floats
-\SetAlCapFnt{\accentcolor\maybesffamily}  % print algorithm label like a caption label
 \SetKwComment{tct}{\raisebox{0.10em}{\(\triangleright\)}\,}{}  % triangle as comment symbol
 \SetFuncSty{textup}  % print function names like usual operators
 \SetCommentSty{emph}  % print comments as set with \emph
