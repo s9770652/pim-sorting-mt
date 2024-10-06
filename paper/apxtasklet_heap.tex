@@ -40,14 +40,13 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_32zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
-		The date size is 32 bit.
+		The date size is 32 bits.
 		Beware of the different \(y\) axis for the zero-one input distribution.
 	}
 	\label{fig:heap:runtime_uint32}
@@ -94,14 +93,13 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\heapalgos}{
 				\plotpernlognwitherrors{#1}{tableHeap_64zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:heap:runtime}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:heap:runtime}.
-		The date size is 64 bit.
+		The date size is 64 bits.
 		Beware of the different \(y\) axis for the zero-one input distribution.
 	}
 	\label{fig:heap:runtime_uint64}

@@ -53,7 +53,6 @@
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_32zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
@@ -61,7 +60,7 @@
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
 		Instead of total runtimes, the speedups over \IS{} are given for better clarity.
-		The date size is 32 bit.
+		The date size is 32 bits.
 	}
 	\label{fig:shell:two-tier_uint32}
 \end{figure}
@@ -114,7 +113,6 @@
 			\pgfplotsinvokeforeach{2,...,9}{
 				\plotspeedup[x filter/.expression={x > #1 ? x : nan}]{#1}{1}{tableSmallSorts_64zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
@@ -122,7 +120,7 @@
 	\caption{
 		An extension to \cref{fig:shell:two-tier}.
 		Instead of total runtimes, the speedups over \IS{} are given for better clarity.
-		The date size is 64 bit.
+		The date size is 64 bits.
 	}
 	\label{fig:shell:two-tier_uint64}
 \end{figure}
@@ -148,7 +146,7 @@
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
-		The date size is 32 bit.
+		The date size is 32 bits.
 		The input distribution is the reverse sorted one.
 	}
 	\label{fig:shell:three-tier_uint32reverse}
@@ -175,7 +173,7 @@
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		A repetition of \cref{fig:shell:three-tier}.
-		The date size is 32 bit.
+		The date size is 32 bits.
 		The input distribution is the uniform one.
 	}
 	\label{fig:shell:three-tier_uint32uniform}
@@ -202,7 +200,7 @@
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
-		The date size is 64 bit.
+		The date size is 64 bits.
 		The input distribution is the reverse sorted one.
 	}
 	\label{fig:shell:three-tier_uint64reverse}
@@ -229,7 +227,7 @@
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:three-tier}\hfil\tikzexternalenable
 	\caption[]{
 		An extension to \cref{fig:shell:three-tier}.
-		The date size is 64 bit.
+		The date size is 64 bits.
 		The input distribution is the uniform one.
 	}
 	\label{fig:shell:three-tier_uint64uniform}

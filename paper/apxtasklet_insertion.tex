@@ -41,14 +41,13 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_32zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
-		The date size is 32 bit.
+		The date size is 32 bits.
 	}
 	\label{fig:insertion:against_others_uint32}
 \end{figure}
@@ -97,14 +96,13 @@
 			\expandafter\pgfplotsinvokeforeach\expandafter{\insertionalgos}{
 				\plotpernn{#1}{tableSmallSorts_64zipf}
 			}
-
 		\end{groupplot}
 	\end{tikzpicture}
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:insertion:against_others}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:insertion:against_others}.
-		The date size is 64 bit.
+		The date size is 64 bits.
 	}
 	\label{fig:insertion:against_others_uint64}
 \end{figure}
