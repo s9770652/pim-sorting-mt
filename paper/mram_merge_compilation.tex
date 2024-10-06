@@ -74,7 +74,7 @@ For example, with \cachesize{}~=~1024, \seqreadcachesize{}~=~512, \QS{} as \ac{W
 			The assembler code generated for \lstinline|__builtin_dpu_seqread_get|.
 			´Line 2 is omitted in half of the cases, namely when the address of the reader is already stored in a register.
 		}
-		\label{fig:mram:assembler:auto}
+		\label{fig:merge:assembler:auto}
 	\end{subfigure}
 
 	\smallskip
@@ -105,7 +105,7 @@ For example, with \cachesize{}~=~1024, \seqreadcachesize{}~=~512, \QS{} as \ac{W
 		\caption{
 			The handwritten assembler code.
 		}
-		\label{fig:mram:assembler:manual}
+		\label{fig:merge:assembler:manual}
 	\end{subfigure}
 
 	\caption{
@@ -114,7 +114,7 @@ For example, with \cachesize{}~=~1024, \seqreadcachesize{}~=~512, \QS{} as \ac{W
 		The flags \lstinline|nc10| and \lstinline|nc11| are true if and only if the respective carry bit is not generated.
 		Only if a flag evaluates to true, a jump to the specified label is performed.
 	}
-	\label{fig:mram:assembler}
+	\label{fig:merge:assembler}
 \end{figure}
 
 A drawback to the two-buffer system is that data are loaded twice.
@@ -125,12 +125,12 @@ However, the two-buffer system is intrinsic to \lstinline|__builtin_dpu_seqread_
 For this reason, inline assembly must be employed to help adapt to the new buffer sizes.
 This includes changing the carry bit condition, the amount of \ac{MRAM} data read, and the number of bytes by which a pointer to a current element is reset.
 
-A closer look at the original compilation, as shown in \cref{fig:mram:assembler:auto}, reveals more savings potential.
+A closer look at the original compilation, as shown in \cref{fig:merge:assembler:auto}, reveals more savings potential.
 Despite being constant, the \ac{WRAM} address of the sequential-read buffer is loaded from the \lstinline[keywords={}]|struct| representing the reader (ln.~6) whenever new data need to be loaded.
 The \ac{MRAM} address stored in the reader is not only loaded (ln.~3) but also stored (ln.~5) after being set to the new value.
 In exactly half of the instances where this assembler code appeared, even the address of the reader \lstinline[keywords={}]|struct| itself first needs to be loaded from the stack (ln.~2), because the register into which it is loaded gets overwritten thereafter.
 These four load and store instruction can be cut by abandoning \lstinline[keywords={}]|struct|s to represent the two readers used and employing two arrays of length 2, one for the buffer addresses and one for the \ac{MRAM} addresses.
-As a consequence, these four addresses are kept permanently within registers without ever being overwritten, making the inline assembler code, as shown in \cref{fig:mram:assembler:manual} significantly shorter \Dash admittedly, the savings are less than the reduced number of lines suggests, for the \ac{DMA} dominates the runtime in this piece of code.
+As a consequence, these four addresses are kept permanently within registers without ever being overwritten, making the inline assembler code, as shown in \cref{fig:merge:assembler:manual} significantly shorter \Dash admittedly, the savings are less than the reduced number of lines suggests, for the \ac{DMA} dominates the runtime in this piece of code.
 
 Next to \lstinline|seqread_get|, more optimisation potential is hidden in the function \lstinline|seqread_init|, which is called once for each sequential reader before a new pair of runs is merged.
 This function checks whether the \ac{MRAM} address to which a sequential reader is set is already in the buffer.
