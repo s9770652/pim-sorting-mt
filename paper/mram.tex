@@ -10,7 +10,7 @@ A key aspect of the transfer management is the use of the sequential reader, tha
 \Cref{sec:mram:seq_reader} 0 the advantages of the sequential reader and explains its usage and inner workings.
 \Cref{sec:mram:triple} addresses the segmentation of the \ac{WRAM} into several buffers which are needed by both sequential readers and \MS{} itself.
 \Cref{sec:mram:merge} deals with the sequential \ac{MRAM} \MS{}, shows how the sequential reader can be improved upon, and concludes with an analysis of the performance.
-Finally, the parallel \ac{MRAM} \MS{} is built from the sequential one in \cref{sec:par}.
+Finally, the parallel \ac{MRAM} \MS{} is built from the sequential one in \cref{sec:mram:par}.
 
 In some instances, we employ \lstinline|T| to denote the data type of the input and \lstinline[keywords={}]|sizeof(T)| to denote the size of an element of type \lstinline|T| in bytes.
 Every measurement presented in this \lcnamecref{sec:mram} was repeated ten times, which is a sufficient number given the large inputs and the low runtime variance of the \MS*{}.

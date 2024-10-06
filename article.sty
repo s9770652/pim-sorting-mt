@@ -210,11 +210,6 @@
 \SetKwInOut{KwResult}{\maybesffamily Result\!}
 \hyphenation{Al-go-rithm}
 
-% Allowing underscores in names of procedure and function environments.
-% taken from: https://tex.stackexchange.com/a/680985
-\NewCommandCopy{\legacyunderscore}{\_}
-\renewcommand{\_}{\ifincsname_\else\legacyunderscore\fi}
-
 \makeatletter
 % Remove right-hand margin in algorithm
 % taken from: https://tex.stackexchange.com/a/520407

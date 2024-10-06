@@ -1,29 +1,32 @@
 \subsection{Presentation of Key Aspects}
 \label{sec:mram:par:aspects}
 
-The parallel \MS{} is essentially a full-space \MS{}, meaning it needs an auxiliary array of the same size as the input array and the two arrays switch roles after each round.
+The parallel \ac{MRAM} \MS{} is essentially a full-space \MS{}, meaning it needs an auxiliary array of the same size as the input array and the two arrays switch roles after each round.
 The parallel merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer demanded that two runs be neighboured when merging.
 Likewise, the output location is arbitrary now, too, and not related to the indices of the two runs.
-Please note that the algorithm presented here is not stable but will be stabilised later on in this \lcnamecref{sec:par}.
-Suppose that there are but two tasklets and both have sorted their respective share of the input.
-One of the tasklets is now suspended, whilst the other one determines which of the runs is longer.
-Then, it determines the median of the longer run, which will act as \emph{pivot element}.
-The pivot is used to find an index~\(i\) which separates the shorter run such that any element with index \(i' < i\) is not greater than the pivot and any element with index \(i' \ge i\) is at least as great as the pivot.
-Finding such an index \(i\) can be done through a binary search.
-The elements in front of the pivot and index~\(i\), respectively, are at most as great as the pivot so they go in front of the pivot in the output.
-This means that the position of the pivot can be calculated by taking the output location and offsetting it by the number of elements within the two front halves.
-Now, the front halves of both runs can be merged to the positions in front of the pivot using \cref{alg:mram:two-tier merge}, and the back halves can be merged to the positions behind the pivot.
-Since these two merges affect distinct elements, they can be performed in parallel by the two tasklets.
+Please note that the algorithm presented here is not stable but will be stabilised later on in this \lcnamecref{sec:mram:par:aspects}.
+
+Suppose that there are but two tasklets and both have formed a starting run using the sequential \ac{MRAM} \MS{}.
+One of the tasklets is now temporarily suspended, whilst the other one determines which of the runs is longer.
+Then, it determines the median of the longer run, which will act as \emph{pivot element} dividing the longer run into a front half and a back half.
+The pivot is used to find an index~\(i\) which separates the shorter run into a front half and a back half such that any element with index~\(i' < i\) is not greater than the pivot and any element with index \(i' \ge i\) is at least as great as the pivot.
+Finding such an index \(i\) can be implemented with a binary search.
+The elements both front halves are at most as great as the pivot so they can go to the front of the output run.
+This means that the position of the pivot can be calculated by taking the output location and offsetting it by the combined length of the two front halves.
+Now, the front halves of both runs can be merged to the positions in front of the pivot using a sequential merge procedure, and the back halves can be merged to the positions behind the pivot.
+Since these two merges affect distinct elements and addresses, they can be performed in parallel by the two tasklets.
 
 The two tasklets do not merge the same number of elements necessarily, but the workloads cannot differ by a factor greater than three.
-The longer run has a length of at least \(n/2\) elements, the shorter run of at most \(n/2\) many.
-Due to the pivot being the median of the longer run, both tasklets are guaranteed to merge at least \(n/4\) elements.
-In the worst case, the pivot is either strictly less or strictly greater than all elements in the shorter run, meaning the shorter run divided at its beginning or end, respectively, and is merged in its entirety by one of the tasklets.
+The longer run has a length of at least \(n/2\) elements and is divided into two halves with at least \(n/4\) elements each due to the pivot being the median.
+Thus, both tasklets are guaranteed to merge at least \(n/4\) elements.
+The shorter run has a length of at most \(n/2\) elements.
+In the worst case, the pivot is either strictly less or strictly greater than all elements in the shorter run, meaning the shorter run is divided at its beginning or end, respectively, and is merged in its entirety by one of the tasklets.
 This means that each tasklet merges at least \qty{25}{\percent} and at most \qty{75}{\percent} of the elements.
 
 The parallel \MS{} can be generalised to work with more than two tasklets.
 If there are, for example, four tasklets, then Tasklets~0 and 1 merge their runs in parallel, as do Tasklets~2 and~3.
-Then, Tasklet~0 partitions the resulting two runs and assigns two of their halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their particular halves again and merge in parallel with Tasklets~1 and~3, respectively.
+Then, Tasklet~0 partitions the resulting two runs and assigns their back halves to Tasklet~2, so that both Tasklet~0 and~2 can partition their particular halves again and merge in parallel with Tasklets~1 and~3, respectively.
+For simplicity, the number of tasklets is always a power of two in this \cref{sec:mram:par}.
 
 \begin{figure}
 	\centering
@@ -36,7 +39,7 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 		fade right/.style={dash pattern=on 12pt off 2pt on 3pt off 3pt on 2pt off 3pt on 1pt off 3pt on 1pt},
 		long fade left/.style={dash pattern=on 1pt off 3pt on 1pt off 3pt on 1pt off 3pt on 2pt off 3pt on 2pt off 2pt on 3pt off 2pt on 3pt off 2pt on 14pt},
 		long fade right/.style={dash pattern=on 14pt off 2pt on 3pt off 2pt on 3pt off 3pt on 2pt off 3pt on 2pt off 2pt on 1pt off 3pt on 1pt off 3pt on 1pt},
-		]
+	]
 		\def\startA{\pad}
 		\def\lenAA{5}
 		\def\lenAB{5}
@@ -59,9 +62,6 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 		\draw[white, line width=4pt] ({\len-(\startZ)-1}, \distance/3*2+1) -| +(-\lenBA-\padMid-\lenBB, \distance/3);
 		\draw[rounded corners]       ({\len-(\startZ)-1},   \distance/3*2) -| ++(0, 1) -| +(-\lenBA-\padMid-\lenBB, \distance/3);
 		\draw[ptr, <-]               ({\len-(\startZ)-1},               1) -- +(90:\distance);
-
-		%		\draw[white, line width=4pt] (\startZ+\lenAA+\lenBA+0.75, 1) to[out=90, in=-90] (0.5+\lenAA+\startA, \distance+1);
-		%		\draw[ptr, <-]               (\startZ+\lenAA+\lenBA+0.50, 1) to[out=90, in=-90] (0.5+\lenAA+\startA, \distance+1);
 
 		\draw[white, line width=4pt]    (\startZ+\lenAA+\lenBA+0.45, 1) -| +(0, \distance/4) -- (0.5+\lenAA+\startA, 1+\distance/16*13) -| ++(0, \distance/16*3);
 		\draw[ptr, <-, rounded corners] (\startZ+\lenAA+\lenBA+0.50, 1) -| +(0, \distance/4) -- (0.5+\lenAA+\startA, 1+\distance/16*13) -| ++(0, \distance/16*3);
@@ -109,8 +109,8 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 		\draw (\lenBB+\lenAB+1+\lenBA+\lenAA+\startZ, 0) -- +(90:1);
 
 		% Braces.
-		\draw[brace] (\startA, 2+\distance) --+(\lenAB+1+\lenAA, 0) node[pos=0.5, above=1ex] {longer run\vphantom{p}};
-		\draw[brace] (\startB, 2+\distance) --+(  \lenBB+\lenBA, 0) node[pos=0.5, above=1ex] {shorter run\vphantom{p}};
+		\draw[brace] (\startA, 2+\distance) -- +(\lenAB+1+\lenAA, 0) node[pos=0.5, above=1ex] {longer run\vphantom{p}};
+		\draw[brace] (\startB, 2+\distance) -- +(  \lenBB+\lenBA, 0) node[pos=0.5, above=1ex] {shorter run\vphantom{p}};
 
 		% Texts.
 		\node[align=right, inner sep=0pt, text width=12mm, yshift=-0.4pt] at (-1.3, 1+\distance+0.5) {\lstinline|Input|};
@@ -132,10 +132,10 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 
 	\caption{
 		Parallel merge of two runs.
-		The first run is the longer one, so its median \(p\) is chosen as pivot which is used to divide the shorter run.
+		The first run is the longer one, so its median \(p\) is chosen as a pivot which is used to divide the shorter run.
 		Afterwards, the pivot is moved to its output location.
-		The two front halves of the runs are assigned to one tasklet and, eventually, are written to the positions in front of the pivot.
-		At the same time, the two back halves of the runs are processed by another tasklet.
+		The two front halves of the runs are assigned to one tasklet and are merged to the positions in front of the pivot.
+		At the same time, the two back halves of the runs are merged by another tasklet to the positions behind of the pivot.
 		\cite[Figure~27.6]{cormen2013algorithmen}
 	}
 	\label{fig:par:merge}
@@ -146,81 +146,80 @@ Then, Tasklet~0 partitions the resulting two runs and assigns two of their halve
 The communication network can be visualised as forest of binomial trees.
 During the first parallel merge, Tasklet~1 informs Tasklet~0 about being finished with sorting (\emph{bottom-up communication}), and Tasklet~0 informs Tasklet~1 about being finished with partitioning (\emph{top-down communication}).
 Likewise, Tasklet~3 and~4 communicate, Tasklets~5 and~6, and so on.
-During the second parallel merge, Tasklets~1, 2, and~3 inform Tasklet~0 about being finished with sorting, and Tasklet~0 informs Tasklet~2 about being finished with partitioning.
+At the beginning of the second parallel merge, Tasklets~1, 2, and~3 inform Tasklet~0 about being finished with sorting, and Tasklet~0 informs Tasklet~2 about being finished with partitioning.
 Then, both tasklets partition again and inform Tasklet~1 and 3, respectively.
-This bidirectional scheme is expanded for the third and fourth round of parallel merging if those exist.
-Tasklets identify their communication partners through bitwise logic on tasklet identifiers.
+This bidirectional communication scheme is expanded for the third and fourth parallel merge if those exist.
+We implemented the identification of communication partners through bitwise logic on tasklet identifiers.
 
-To inform others on \emph{which} elements they have to sort, there is a \ac{WRAM} array whither the particular indices are written by the tasklets performing the partitioning.
-To inform others on \emph{when} they are finished with sorting or partitioning, tasklets employ \emph{handshakes}.
+To inform tasklets on \emph{which} elements they have to sort, there is a global \ac{WRAM} array whither the division points indices are written by partitioning tasklets.
+To inform tasklets on \emph{when} they are finished with sorting or partitioning, tasklets employ \emph{handshakes}.
 Handshakes allow for bilateral communication, which is enough for parallel \MS{}.
-A tasklet can call \lstinline|handshake_wait_for(id)| and is suspended until Tasklet~\lstinline|id| calls \lstinline|handshake_notify()|.
-Likewise, if Tasklet \lstinline|id| calls \lstinline|handshake_notify|, it is suspended until some tasklet calls \lstinline|handshake_wait_for| with its id.
+A tasklet can call \lstinline|handshake_wait_for(id)| and gets suspended until Tasklet~\lstinline|id| calls \lstinline|handshake_notify()|.
+Likewise, if Tasklet \lstinline|id| calls \lstinline|handshake_notify()|, it gets suspended until some other tasklet calls \lstinline|handshake_wait_for(id)|.
 If two or more tasklets wait for the same tasklet, an error is thrown and the execution halts.
 Handshakes render bottom-up communication straightforward:
-Each non-root calls \lstinline|handshake_notify| when done with sorting, and each root calls \lstinline|handshake_wait_for| for all of its successors.
-Due to workload imbalances, some tasklets will try to shake hands earlier than others and have to wait.
-Because they are suspended while waiting, they free up the pipeline, thus quickening the pace of the remaining tasklets.
+Each non-root of a communication tree calls \lstinline|handshake_notify| when done with sorting, whereas the root calls \lstinline|handshake_wait_for| for all of its successors.
+Due to workload imbalances, some tasklets will try to shake hands earlier than others and will have to wait.
+Because they are suspended while waiting, they free up the pipeline, thus accelerating the remaining tasklets.
 Top-down communication is also straightforward:
-After having shaken hands, a non-root immediately calls \lstinline|handshake_notify| again to get suspended once more.
-The root repeatedly partitions the runs, writes the division points to the \ac{WRAM} array mentioned earlier, and calls \lstinline|handshake_wait_for| to resume the next tasklet.
+After having shaken hands, each non-root immediately calls \lstinline|handshake_notify| again to get suspended once more.
+The root repeatedly partitions the runs, writes the division points to the global \ac{WRAM} array mentioned earlier, and calls \lstinline|handshake_wait_for| to resume the next tasklet.
 
 
 \paragraph{Binary Search}
-The binary search is conventionally implemented, meaning elements are loaded individually from the \ac{MRAM} and there is no mechanism to load a block of data via \lstinline|mram_read| and search within the \ac{WRAM} once the search interval has been narrowed down enough.
-Whilst we did implement such a two-tier binary search, the runtime reduction is below measurement uncertainty.
+The binary search is conventionally implemented, meaning elements are loaded individually from the \ac{MRAM} and there is no mechanism to load a block of data via \lstinline|mram_read| for a search within the \ac{WRAM} once the search interval has been narrowed down enough.
+Whilst we did implement such a two-tier binary search, the speedup is below measurement uncertainty.
 The reason is that the binary search is executed a few times in total only, so its impact on the total runtime is minuscule.
-For the sake of code simplicity and program size, the \ac{WRAM} search tier has been removed.
-Reducing the program size is a valid concern since the many unrolled loops bloat the program and only a handful of bytes in the \ac{IRAM} remain free.
+For the sake of code simplicity and kernel size, the \ac{WRAM} search tier has been removed.
+Reducing the kernel size is a valid concern since the many unrolled loops bloat the kernel and only a handful of bytes in the \ac{IRAM} remain free.
 
 Recall that the two halves assigned to a tasklet contain between \qty{25}{\percent} and \qty{75}{\percent} of the elements of the respective runs, which can lead to workload imbalances.
 A more even workload of \qty{50}{\percent} would be achieved if the median of the merged run were chosen as pivot and the runs divided accordingly.
-Finding the two positions where the runs shall be divided requires a modification to the binary search:
-Divide both runs in the middle.
-If these are not valid division points, then one of the runs has more little elements in its front half than the other run.
-This means that the front half of this run must be longer and the front half of the other run be shorter.
-Therefore, the search intervals can be narrowed down to the right side of the run with the less element and to the left side of the run with the greater element.
+Finding the two positions where the runs should be divided according to this common median requires a modification to the binary search.
+Two search intervals are set up, one for either run.
+Then, the medians of both runs are determined.
+If this does not produce valid division points, then one of the runs has more little elements in its front half than the other run.
+This means that the front half of this run must become longer and the front half of the other run shorter.
+Therefore, the search intervals can be narrowed down to the right side of the run with the less elements and to the left side of the run with the greater elements.
 The process can now be repeated until two valid division points are found.
 
 To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe of this thesis, so the effect of load imbalances manifests in our measurements.
 
 
 \paragraph{Alignment}
-In \cref{sec:mram:merge}, it is demanded that all sizes and positions be multiples of 8.
-This can be ensured during the first, sequential phase of the parallel \MS{} by dividing the input accordingly and introducing dummy variables if need be.
-In the second phase with parallel merging, there is no control over any alignment whatsoever because the sizes of run halves are arbitrary.
-This raises the need for modifications to the sequential merge procedure, which slow it down if the input consists of 32-bit elements.
+In \cref{sec:mram:merge}, it is demanded that all sizes and positions be multiples of 8 even if the input consists of 32-bit elements.
+Now, this can be ensured during the formation of starting runs by dividing the input accordingly and introducing dummy variables if need be.
+Thereafter, however, there is no control over any alignment whatsoever because the sizes of run halves are arbitrary.
+This raises the need for modifications to the sequential merge procedure.
 
-Before beginning with the first tier, the alignment of the output location must be checked.
-If it is unaligned, the less of the head elements is written to the output location.
-Now, the output location is aligned to 8 bytes again, meaning the first tier can proceed as normal since emptying the cache through \lstinline|mram_write| is unproblematic.
+Before beginning the first tier, the alignment of the output location must be checked.
+If it is unaligned, the less of the first elements of both runs is written to the output location.
+As a result, the updated output location is aligned to 8 bytes again, meaning the first tier can proceed as normal since emptying the cache through \lstinline|mram_write| is unproblematic.
 
 At first, the second tier proceeds as normal, too.
 Once the less run is depleted, the cache may contain an odd number of elements, so the current element of the greater run is written to the cache before emptying it.
-However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in \cref{sec:mram:merge}, where it was sufficient to loop over the remainder in the \ac{MRAM}, write it to the cache, and move it to the respective output location.
-The current output location is still aligned to 8 bytes but it may very well be that the first element of the remainder has an unaligned address.
+However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in \cref{sec:mram:merge}.
+There, it was sufficient to loop over the remainder in the \ac{MRAM}, write it to the cache, and move it to the respective output location.
+Now, the current output location is still aligned to 8 bytes but it may very well be that the first element of the remainder has an unaligned address.
 This indicates a mismatch, for all unaligned elements must be transferred to an aligned address and all aligned elements to an unaligned one.
-When using \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the \ac{MRAM} and within the \ac{WRAM} is the same.
-In such an instance, the remainder is loaded blockwise from the \ac{MRAM} into the cache.
+When calling \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the \ac{MRAM} and within the \ac{WRAM} must be the same.
+If such an instance is detected, the remainder is loaded blockwise from the \ac{MRAM} into the cache.
 There, a loop shifts each element forward by one position, resolving the mismatch.
 Afterwards, the shifted elements can be written to the output location.
 Since only an even number of elements can be moved via \lstinline|mram_write|, it may be necessary to transfer a single item individually at the end in case that the remainder had an odd length.
 
 Writing single 32-bit elements to the \ac{MRAM} is not threadsafe, since, internally, eight bytes are read to an oblique \ac{WRAM} cache, partially modified, and written back to the \ac{MRAM}.
-Therefore, a so-called atomic write, which utilises costly virtual mutexes, must be performed.
+Therefore, an atomic write, which utilises costly virtual mutexes, must be performed.
 
 
 \paragraph{Stability}
 The parallel merging algorithm as presented above makes \MS{} unstable.
-The reason is that one or both runs may contain the pivot value multiple times and that a division point separates the duplicates.
+The reason is that one or both runs may contain the pivot value multiple times and that a division point may separate the duplicates.
 Therefore, it must be ensured that all duplicates of a run remain within the same half.
-To do so, it is checked if its left neighbour has the same value once the value of the median is determined.
-If so, there may be even more duplicates so a binary search is employed to find the first occurrence of the pivot value within the longer run.
-This first occurrence marks the division point for the longer run.
-Then, it must be checked whether the shorter run precedes or follows the longer run.
-If it precedes it, then possible duplicates of the pivot must also precede the counterparts in the longer run.
-In such an instance, a binary search is employed to find the greatest index \(i\) of the shorter run such that the element with index \(i - 1\) is at most as great as the pivot.
-If, however, the shorter run follows the longer run, analogous reasoning dictates the employment of a binary search to find the least index \(i\) such that the element with index \(i\) is at least as great as the pivot.
-In any case, it is now known how many elements precede the pivot so its position in the output can be determined.
+To do so, once the median is determined, it is checked if the left neighbour of the median has the same value .
+If so, there may be even more duplicates so a binary search is employed to find the earliest occurrence of the pivot value within the longer run.
+This earliest occurrence marks the division point for the longer run.
+Similarly, the binary search in the shorter run now has to find the earliest possible division point, too.
 
-To our great dissatisfaction, we did not manage to implement a bug-free version for 16 tasklets within the timeframe of this thesis, as edge cases with many empty pairs of runs lead to buffer overflows with unknown sources.
+To our great dissatisfaction, we did not manage to implement a bug-free version within the timeframe of this thesis.
+With the zero-one input distribution, the output is corrupted, whence its exclusion in the respective figures.
