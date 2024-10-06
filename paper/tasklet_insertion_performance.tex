@@ -14,10 +14,13 @@ For most input distributions, the implicit \IS{} is also a bit slower, as it eff
 Of course, the gap becomes less significant with increasing input lengths as the other operations of the loops dominate the runtime.
 
 An outlier, however, are the reverse sorted inputs.
-For 32-bit numbers (\cref{fig:insertion:against_others}), the implicit \IS{} is up to \qty{45}{\percent} slower than the explicit one.
+For 32-bit numbers (\cref{fig:insertion:against_others}), the speedup\footnote{
+	The \emph{speedup} \(S\) of an algorithm~\(A\) over an algorithm~\(B\) is defined as the ratio \(\operatorname{t}\mkern1mu(B\mkern1mu) / \operatorname{t}\mkern1mu(A)\) of their runtimes \(\operatorname{t}\mkern1mu(A)\) and \(\operatorname{t}\mkern1mu(B\mkern1mu)\).
+	Values below 1 indicate that algorithm~\(A\) runs slower than algorithm~\(B\).
+} of the implicit \IS{} over the explicit one drops down to as little as \num{0.68}.
 This comes as a surprise since both versions effectively execute the same loop body while shifting everything one position backwards, with only the loop condition being different.
 Due to \acp{DPU} being uniform-cost machines, a value check on whether the preceding element is less (explicit \IS{}) and an address check on whether the preceding position is the start of the array (implicit \IS{}) should take the same amount of time.
-Yet, even the sentinel-less \IS{} surpasses the implicit \IS{}, even though doing both value checks and address checks!
+Yet, even the sentinel-less \IS{} surpasses the implicit \IS{}, despite doing both value checks and address checks.
 For 64-bit numbers (\cref{fig:insertion:against_others_uint64}), the implicit \IS{} would be expected to perform better than the explicit one, considering that a value check now takes two instructions and an address check still only one.
 Nonetheless, the two \IS*{} tie.
 This constitutes another case of bad compilation.
