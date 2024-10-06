@@ -55,7 +55,7 @@
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			32-bit integers
+			32-bit integers (\(n = {}\)\liningnums{2\textsuperscript{19}})
 		}
 	\end{subfigure}
 
@@ -78,13 +78,14 @@
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
-			64-bit integers
+			64-bit integers (\(n = {}\)\liningnums{2\textsuperscript{18}})
 		}
 	\end{subfigure}
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:mram}\hfil\tikzexternalenable
 	\caption{
 		An extension to \cref{fig:merge:mram} with \QS{} (stable) and \MS{} (unstable) used during the run formation.
+		\todo[inline]{Phasen}
 	}
 	\label{fig:merge:mram_unstable}
 \end{figure}
@@ -174,7 +175,7 @@
 		\centering
 		\pgfplotstabletypeset{\tableMergeMramXxxii}
 		\caption{
-			32-bit integers (\(n = 2^{19}\) per tasklet)
+			32-bit integers (\(n = {}\)\liningnums{2\textsuperscript{19}} per tasklet)
 		}
 	\end{subtable}
 	\hfil
@@ -182,13 +183,14 @@
 		\centering
 		\pgfplotstabletypeset{\tableMergeMramLxiv}
 		\caption{
-			64-bit integers (\(n = 2^{18}\) per tasklet)
+			64-bit integers (\(n = {}\)\liningnums{2\textsuperscript{18}} per tasklet)
 		}
 	\end{subtable}
 
 	\caption{
 		An extension to \cref{tab:mram:sizes}.
 		The input size per tasklet is fixed to \qty[exponent-mode=input]{2}{\mebi\byte}.
+		\todo[inline]{Prozente/Speedups}
 	}
 	\label{tab:mram:sizes_same_n}
 \end{table}

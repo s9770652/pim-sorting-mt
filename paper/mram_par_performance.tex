@@ -83,7 +83,7 @@ The measurements are subdivided into the three phases of the parallel \MS{}, tha
 On the one hand, most results are unsurprising.
 The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to short first and second phases, whilst the uniform and Zipf's input distribution make these two phases last longer.
 The third phase always takes roughly the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
-The greater parallel speedup of the uniform and Zipf's input distribution shines through by the third phase being short compared to the relatively long first and second phase.
+%The greater parallel speedup of the uniform and Zipf's input distribution shines through by the third phase being short compared to the relatively long first and second phase.
 
 Almost sorted inputs, on the other hand, are clear outsiders because of the remarkably long third phase, making them the worst case amongst all benchmarked ones.
 Despite the long runtime, the parallel speedup is about the same as for sorted and reverse sorted inputs.
@@ -109,7 +109,7 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
 	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
 	columns={dist,first,second,third},
-]{6}{\tableMergeParXxxii}
+]{6}{\tableMergeParUnstableXxxii}
 
 \pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
 \expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
@@ -129,7 +129,7 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
 	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
 	columns={dist,first,second,third},
-]{6}{\tableMergeParLxiv}
+]{6}{\tableMergeParUnstableLxiv}
 
 \begin{figure}
 	\tikzsetnextfilename{par_phases}
@@ -143,19 +143,19 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 			\nextgroupplot[ymax=1.5e9, ytick distance=5e8, yticklabels={,\(0.0\), \(0.5\), \(1.0\), \(1.5\)}, title/.add={}{32-bit}]
 			\pgfplotsset{legend to name=leg:par:phases, legend entries={Third Phase,Second Phase,First Phase}, legend reversed}
 			\pgfplotsset{cycle list shift=2}
-			\addplot+ table[x=dist, y=third] {\tableMergeParXxxii};
+			\addplot+ table[x=dist, y=third] {\tableMergeParUnstableXxxii};
 			\pgfplotsset{cycle list shift=0}
-			\addplot+ table[x=dist, y=second] {\tableMergeParXxxii};
+			\addplot+ table[x=dist, y=second] {\tableMergeParUnstableXxxii};
 			\pgfplotsset{cycle list shift=-2}
-			\addplot+ table[x=dist, y=first] {\tableMergeParXxxii};
+			\addplot+ table[x=dist, y=first] {\tableMergeParUnstableXxxii};
 			%
 			\nextgroupplot[ymax=1e9, yticklabels={,\(0.0\), \(0.2\), \(0.4\), \(0.6\), \(0.8\), \(1.0\)}, title/.add={}{64-bit}]
 			\pgfplotsset{cycle list shift=2}
-			\addplot+ table[x=dist, y=third] {\tableMergeParLxiv};
+			\addplot+ table[x=dist, y=third] {\tableMergeParUnstableLxiv};
 			\pgfplotsset{cycle list shift=0}
-			\addplot+ table[x=dist, y=second] {\tableMergeParLxiv};
+			\addplot+ table[x=dist, y=second] {\tableMergeParUnstableLxiv};
 			\pgfplotsset{cycle list shift=-2}
-			\addplot+ table[x=dist, y=first] {\tableMergeParLxiv};
+			\addplot+ table[x=dist, y=first] {\tableMergeParUnstableLxiv};
 		\end{groupplot}
 	\end{tikzpicture}
 
@@ -167,4 +167,17 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 	\label{fig:par:phases}
 \end{figure}
 
-\todo[inline]{stabiler \MS{}}
+The measurements for the stable parallel \MS{} are shown in \cref{fig:par:speedup_unstable,fig:par:phases_unstable}.
+For the uniform and Zipf's input distributions, the wall-clock time is only somewhat increased.
+Because the \ac{WRAM} \MS{} is hardly slower than the \ac{WRAM} \QS{}, the first phase takes hardly longer.
+The second phase is not altered algorithmically, but it makes up the majority of the total runtime increase due to its starting runs being only half as long as in the unstable case.
+For uniformly distributed input, the third phase takes just as long as before since duplicates are virtually non-existent.
+For inputs following Zipf's law, the third phase takes only slightly longer, as duplicates start to accumulate significantly only in later rounds.
+Since the first two phases affect also the sequentially executed \MS{} and the third phase remains largely the same, the speedups drop slightly but remain above~10.
+
+For the sorted and almost sorted input distributions, the picture is mostly the same.
+For the reverse sorted input distribution, the wall-clock time increases significantly.
+Because this input distribution constitutes the worst-case of the \ac{WRAM} \MS{}, the first phase takes about one-and-a-half times as long.
+Its speedup actually manages to rise slightly.
+We would expect the biggest speedup drop for the zero-one input distribution, where plentiful duplicates should worsen workload imbalances.
+Unfortunately, the buggy implementation renders an analysis of the runtime pointless.

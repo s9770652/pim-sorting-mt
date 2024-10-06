@@ -220,6 +220,8 @@ To do so, once the median is determined, it is checked if the left neighbour of 
 If so, there may be even more duplicates so a binary search is employed to find the earliest occurrence of the pivot value within the longer run.
 This earliest occurrence marks the division point for the longer run.
 Similarly, the binary search in the shorter run now has to find the earliest possible division point, too.
+Clearly, the guarantee that a partitioning step yields two halves with a length ratio of no more than 3 is lost under this strict partitioning.
+When duplicates are plentiful, work-load imbalances become worse and the runtime suffers.
 
 To our great dissatisfaction, we did not manage to implement a bug-free version within the timeframe of this thesis.
 With the zero-one input distribution, the output is corrupted, whence its exclusion in the respective figures.

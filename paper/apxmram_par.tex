@@ -1,0 +1,221 @@
+\section{Parallel \texorpdfstring{\MS{}}{MergeSort}}
+\label{apx:mram:par}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	% 32-bit | Stabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_32#1}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint32/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_32#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint32/#1.txt}
+
+	% 64-bit | Stabil
+	\pgfplotstablenewnamed[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{tableMergeParStable_64#1}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=1/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=2/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=4/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=8/STABLE=true/uint64/#1.txt}
+	\pgfplotstablevertcatnamed{tableMergeParStable_64#1}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
+}
+
+\begin{figure}[!ht]
+	\captionsetup[subfigure]{belowskip=1mm}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{par_speedup_uint32}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				groupplot xlabel={Tasklets},
+				groupplot ylabel={Parallel Speedup},
+				xtick={1,2,4,8,16},
+				xmode=log,
+				ymin=0,
+				ymax=12,
+				ytick distance=2,
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+				\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+					\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_32#1\endcsname}
+				}
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+				\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+					\ifstrequal{#1}{zeroone}{}{
+						\ifstrequal{#1}{uniform}{\pgfplotsset{cycle list shift=1}}{}  % skip colour of zero-one distribution
+						\expandafter\speeduppar\expandafter{\csname tableMergeParStable_32#1\endcsname}
+					}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			32-bit integers (\(n = {}\)\liningnums{2\textsuperscript{19}})
+		}
+	\end{subfigure}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{par_speedup_uint64}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				groupplot xlabel={Tasklets},
+				groupplot ylabel={Parallel Speedup},
+				xtick={1,2,4,8,16},
+				xmode=log,
+				ymin=0,
+				ymax=12,
+				ytick distance=2,
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+				\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+					\expandafter\speeduppar\expandafter{\csname tableMergeParUnstable_64#1\endcsname}
+				}
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\addplot[forget plot, very nearly transparent] coordinates {(1,1)(2,2)(3,3)(4,4)(5,5)(6,6)(7,7)(8,8)(9,9)(10,10)(11,11)(16,11)};
+				\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+					\ifstrequal{#1}{zeroone}{}{
+						\ifstrequal{#1}{uniform}{\pgfplotsset{cycle list shift=1}}{}  % skip colour of zero-one distribution
+						\expandafter\speeduppar\expandafter{\csname tableMergeParStable_64#1\endcsname}
+					}
+				}
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			64-bit integers (\(n = {}\)\liningnums{2\textsuperscript{18}})
+		}
+	\end{subfigure}
+
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:par:speedup}\hfil\tikzexternalenable
+	\caption{
+		An extension to \cref{fig:par:speedup} with both a stable and an unstable parallel \MS{}.
+		Unfortunately, the output becomes corrupted when using the zero-one input distribution, which is why it is excluded from the right-hand column.
+	}
+	\label{fig:par:speedup_unstable}
+\end{figure}
+
+\clearpage
+\section*{\phantom{Parallel \texorpdfstring{\MS{}}{MergeSort}}}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=true/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/stable/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint32/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParStableXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=true/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/stable/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParStableLxiv}
+
+\begin{figure}[!ht]
+	\captionsetup[subfigure]{aboveskip=-2mm, belowskip=1mm}
+	\pgfplotsset{64-bit filter/.style={ y filter/.append expression={x == 3 ? nan : y} }}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{par_phases_uint32}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				barplot,
+				ybar=-\pgfkeysvalueof{/pgf/bar width},
+%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+				ymax=1.6e9,
+				ytick distance=4e8,
+				yticklabels={,\(0.0\), \(0.4\), \(0.8\), \(1.2\), \(1.6\)}
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\pgfplotsset{cycle list shift=2}
+				\addplot+ table[x=dist, y=third] {\tableMergeParUnstableXxxii};
+				\pgfplotsset{cycle list shift=0}
+				\addplot+ table[x=dist, y=second] {\tableMergeParUnstableXxxii};
+				\pgfplotsset{cycle list shift=-2}
+				\addplot+ table[x=dist, y=first] {\tableMergeParUnstableXxxii};
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\pgfplotsset{cycle list shift=2}
+				\addplot+ [64-bit filter] table[x=dist, y=third] {\tableMergeParStableXxxii};
+				\pgfplotsset{cycle list shift=0}
+				\addplot+ [64-bit filter] table[x=dist, y=second] {\tableMergeParStableXxxii};
+				\pgfplotsset{cycle list shift=-2}
+				\addplot+ [64-bit filter] table[x=dist, y=first] {\tableMergeParStableXxxii};
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			32-bit integers (\(n = {}\)\liningnums{2\textsuperscript{19}})
+		}
+	\end{subfigure}
+
+	\begin{subfigure}{\textwidth}
+		\tikzsetnextfilename{par_phases_uint64}
+		\begin{tikzpicture}[plot]
+			\begin{groupplot}[
+				adaptive group=1 by 2,
+				barplot,
+				ybar=-\pgfkeysvalueof{/pgf/bar width},
+%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+				ymax=1.2e9,
+				ytick distance=3e8,
+				yticklabels={,\(0.0\), \(0.3\), \(0.6\), \(0.9\), \(1.2\)},
+			]
+				\nextgroupplot[title/.add={}{Unstable}]
+				\pgfplotsset{cycle list shift=2}
+				\addplot+ table[x=dist, y=third] {\tableMergeParUnstableLxiv};
+				\pgfplotsset{cycle list shift=0}
+				\addplot+ table[x=dist, y=second] {\tableMergeParUnstableLxiv};
+				\pgfplotsset{cycle list shift=-2}
+				\addplot+ table[x=dist, y=first] {\tableMergeParUnstableLxiv};
+				%
+				\nextgroupplot[title/.add={}{Stable}]
+				\pgfplotsset{cycle list shift=2}
+				\addplot+ [64-bit filter] table[x=dist, y=third] {\tableMergeParStableLxiv};
+				\pgfplotsset{cycle list shift=0}
+				\addplot+ [64-bit filter] table[x=dist, y=second] {\tableMergeParStableLxiv};
+				\pgfplotsset{cycle list shift=-2}
+				\addplot+ [64-bit filter] table[x=dist, y=first] {\tableMergeParStableLxiv};
+			\end{groupplot}
+		\end{tikzpicture}
+		\caption{
+			64-bit integers (\(n = {}\)\liningnums{2\textsuperscript{18}})
+		}
+	\end{subfigure}
+
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:par:phases}\hfil\tikzexternalenable
+	\caption{
+		An extension to \cref{fig:par:speedup} with both a stable and an unstable parallel \MS{}.
+		Unfortunately, the output becomes corrupted when using the zero-one input distribution, which is why it is excluded from the right-hand column.
+	}
+	\label{fig:par:phases_unstable}
+\end{figure}
