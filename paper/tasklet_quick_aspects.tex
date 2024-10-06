@@ -61,7 +61,7 @@ There are tremendous consequences for the runtime depending on the exact impleme
 			yticklabel style={/pgf/number format/.cd, precision=3, fixed, zerofill},
 		]
 			\nextgroupplot[title/.add={}{32-bit}]
-			\pgfplotsset{legend to name=leg:quick:fallback, legend entries={16,17,19,20}}
+			\pgfplotsset{legend to name=leg:quick:fallback, legend entries={\(16\),\(17\),\(19\),\(20\)}}
 			\pgfplotsinvokeforeach{16,17,19,20}{
 				\plotspeedup{#1_32}{18_32}{tableQuickFallback}
 			}

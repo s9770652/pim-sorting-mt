@@ -21,11 +21,11 @@ The entire triple buffer has the size \(\triplebuffersize ≔ \cachesize{} + 4 �
 Note that padding may appear in front of each first sequential-read buffer only, since the heap pointer is necessarily at a multiple of \seqreadcachesize{} after any call of \lstinline|seqread_alloc|.
 Because of otherwise wasted memory, it makes little sense to set \cachesize{} to a value which is not a multiple of \seqreadcachesize{}.
 The optimal values for both \cachesize{} and \seqreadcachesize{} are determined in \cref{sec:mram:merge:performance}.
-\todo[info]{Welche Alternativformulierung wolltest Du hier haben? Ich habe sie leider vergessen.}
+\todo[info]{Welche Alternativformulierungen wolltest Du auf dieser Seite haben? Ich vergaß sie leider.}
 
 \begin{figure}[b]
 	\centering
-	\tikzsetnextfilename{triple_buffer}
+	\tikzsetnextfilename{merge_triple}
 	\begin{tikzpicture}[sketch]
 		\def\cache{8}
 		\def\padding{2}

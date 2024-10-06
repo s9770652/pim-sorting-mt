@@ -12,7 +12,7 @@ Let us first focus on short inputs where only two passes with step sizes~\(\step
 The previous results on \IS{} suggest that a fast \ShS{} should make use of~\(\stepsizes_1\) sentinel values.
 \Cref{fig:shell:two-tier,fig:shell:two-tier_uint32,fig:shell:two-tier_uint64} show that, with the exception of the \ShS{} with step size \(\stepsizes_1 = 2\), the additional pass starts to pay off at around 16 elements for both 32-bit and 64-bit values with the uniform random input distribution, reaching a speedup of around \numrange{1.15}{1.2} at 24 elements.
 In case of the reverse sorted input, the speedup is practically always above \(1\) even for very short inputs, reaching around \numrange{1.25}{2.1} at 24 elements.
-On sorted and almost sorted inputs, \ShS{} exhibits a slowdown in the tested range of input lengths.
+On sorted and almost sorted inputs, \ShS{} exhibits a slowdown in the benchmarked range of input lengths.
 
 \begin{figure}
 	\tikzsetnextfilename{shell_two-tier}
@@ -20,7 +20,6 @@ On sorted and almost sorted inputs, \ShS{} exhibits a slowdown in the tested ran
 		\begin{groupplot}[
 			horizontal sep for labels,
 			adaptive group=1 by 2,
-			groupplot xlabel={Input Length \(n\)},
 			xtick distance=3,
 			minor xtick=data,
 			title={},
@@ -41,7 +40,7 @@ On sorted and almost sorted inputs, \ShS{} exhibits a slowdown in the tested ran
 
 	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:shell:two-tier}\hfil\tikzexternalenable
 	\caption{
-		Mean runtimes and speedups over \IS{} of \IS{} (\(1\)) and various two-pass \ShS*{} (\(2\)--\(9\)), whose step sizes \(\stepsizes_1\) are indicated by their labels, on uniformly distributed 32-bit integers.
+		Mean runtimes and speedups over \IS{} of \IS{} (1) and various two-pass \ShS*{} (2--9), whose step sizes \(\stepsizes_1\) are indicated by their labels, on uniformly distributed 32-bit integers.
 	}
 	\label{fig:shell:two-tier}
 \end{figure}

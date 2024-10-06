@@ -64,17 +64,17 @@ The transfer of each byte costs a further \qty{0.5}{\cycles}.
 This means that \acp{DMA} for about \qty{128}{\byte} of data or less are dominated by the overhead.
 Therefore, it recommended to move large blocks of \ac{MRAM} data into the \ac{WRAM}, perform calculations there, and move the modified data block back to the \ac{MRAM}.
 This way, the overhead is mitigated.
-Please note that, like for \ac{WRAM} data, the time to access \ac{MRAM} data is independent of the exact location \Dash only the memory type matters.
+Note that, like for \ac{WRAM} data, the time to access \ac{MRAM} data is independent of the exact location \Dash only the memory type matters.
 
 To perform such blockwise moves, one calls the \langC{} function \lstinline|mram_read| and \lstinline|mram_write|, which take a source address, a target address, and the number of bytes to use transfer.
 There are, however, several limitations.
 \begin{itemize}
 	\item
-	The \ac{WRAM} address must be aligned on 8 bytes.
+	The \ac{WRAM} address must be aligned to 8 bytes.
 	This can be ensured automatically by adding appropriate qualifiers to stack variables or by using heap memory which gets properly aligned automatically.
 
 	\item
-	The \ac{MRAM} address must be aligned on 8 bytes.
+	The \ac{MRAM} address must be aligned to 8 bytes.
 	No special functionality exists to this end;
 	it is up to the programmer to organise the \ac{MRAM} with this limitation in mind and to resort to \acp{DMA} to single elements if such an alignment is not given.
 
@@ -92,7 +92,7 @@ Multiplication, division, and floating point arithmetic are emulated in software
 In their stead, addition, subtraction, and bitwise logic should be used.
 Also, due to the uniform-cost model, a decrease in the count of instructions translates into a performance gain.
 Unfortunately, a common issue is a nosediving quality of the compilation, perhaps resulting from a wrong configuration of the \abb{LLVM}-based compiler.
-Investigating the compilation and trying different approaches \Dash including even mundane alternatives like reordering independent if statements \Dash is paramount when aiming for top performance and, thus, a recurring theme in this thesis.
+Investigating the compilation and trying different approaches \Dash including even mundane alternatives like reordering independent \lstinline|if| statements \Dash is paramount when aiming for top performance and, thus, a recurring theme in this thesis.
 General experience shows that explicitly saving the result of a computation if the value is reused later on prevents the compiler from issuing a recalculation which would hurt elsewise due to the compute-boundedness of the architecture.
 Also, it seems that pointer logic tends to be compiled better than index logic.
 Lastly, inlining leads to a performance gain oftentimes as the overhead for function calls is quite heavy.

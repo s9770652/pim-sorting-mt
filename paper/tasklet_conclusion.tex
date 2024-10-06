@@ -63,7 +63,7 @@ Deferred copying of runs and fine-tuned unrolling could make the runtime of \MS{
 Some allowance on the starting run lengths does not affect the average runtime too much, so the zigzagging of the runtime could be dampened by dynamically adjusting the starting run length.
 A not-yet-implemented strategy to speed up flushing is the interpretation of two consecutive 32-bit integers as one 64-bit integer which then gets loaded and stored away in just two 64-bit instructions instead of four 32-bit ones.
 The compiler can be prescribed to do so by casting the involved 32-bit integer pointers to their 64-bit counterparts.
-Special care, however, is required with regards to the alignment, as the addresses of 32-bit integers are aligned on four bytes, whereas those of 64-bit integers are aligned on eight bytes~\cite[DPU ABI -- Data types]{upmemSDK}.
+Special care, however, is required with regards to the alignment, as the addresses of 32-bit integers are aligned to four bytes, whereas those of 64-bit integers are aligned to eight bytes~\cite[DPU ABI -- Data types]{upmemSDK}.
 A trivial implementation of such a flushing yielded both gains and losses for the runtime in the single-digits percentagewise, depending on the \MS{} and the input length.
 A feature, last but not least, worthwhile to implement should be the detection of natural runs~\cites[Chapter~2.6]{lang2009algorithmen}[Chapter~2.3.2]{wirth1975algorithmen}, that is runs already present in the input.
 

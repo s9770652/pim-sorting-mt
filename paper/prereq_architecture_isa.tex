@@ -32,9 +32,9 @@ Some examples:
 	\item
 	\lstinline|jump .LABEL| sets the program counter to the index of the labelled instruction.
 \end{itemize}
-Despite their name, some of the general-purpose registers have conventional uses.
+Despite their name, some of the general-purpose registers do have conventional uses.
 The Registers~\lstinline|r0| to \lstinline|r7| are filled with the up to eight arguments of a function before it is called.
-The return value of a function is written to the Registers~\lstinline|r0| or \lstinline|d0|, depending on whether it is \qty{32}{\bit} or \qty{64}{\bit} large.
+The return value of a function is written to the Registers~\lstinline|r0| or \lstinline|d0|, depending on whether it is \qty{32}{\bits} or \qty{64}{\bits} large.
 Register~\lstinline|r22| contains the stack pointer, that is the address of the currently last element in the stack of the respective tasklet.
 When a function is called and it need store data on the stack, it saves the original value of the stack pointer on the stack itself before incrementing the stack pointer, therethrough allocating new memory.
 When the function terminates, it loads the original stack pointer value back into Register~\lstinline|r22|, therethrough deallocating memory.

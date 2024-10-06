@@ -9,9 +9,6 @@
 		dpu/.style={ },
 		mem d/.style={ fill=accentcolor!10!white },
 		mem u/.style={ fill=accentcolor!25!white },
-		flow/.style={ {Straight Barb[width=1.5mm]}-{Straight Barb[width=1.5mm]} },
-		flow left/.style={ {Straight Barb[width=1.5mm]}- },
-		flow right/.style={ -{Straight Barb[width=1.5mm]} },
 	]
 		\def\lenx{25}
 		\def\pad{0.5}
@@ -35,7 +32,7 @@
 			\pgfmathsetmacro{\fadefill}{int( (\numdpu+1-\i)/(\numdpu+1) * 0.05 * 100 )}
 			\draw[dpu, draw=black!\fade, fill=black!\fadefill] ($(dpu) + (\i*\paddpu, \i*\paddpu)$) coordinate (dpu\i) rectangle +({\lendpux}, {\lendpuy});
 		}
-		\draw[latex-latex] ($(dpu) +  ({\lendpux+\pad/2}, 0)$) -- +(\numdpu*\paddpu, \numdpu*\paddpu) node[midway, below right=-1mm] {×8};
+		\draw[ptr, <->] ($(dpu) +  ({\lendpux+\pad/2}, 0)$) -- +(\numdpu*\paddpu, \numdpu*\paddpu) node[midway, below right=-1mm] {×8};
 		\node[above, opacity=0] at (dpu) {×8};
 
 		% Memories.
@@ -56,22 +53,22 @@
 		\draw[mem d] ($(dma)  + ({\lenmemhalfx+\intermem},                        0)$) coordinate (mram) rectangle +({\lenmramx},        {\lenmemy}) node[midway]            {MRAM};
 
 		% Data flows.
-		\draw[flow]       ($(pipe) + (0,                  {\lenmemy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ Register File
-		\draw[flow]       ($(iram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ IRAM
-		\draw[flow]       ($(wram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ WRAM
-		\draw[flow right] ($(pipe) + ({\lenmemx},         {\lenmemy/2})$) -- +({2*\intermem+\lenmemx}, 0);  % Pipeline ↔ DMA
+		\draw[flow, <->] ($(pipe) + (0,                  {\lenmemy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ Register File
+		\draw[flow, <->] ($(iram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ IRAM
+		\draw[flow, <->] ($(wram) + (0,              {\lenmemhalfy/2})$) -- +(-\intermem,             0);  % Pipeline ↔ WRAM
+		\draw[flow,  ->] ($(pipe) + ({\lenmemx},         {\lenmemy/2})$) -- +({2*\intermem+\lenmemx}, 0);  % Pipeline ↔ DMA
 
-		\draw[flow]       ($(wram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % WRAM ↔ DMA
-		\draw[flow left]  ($(iram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % IRAM → DMA
+		\draw[flow, <->] ($(wram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % WRAM ↔ DMA
+		\draw[flow, <- ] ($(iram) + ({\lenmemx}, {\lenmemhalfy/2})$) -- +(\intermem, 0);  % IRAM → DMA
 
-		\draw[flow]       ($(dma)  + ({\lenmemhalfx}, {\lenmemy/2})$) -- +(\intermem, 0);  % DMA ↔ MRAM
+		\draw[flow, <->] ($(dma)  + ({\lenmemhalfx}, {\lenmemy/2})$) -- +(\intermem, 0);  % DMA ↔ MRAM
 
-		\draw[flow]       ($({\pad+\lencontrolx}, {\leny-\pad-\lencontroly/2})$) -- +(\intermem, 0);  % CSI ↔ DDR
+		\draw[flow, <->] ($({\pad+\lencontrolx}, {\leny-\pad-\lencontroly/2})$) -- +(\intermem, 0);  % CSI ↔ DDR
 		\foreach \i in {\numdpu,...,0}{
 			\pgfmathsetmacro{\fade}{int( (\numdpu+1-\i)/(\numdpu+1) * 100 )}
 			\def\flowlen{\leny-2*\pad-\lencontroly-\i*\paddpu-\lendpuy+\padmem}
-			\draw[flow, draw=black!\fade] ($(pipe) + ({\lenmemx/2},  {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % Pipeline ↔ Control/Status Interface
-			\draw[flow, draw=black!\fade] ($(mram) + ({\lenmramx/2}, {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % MRAM ↔ DDR4 Interface
+			\draw[flow, <->, draw=black!\fade] ($(pipe) + ({\lenmemx/2},  {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % Pipeline ↔ Control/Status Interface
+			\draw[flow, <->, draw=black!\fade] ($(mram) + ({\lenmramx/2}, {\lenmemy}) + ({\i*\paddpuflow}, {\i*\paddpu})$) -- +($(0, {\flowlen})$);  % MRAM ↔ DDR4 Interface
 		}
 
 		% Controllers.
@@ -80,7 +77,7 @@
 	\end{tikzpicture}
 
 	\caption{
-		The structure of a \ac{PIM} chip.
+		Schematic depiction of a \ac{PIM} chip.
 		The bright components are part of a standard \ac{DDR} package, the dark components are exclusive to \ac{PIM} chips.~\cite{upmem2019HotChips}
 	}
 	\label{fig:arch:chip}
@@ -116,5 +113,5 @@ The \ac{IRAM} has a size of \qty{24}{\kibi\byte} which translates to a maximum o
 }
 This memory can be modified only by the host, as the \ac{DPU} can only read it, which is an automated process usually.
 
-Next to these major memories, there is also a \qty{256}{\bit} large \emph{atomic memory} whose bits are accessible in a thread-safe way, allowing for mutual exclusion, barriers, and similar.
-Furthermore, there is a \qty{64}{\bit} large \emph{run memory} through which individual threads can be booted, suspended, and resumed by setting the corresponding status bit.
+Next to these major memories, there is also a \qty{256}{\bits} large \emph{atomic memory} whose bits are accessible in a thread-safe way, allowing for mutual exclusion, barriers, and similar.
+Furthermore, there is a \qty{64}{\bits} large \emph{run memory} through which individual threads can be booted, suspended, and resumed by setting the corresponding status bit.
