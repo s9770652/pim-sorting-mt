@@ -35,6 +35,13 @@
 
 \makeatletter
 \@ifclassloaded{scrbook}{
+	\newenvironment{abstract}{}{}  % (wird von 'abstract' neu definiert)
+	\RequirePackage{abstract}  % Zusammenfassungsumgebung für die Dokumentenklasse 'scrbook'
+}{}
+\makeatother
+
+\makeatletter
+\@ifclassloaded{scrbook}{
 	\RequirePackage[algochapter]{algorithm2e}  % Algorithmen setzen
 }{
 	\RequirePackage{algorithm2e}  % Algorithmen setzen

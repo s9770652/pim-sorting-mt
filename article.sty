@@ -36,6 +36,12 @@
 \addtokomafont{descriptionlabel}{\accentcolor}
 \addtokomafont{chapterentrypagenumber}{\addfontfeatures{RawFeature=+tnum}}
 
+\makeatletter
+\@ifclassloaded{scrbook}{
+	\renewcommand{\abstractnamefont}{\usekomafont{descriptionlabel}}  % used by 'abstract'
+}{}
+\makeatother
+
 \setlist[enumerate,1]{font=\usekomafont{labelitemi}}
 \setlist[enumerate,2]{font=\usekomafont{labelitemii}}
 \setlist[enumerate,3]{font=\usekomafont{labelitemiii}}
