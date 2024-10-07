@@ -1,7 +1,10 @@
 \chapter[Sorting in the \texorpdfstring{\abb{WRAM}}{WRAM}]{Sorting in the \acs*{WRAM}}
 \label{sec:tasklet}
 
-This \lcnamecref{sec:tasklet} is concerned with sequentially sorting data which fits into the \ac{WRAM} entirely.
+This \lcnamecref{sec:tasklet} is concerned with sorting data which fits into the \ac{WRAM} entirely.
+The presented sorting algorithms are designed for sequential execution by a single tasklet.
+Key characteristics of the \ac{DPU} architecture which are of especial importance in this \lcnamecref{sec:tasklet} are the uniform access to \ac{WRAM} data and the uniform cost of instructions.
+
 \Cref{sec:tasklet:insertion} discusses \IS{} which is a component of all algorithms presented thereafter as it is lightweight and performant on short inputs.
 \Cref{sec:tasklet:shell} covers \ShS{} which is a generalisation of \IS{}.
 \hyperref[sec:tasklet:heap]{\nameCrefs{sec:tasklet:heap} }\labelcref{sec:tasklet:heap}, \labelcref{sec:tasklet:quick}, and \labelcref{sec:tasklet:merge} deal with \HS{}, \QS{}, and \MS{}, respectively, which are more elaborate algorithms suitable for long inputs.
@@ -38,10 +41,10 @@ The meaning behind and reasoning for the individual parameters in the configurat
 	starting run length of 14 elements
 \end{description}
 
-The measurements were confined to at most \num{1024} elements.
+Measurements are confined to at most \num{1024} elements.
 The reason is that \qty{64}{\kibi\byte} of \ac{WRAM} are available and that most kernels will run with at least 11 tasklets to saturate the instruction pipeline.
 In consequence, at most \qty{5957}{\byte} are allotted to each tasklet.
-To account for the tasklet stack, this number is reduced by \qty{600}{\byte}, leaving space for about \num{1339} 32-bit elements.
+The tasklet stack accounts for \qty{600}{\byte} of this amount, leaving space for about \num{1339} 32-bit elements.
 On that score, 1024 elements is a reasonable cutoff.
 
 \input{tasklet_insertion}
