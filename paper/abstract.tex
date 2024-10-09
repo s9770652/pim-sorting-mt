@@ -1,17 +1,15 @@
 \begin{abstract}
 	\noindent
-	The growing disparity between processing speed and memory latency, coupled with increasing data demands, has led to memory accesses being a serious detriment to many modern workflows.
-	An example are sorting algorithms, which are often designed around the constraints set by the memory.
-	\Ac{PIM} is an umbrella term encompassing several approaches which offload computational tasks to accelerators in or near the memory itself.
-	In \ac{PIM} systems designed and manufactured by \upmem{}, traditional \ac{DRAM} modules are augmented with general-purpose processors called \acp{DPU}.
+	The growing disparity between processing and memory speed, coupled with increasing data demands, has led to memory accesses being a bottleneck for many modern workflows.
+	An example are sorting algorithms, which are often designed around the constraints set by memory subsytems.
+	\Acl*{PIM} (also known as processing in memory, \acs*{PIM}) is an umbrella term encompassing several approaches which offload computational tasks to accelerators in or near the memory itself.
+	In \acs*{PIM} systems designed and manufactured by \upmem{}, traditional dynamic random-access memory (\acs*{DRAM}) modules are augmented with general-purpose processors called \acfp*{DPU}.
 	These are located next to the memory banks themselves, whereby high memory access speed is accomplished.
-	An \upmem{}-based \ac{PIM} system may contain thousands of \acp{DPU}, each capable of additional thread-level parallelism.
-	Despite being designed for general use, the \ac{DPU} architecture does come with limitations to its processing prowess.
+	An \upmem{}-based \acs*{PIM} system may contain thousands of \acsp*{DPU}, each capable of additional thread-level parallelism.
+	Although designed for general use, the \acs*{DPU} architecture does come with limitations to its computational prowess.
 
-	The scope of this thesis is the design, implementation, and evaluation of integer sorting algorithms which run on a single \ac{DPU}.
-	We investigate several sequential and parallel sorting algorithms, documenting the engineering process and adaptations to the merits and shortcomings of the \ac{DPU} architecture.
-	We find that sorting integers is a suitable task for a \ac{DPU}, which can be sped up nearly optimally through multithreading.
-	This paves the way for more large-scale sorting algorithms which run on multiple \acp{DPU}.
+	The scope of this thesis is the design, implementation, and evaluation of sorting algorithms which run on a single \acs*{DPU}.
+	We investigate several sequential and parallel sorting algorithms, documenting the engineering process and adaptations to the merits and shortcomings of the \acs*{DPU} architecture.
+	We find that sorting is a suitable task for a \acs*{DPU}, which can be sped up nearly ideally through multithreading.
+	This paves the way for more large-scale sorting algorithms which run on multiple \acsp*{DPU}.
 \end{abstract}
-
-\acresetall
