@@ -178,32 +178,9 @@
 	\todo[inline]{Sortiergrundlagen: stable, in-place, \(\bigomega{n \log n}\)}
 	\todo[inline]{Master-Theorem + log-Spezialfall für Analyse des par.\ \MS{}?}
 	\todo[inline]{Unterscheidung Größe/Länge. Außerdem: little/less/least und great/greater/greatest für Eingabeelemente}
+	\todo[inline]{Zipf's law überall heraus?}
 
-	\begin{problem}[Sorting]
-		Given a sequence \(\left\langle a_1, a_2, \dots, a_n \right\rangle\) of \(n\) numbers, output a permutation \(\left\langle a_1', a_2', \dots, a_n' \right\rangle\) of the input sequence such that \(a_1' \le a_2' \le \dots \le a_n'\) holds.
-	\end{problem}
-
-	We took our cue from \citeauthor{axtmann2020engineering}~\cite{axtmann2020engineering} for the choice of distributions.
-	\begin{description}
-		\item[Sorted]
-		The numbers from \(0\) to \(n - 1\) are generated in ascending order.
-
-		\item[Reverse Sorted]
-		The numbers from \(0\) to \(n - 1\) are generated in descending order.
-
-		\item[Almost Sorted]
-		First, the numbers from \(0\) to \(n - 1\) are generated in ascending order, then, \(\floor{\sqrt{n}}\) many random pairs are drawn and swapped sequentially.
-		Pairs may not be disjoint.
-
-		\item[Zero-One]
-		Every element is set to either \(0\) or \(1\), each with a probability of \qty{50}{\percent}.
-
-		\item[Uniform]
-		Every element is drawn independently and uniformly from the range \([0, 2^{31} - 1]\).
-
-		\item[Zipf's]
-		Every element is drawn independently from the range \([1, 100]\), with each value \(k\) being drawn with a probability proportional to \(1/k^{0.75}\).
-	\end{description}
+	\include{intro}
 
 	\include{prereq}
 

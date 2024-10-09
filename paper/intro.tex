@@ -1,0 +1,89 @@
+\chapter{Introduction}
+\label{sec:intro}
+
+\begin{figure}[!b]
+	\centering
+	\tikzsetnextfilename{intro_memorywall}
+	\begin{tikzpicture}[plot]
+		\begin{groupplot}[
+			width=8cm,
+			height=3cm,
+			groupplot xlabel={Year},
+			groupplot ylabel={Performance},
+			xticklabel style={/pgf/number format/1000 sep={}},
+			ymode=log,
+			ymin=1,
+			ymax=10000,
+			ytick={1,10,100,1000,10000},
+		]
+			\nextgroupplot
+			\addplot+ [no markers] coordinates { (1980,1) (1986,1.25^6) (2000,{(1.25^6)*1.52^14}) (2005,{((1.25^6)*1.52^14)*1.2^5}) (2015,{((1.25^6)*1.52^14)*1.2^5}) };
+			\addplot+ [no markers] coordinates { (1980,1) (2015,1.07^35) };
+		\end{groupplot}
+	\end{tikzpicture}
+
+	\caption{
+		Sketch of the divergent development of the latency of a single \acs*{DRAM} bank (bottom) and the average time difference between memory requests by a single processor core (top), with the performance of the year 1980 as baseline.~\cite[Figure~2.2]{hennessy2012computer}
+	}
+	\label{fig:intro:memory wall}
+\end{figure}
+
+For decades, processor and memory technology have developed in opposite directions.
+In case of processors, particular attention has been paid to speed, whereas it has been capacity for memory.
+As a consequence, the performance of a processor core has grown by up to \qty{52}{\percent} year after year, while the latency of \ac{DRAM}, for example, has been improving only by \qty{7}{\percent} (see \cref{fig:intro:memory wall}).
+The improvements in bandwidth, though not as bad as those in latency, could not keep up with processor improvements as well.
+The emergence of multicore architectures has aggravated the discrepancies.
+Thus looms the \emph{memory wall} which gets hit when a processor is forced to idle while waiting for data.
+Techniques like prefetching and multi-level caches have been developed to defer the impact, and yet, idle times make up as much as \qty{60}{\percent} of the total runtime~\cite{mutlu23memorycentric}.
+Additionally, despite latency improvements being partially slowed down due to energy concerns~\cite[130]{hennessy2012computer}, memory transfers are also responsible for much of the total power consumption of a system.
+In consumer devices, \qty{63}{\percent} of the total power consumption is spent on memory transfers~\cite{boroumand2018google}, and \qty{40}{\percent} in scientific applications~\cite{kestor2013quantifying}.
+
+One approach to tear the memory wall down is \acrolabel{PIM}\emph{\acl{PIM}}\acused{PIM} (also \emph{processing in memory}, \acs{PIM}), which is further divisible into \acl*{PuM} and \acl*{PnM}~\cite{mutlu23memorycentric,mutlu2022Benchmarking,peccerillo2022survey}.
+\Acfi{PuM} denotes analogue computation through repurposing existing structures within a memory device, like memory storage cells or and peripheral circuitry.
+This allows mainly for simple bitwise operations but also for random number generation.
+Even vector-matrix multiplication is possible in memory built from crossbar arrays, allowing for more complex tasks like signal processing, compression, and image filtering~\cite{li2017analogue}.
+
+\Acfi{PnM} denotes digital computation through additional compute engines close to or in the memory device.
+The memory latency improves because of the proximity to the storage, and the bandwidth scales naturally with the size of the memory.
+Separate circuitry allows for more complex applications like weather modelling~\cite{gagandeep2020nero} or personalised recommendation~\cite{liu2020recnmp}.
+
+The \ac{PnM} solution offered by \upmem{} augments regular \ac{DRAM} modules by adding general-purpose \acp*{DPU}, leading to potentially thousands of \acsp*{DPU} in a fully equipped system.
+The parallelism potential is elevated by each \acs*{DPU} being capable of thread-level parallelism.
+Next to the memory of a \acsp*{DRAM} module, which is also referred to as \acf*{MRAM}, each \acs*{DPU} possesses a private scratchpad memory called \acf*{WRAM} which is smaller but faster than the \acs*{MRAM}.
+Despite the rather limited computational prowess of individual \acsp*{DPU}, the architecture has sparked interest~\cite{mutlu23memorycentric,mutlu2022Benchmarking,peccerillo2022survey,hyun2024pathfinding} and promising performance in applications like sparse matrix-vector multiplication~\cite{giannoula2022sparse}, time series analysis~\cite{mutlu2022Benchmarking}, reinforcement learning~\cite{gogineni2024swiftrl}, deep learning recommendation models~\cite{chen2024updlrm}, and compression~\cite{nider2021casestudy} make further investigations worthwhile.
+
+One possible new application for \ac{PIM} is sorting.
+Sorted data is crucial in many applications, as it allows to search in logarithmic time instead of linear time through a binary search, determine whether a data set is a subset of another one, delete duplicates trivially, or impose a topological ordering on a directed acyclic graph of dependencies for time-forward processing.
+Consideration of data access patterns plays a vital role in designing sorting algorithms, and the limitations of the various kinds of memory have led to quite sophisticated solutions.
+
+First, in \cref{sec:prereq}, we lay the groundwork for following the engineering process of our proposed algorithms by giving a basic overview of the \upmem{} hardware and of sorting algorithms in general.
+In \cref{sec:tasklet}, we focus on sequential sorting algorithms for small inputs which fit into the \acs*{WRAM}.
+Then, in \cref{sec:mram}, we turn our attention to sequential and parallel sorting algorithms for large inputs which are stored in the \acs*{MRAM} because of their size.
+\Cref{sec:conclusion} concludes this thesis by offering a summary of our findings and giving an outlook on future developments.
+\Cref{apx:tasklet,apx:mram} contain further measurements in support of \cref{sec:tasklet,sec:mram}, respectively.
+
+We restrict ourselves to measuring performance on 32-bit and 64-bit integers only.
+Taking our cue from \citeauthor{axtmann2020engineering}~\cite{axtmann2020engineering}, we benchmark our sorting algorithms against the following six input distributions:
+\begin{description}
+	\item[Sorted]
+	The numbers from \(0\) to \(n - 1\) are generated in ascending order.
+
+	\item[Reverse Sorted]
+	The numbers from \(0\) to \(n - 1\) are generated in descending order.
+
+	\item[Almost Sorted]
+	The numbers from \(0\) to \(n - 1\) are generated in ascending order.
+	Then, \(\floor{\sqrt{n}}\) many random pairs are drawn and swapped sequentially.
+	Pairs may not be disjoint.
+
+	\item[Zero-One]
+	Every element is set independently to either \(0\) or \(1\), each with a probability of \qty{50}{\percent}.
+
+	\item[Uniform]
+	Every element is drawn independently and uniformly from the range \([0, 2^{31} - 1]\).
+
+	\item[Zipf's]
+	Every element is drawn independently from the range \([1, 100]\), with each value \(k\) being drawn with a probability proportional to \(1/k^{0.75}\).
+\end{description}
+The range of possible values in the uniform input distribution is motivated by a simplification of the input generation.
+There is no impact on the performance on 64-bit integers by their 33 most significant bits being always set to zero.

@@ -220,6 +220,14 @@
 \def\Rdash{\d@sh\nobreak\emdash}
 \makeatother
 
+% Manually places label to which the list of acronyms can refer if the first mention does not use '\ac' or something similarly usual.
+% Possible usage: \acrolabel{ACRONYM}\emph{\acl{ACRONYM}}\acused{ACRONYM}
+\makeatletter
+\NewDocumentCommand{\acrolabel}{m}{%
+	\AC@placelabel{#1}%
+}
+\makeatother
+
 
 %%% Tables.
 % Column types for tabularx (X = justified)
