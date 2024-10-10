@@ -122,6 +122,16 @@
 	urldate={2024-07-26},
 }
 
+@online{blum2011comparison,
+	author={Avrim Blum and Manuel Blum},
+	title={Lecture 5},
+	subtitle={Comparison\hyphen{}based Lower Bounds for Sorting},
+	date={2011-09-13},
+	url={https://www.cs.cmu.edu/~avrim/451f11/lectures/lect0913.pdf},
+	organization={Carnegie Mellon University},
+	urldate={2024-07-26},
+}
+
 @article{blum1973median,
 	author={Manuel Blum and Robert W. Floyd and Vaughan Pratt and Ronald L. Rivest and Robert E. Tarjan},
 	title={Time bounds for selection},
@@ -241,7 +251,7 @@
 }
 
 @misc{peters2021patterndefeatingquicksort,
-	title={Pattern-defeating Quicksort},
+	title={Pattern\hyphen{}defeating Quicksort},
 	author={Orson Raphael Lennard Peters},
 	date={2021-06-09},
 	eprint={2106.05123},
@@ -485,6 +495,74 @@
 	eprint={2406.13941},
 	archivePrefix={arXiv},
 	primaryClass={cs.IR},
+}
+
+@article{musser1999introspective,
+	author = {David R. Musser},
+	title = {Introspective Sorting and Selection Algorithms},
+	journaltitle = {Software: Practice and Experience},
+	date = {1999-01-08},
+	volume = {27},
+	issue = {8},
+	pages = {983-993},
+	doi = {10.1002/(SICI)1097-024X(199708)27%3A8<983%3A%3AAID-SPE117>3.0.CO%3B2-%23},
+}
+
+@online{peters2002timsort,
+	author = {Tim Peters},
+	title = {Timsort},
+	date = {2002},
+	url = {https://bugs.python.org/file4451/timsort.txt},
+	urldate = {2024-10-10},
+}
+
+@online{skarupke2016ska,
+	author = {Malte Skarupke},
+	title = {I Wrote a Faster Sorting Algorithm},
+	date = {2016-12-27},
+	url = {https://probablydance.com/2016/12/27/i-wrote-a-faster-sorting-algorithm/},
+	urldate = {2024-10-10},
+}
+
+@article{bingmann2015engineering,
+	author = {Timo Bingmann and Andreas Eberle and Peter Sanders},
+	title = {Engineering Parallel String Sorting},
+	journaltitle = {Algorithmica},
+	date = {2015-09-18},
+	editor = {Mohammad Taghi Hajiaghayi},
+	volume = {77},
+	number = {2},
+	pages = {235-285},
+	issn = {1432-0541},
+	doi = {10.1007/s00453-015-0071-1},
+}
+
+@InProceedings{kaligosi2009misprediction,
+	author={Kanela Kaligosi and Peter Sanders},
+	editor={Yossi Azar and Thomas Erlebach},
+	title={How Branch Mispredictions Affect Quicksort},
+	booktitle={14th Annual European Symposium},
+	maintitle={Algorithms},
+%	date={2012-09-10},
+	series={ESA '06},
+	eventdate={2012-09-11/2012-09-13},
+	location={Zurich},
+	publisher={Springer Berlin Heidelberg},
+	address={Berlin, Heidelberg},
+	pages={780-791},
+	abstract={We explain the counterintuitive observation that finding “good” pivots (close to the median of the array to be partitioned) may not improve performance of quicksort. Indeed, an intentionally skewed pivot improves performance. The reason is that while the instruction count decreases with the quality of the pivot, the likelihood that the direction of a branch is mispredicted also goes up. We analyze the effect of simple branch prediction schemes and measure the effects on real hardware.},
+	isbn={978-3-540-38875-3},
+	doi={10.1007/11841036},
+}
+
+@misc{edelkamp2016misprediction,
+	title={BlockQuicksort: How Branch Mispredictions don't affect Quicksort},
+	author={Stefan Edelkamp and Armin Weiß},
+	year={2016},
+	eprint={1604.06697},
+	archivePrefix={arXiv},
+	primaryClass={cs.DS},
+	eprint={1604.06697v2},
 }
 
 @book{cormen2013algorithmen,

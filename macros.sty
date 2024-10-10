@@ -84,13 +84,21 @@
 }
 
 %%% Texts.
+\NewDocumentCommand{\BQS}{s}{Block\-Quick\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\BS}{s}{Bubble\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\CS}{s}{Counting\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\HS}{s}{Heap\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\IntroS}{s}{Intro\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\IPSo}{s}{IPS\textsuperscript{\liningnums{4}}o\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\IS}{s}{Insertion\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\MS}{s}{Merge\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\QS}{s}{Quick\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\RS}{s}{Radix\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\SelS}{s}{Selection\-Sort\IfBooleanT{#1}{s}}
 \NewDocumentCommand{\ShS}{s}{Shell\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\SkaS}{s}{Ska\-Sort\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\SSSSS}{s}{S\textsuperscript{\liningnums{5}}\IfBooleanT{#1}{s}}
+\NewDocumentCommand{\TS}{s}{Tim\-Sort\IfBooleanT{#1}{s}}
 
 \NewDocumentCommand{\cachesize}{s}{\IfBooleanTF{#1}{CACHE\_SIZE}{\text{\lstinline|CACHE_SIZE|}}}
 \NewDocumentCommand{\langC}{}{C}

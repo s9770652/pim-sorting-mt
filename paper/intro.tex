@@ -30,10 +30,10 @@
 
 For decades, processor and memory technology have developed in opposite directions.
 In case of processors, particular attention has been paid to speed, whereas it has been capacity for memory.
-As a consequence, the performance of a processor core has grown by up to \qty{52}{\percent} year after year, while the latency of \ac{DRAM}, for example, has been improving only by \qty{7}{\percent} (see \cref{fig:intro:memory wall}).
+As a consequence, the performance of a processor core has grown by up to \qty{52}{\percent} year after year, whilst the latency of \ac{DRAM}, for example, has been improving only by \qty{7}{\percent} (see \cref{fig:intro:memory wall}).
 The improvements in bandwidth, though not as bad as those in latency, could not keep up with processor improvements as well.
 The emergence of multicore architectures has aggravated the discrepancies.
-Thus looms the \emph{memory wall} which gets hit when a processor is forced to idle while waiting for data.
+Thus looms the \emph{memory wall} which gets hit when a processor is forced to idle whilst waiting for data.
 Techniques like prefetching and multi-level caches have been developed to defer the impact, and yet, idle times make up as much as \qty{60}{\percent} of the total runtime~\cite{mutlu23memorycentric}.
 Additionally, despite latency improvements being partially slowed down due to energy concerns~\cite[130]{hennessy2012computer}, memory transfers are also responsible for much of the total power consumption of a system.
 In consumer devices, \qty{63}{\percent} of the total power consumption is spent on memory transfers~\cite{boroumand2018google}, and \qty{40}{\percent} in scientific applications~\cite{kestor2013quantifying}.
@@ -56,9 +56,9 @@ One possible new application for \ac{PIM} is sorting.
 Sorted data is crucial in many applications, as it allows to search in logarithmic time instead of linear time through a binary search, determine whether a data set is a subset of another one, delete duplicates trivially, or impose a topological ordering on a directed acyclic graph of dependencies for time-forward processing.
 Consideration of data access patterns plays a vital role in designing sorting algorithms, and the limitations of the various kinds of memory have led to quite sophisticated solutions.
 
-First, in \cref{sec:prereq}, we lay the groundwork for following the engineering process of our proposed algorithms by giving a basic overview of the \upmem{} hardware and of sorting algorithms in general.
-In \cref{sec:tasklet}, we focus on sequential sorting algorithms for small inputs which fit into the \acs*{WRAM}.
-Then, in \cref{sec:mram}, we turn our attention to sequential and parallel sorting algorithms for large inputs which are stored in the \acs*{MRAM} because of their size.
+First, \cref{sec:prereq} gives a basic overview of the \upmem{} hardware and of sorting algorithms in general.
+\Cref{sec:tasklet} focuses on sequential sorting algorithms for small inputs which fit into the \acs*{WRAM}.
+Then, \cref{sec:mram} turns to sequential and parallel sorting algorithms for large inputs which are stored in the \acs*{MRAM} because of their size.
 \Cref{sec:conclusion} concludes this thesis by offering a summary of our findings and giving an outlook on future developments.
 \Cref{apx:tasklet,apx:mram} contain further measurements in support of \cref{sec:tasklet,sec:mram}, respectively.
 

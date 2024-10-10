@@ -21,13 +21,21 @@
 \plotspeedup[options]{denominator}{numerator}{table}
 
 % Texts.
+\BQS{}#n
 \BS{}#n
+\CS{}#n
 \HS{}#n
+\IntroS{}#n
+\IPSo{}#n
 \IS{}#n
 \MS{}#n
 \QS{}#n
+\RS{}#n
 \SelS{}#n
 \ShS{}#n
+\SkaS{}#n
+\SSSSS{}#n
+\TS{}#n
 
 \cachesize{}#n
 \cachesize*{}#n
