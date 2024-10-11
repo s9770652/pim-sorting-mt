@@ -14,7 +14,7 @@ The bottleneck is the sequential execution of each merge which eventually leads 
 Even with infinite many processors, this simplistic parallel \MS{} can achieve a theoretical parallel speedup\footnote{
 	The \emph{parallel speedup} \(S\) of a parallel algorithm \(A\) is defined as the ratio \(\operatorname{t}_1(A) / \operatorname{t}_p(A)\) of its wall-clock time \(\operatorname{t}_1(A)\) when run with one processor and of its wall-clock time \(\operatorname{t}_p(A)\) when run with \(p\) processors.
 } of at most \(\bigtheta{\log n}\).
-\Citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} propose an alternative approach whose maximum theoretical parallel speedup is \(\bigtheta{n / \log^2 n}\).
+We implement an alternative by \citeauthor{cormen2013algorithmen}~\cite{cormen2013algorithmen} whose maximum theoretical parallel speedup is \(\bigtheta{n / \log^2 n}\).
 Advantageously, \cref{alg:mram:two-tier merge} for merging \ac{MRAM} data can be reused without fundamental changes when adapting this parallel \MS{} to \acp{DPU}.
 Also, the number of synchronisation points is logarithmic in the number of tasklets only, and the time which each synchronisation takes is insignificant compared to the total runtime.
 

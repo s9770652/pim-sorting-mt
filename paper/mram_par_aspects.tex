@@ -2,16 +2,16 @@
 \label{sec:mram:par:aspects}
 
 The parallel \ac{MRAM} \MS{} is essentially a full-space \MS{}, meaning it needs an auxiliary array of the same size as the input array and the two arrays switch roles after each round.
-The parallel merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer demanded that two runs be neighboured when merging.
+The parallel merge procedure (\cref{fig:par:merge}) operates on arbitrary runs, that is, it is no longer required that two runs be neighboured when merging.
 Likewise, the output location is arbitrary now, too, and not related to the indices of the two runs.
-Please note that the algorithm presented here is not stable but will be stabilised later on in this \lcnamecref{sec:mram:par:aspects}.
+Please note that the algorithm presented here is not stable, but we will propose a stabilised variant in the outlook.
 
 Suppose that there are but two tasklets and both have formed a starting run using the sequential \ac{MRAM} \MS{}.
 One of the tasklets is now temporarily suspended, whilst the other one determines which of the runs is longer.
 Then, it determines the median of the longer run, which will act as \emph{pivot element} dividing the longer run into a front half and a back half.
 The pivot is used to find an index~\(i\) which separates the shorter run into a front half and a back half such that any element with index~\(i' < i\) is not greater than the pivot and any element with index \(i' \ge i\) is at least as great as the pivot.
 Finding such an index \(i\) can be implemented with a binary search.
-The elements both front halves are at most as great as the pivot so they can go to the front of the output run.
+The elements in both front halves are at most as great as the pivot so they can go to the front of the output run.
 This means that the position of the pivot can be calculated by taking the output location and offsetting it by the combined length of the two front halves.
 Now, the front halves of both runs can be merged to the positions in front of the pivot using a sequential merge procedure, and the back halves can be merged to the positions behind the pivot.
 Since these two merges affect distinct elements and addresses, they can be performed in parallel by the two tasklets.
@@ -131,7 +131,7 @@ For simplicity, the number of tasklets is always a power of two in this \cref{se
 	\end{tikzpicture}
 
 	\caption{
-		Parallel merge of two runs.
+		A parallel merge of two runs.
 		The first run is the longer one, so its median \(p\) is chosen as a pivot which is used to divide the shorter run.
 		Afterwards, the pivot is moved to its output location.
 		The two front halves of the runs are assigned to one tasklet and are merged to the positions in front of the pivot.
@@ -143,7 +143,7 @@ For simplicity, the number of tasklets is always a power of two in this \cref{se
 
 
 \paragraph{Communication \& Synchronisation}
-The communication network can be visualised as forest of binomial trees.
+The communication network can be visualised as a forest of binomial trees.
 During the first parallel merge, Tasklet~1 informs Tasklet~0 about being finished with sorting (\emph{bottom-up communication}), and Tasklet~0 informs Tasklet~1 about being finished with partitioning (\emph{top-down communication}).
 Likewise, Tasklet~3 and~4 communicate, Tasklets~5 and~6, and so on.
 At the beginning of the second parallel merge, Tasklets~1, 2, and~3 inform Tasklet~0 about being finished with sorting, and Tasklet~0 informs Tasklet~2 about being finished with partitioning.
@@ -173,34 +173,22 @@ The reason is that the binary search is executed a few times in total only, so i
 For the sake of code simplicity and kernel size, the \ac{WRAM} search tier has been removed.
 Reducing the kernel size is a valid concern since the many unrolled loops bloat the kernel and only a handful of bytes in the \ac{IRAM} remain free.
 
-Recall that the two halves assigned to a tasklet contain between \qty{25}{\percent} and \qty{75}{\percent} of the elements of the respective runs, which can lead to workload imbalances.
-A more even workload of \qty{50}{\percent} would be achieved if the median of the merged run were chosen as pivot and the runs divided accordingly.
-Finding the two positions where the runs should be divided according to this common median requires a modification to the binary search.
-Two search intervals are set up, one for either run.
-Then, the medians of both runs are determined.
-If this does not produce valid division points, then one of the runs has more little elements in its front half than the other run.
-This means that the front half of this run must become longer and the front half of the other run shorter.
-Therefore, the search intervals can be narrowed down to the right side of the run with the less elements and to the left side of the run with the greater elements.
-The process can now be repeated until two valid division points are found.
-
-To our dissatisfaction, we did not manage to implement a bug-free version of this binary search within the timeframe of this thesis, so the effect of load imbalances manifests in our measurements.
-
 
 \paragraph{Alignment}
-In \cref{sec:mram:merge}, it is demanded that all sizes and positions be multiples of 8 even if the input consists of 32-bit elements.
-Now, this can be ensured during the formation of starting runs by dividing the input accordingly and introducing dummy variables if need be.
+In \cref{sec:mram:merge}, it is required that all sizes and positions be multiples of eight even if the input consists of 32-bit elements.
+This can be ensured during the formation of starting runs by dividing the input accordingly and introducing dummy variables if need be.
 Thereafter, however, there is no control over any alignment whatsoever because the sizes of run halves are arbitrary.
 This raises the need for modifications to the sequential merge procedure.
 
 Before beginning the first tier, the alignment of the output location must be checked.
 If it is unaligned, the less of the first elements of both runs is written to the output location.
-As a result, the updated output location is aligned to 8 bytes again, meaning the first tier can proceed as normal since emptying the cache through \lstinline|mram_write| is unproblematic.
+As a result, the updated output location is aligned to \qty{8}{\byte} again, meaning the first tier can proceed as normal since emptying the cache through \lstinline|mram_write| is unproblematic.
 
 At first, the second tier proceeds as normal, too.
 Once the less run is depleted, the cache may contain an odd number of elements, so the current element of the greater run is written to the cache before emptying it.
 However, if there are elements still remaining in the greater run, flushing the remainder becomes more complicated than in \cref{sec:mram:merge}.
 There, it was sufficient to loop over the remainder in the \ac{MRAM}, write it to the cache, and move it to the respective output location.
-Now, the current output location is still aligned to 8 bytes but it may very well be that the first element of the remainder has an unaligned address.
+Now, the current output location is still aligned to \qty{8}{\byte} but it may very well be that the first element of the remainder has an unaligned address.
 This indicates a mismatch, for all unaligned elements must be transferred to an aligned address and all aligned elements to an unaligned one.
 When calling \lstinline|mram_read| and \lstinline|mram_write|, the alignment of elements within the \ac{MRAM} and within the \ac{WRAM} must be the same.
 If such an instance is detected, the remainder is loaded blockwise from the \ac{MRAM} into the cache.
@@ -208,20 +196,5 @@ There, a loop shifts each element forward by one position, resolving the mismatc
 Afterwards, the shifted elements can be written to the output location.
 Since only an even number of elements can be moved via \lstinline|mram_write|, it may be necessary to transfer a single item individually at the end in case that the remainder had an odd length.
 
-Writing single 32-bit elements to the \ac{MRAM} is not threadsafe, since, internally, eight bytes are read to an oblique \ac{WRAM} cache, partially modified, and written back to the \ac{MRAM}.
+Writing single 32-bit elements to the \ac{MRAM} is not threadsafe, since, internally, eight bytes are read to a hidden \ac{WRAM} cache, partially modified, and written back to the \ac{MRAM}.
 Therefore, an atomic write, which utilises costly virtual mutexes, must be performed.
-
-
-\paragraph{Stability}
-The parallel merging algorithm as presented above makes \MS{} unstable.
-The reason is that one or both runs may contain the pivot value multiple times and that a division point may separate the duplicates.
-Therefore, it must be ensured that all duplicates of a run remain within the same half.
-To do so, once the median is determined, it is checked if the left neighbour of the median has the same value .
-If so, there may be even more duplicates so a binary search is employed to find the earliest occurrence of the pivot value within the longer run.
-This earliest occurrence marks the division point for the longer run.
-Similarly, the binary search in the shorter run now has to find the earliest possible division point, too.
-Clearly, the guarantee that a partitioning step yields two halves with a length ratio of no more than 3 is lost under this strict partitioning.
-When duplicates are plentiful, work-load imbalances become worse and the runtime suffers.
-
-To our great dissatisfaction, we did not manage to implement a bug-free version within the timeframe of this thesis.
-With the zero-one input distribution, the output is corrupted, whence its exclusion in the respective figures.

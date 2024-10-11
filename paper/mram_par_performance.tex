@@ -65,24 +65,23 @@
 	\label{fig:par:speedup}
 \end{figure}
 
-The parallel speedup of the unstable \MS{} on \qty{32}{\mebi\byte} of data is shown in \cref{fig:par:speedup}.
+The parallel speedup of the \MS{} on \qty{32}{\mebi\byte} of data is shown in \cref{fig:par:speedup}.
 An ideal parallel speedup would be linear in the number of tasklets but capped at 11 or, rather, slightly above because of \ac{DMA} latency hiding.
-For uniformly distributed inputs and inputs following Zipf's law, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit integers.
+For inputs with a uniform or Zipf's distribution, the measured speedup is very close to the optimum, reaching values above 10 for both 32-bit and 64-bit integers.
 This is owed to workloads tending to be balanced naturally and tasklets being removed from the pipeline once they are finished.
-For all other inputs, the parallel speedup is roughly between 7 and 9 with 32-bit integers and between~6 and~8 with 64-bit integers \Dash a consequence of workloads becoming more unbalanced.
+For all other inputs, the parallel speedup is approximately between 7 and 9 with 32-bit integers and between~6 and~8 with 64-bit integers \Dash a consequence of workloads becoming more unbalanced.
 This shall be illustrated by sorted inputs:
 In the last round, two runs remain.
 When Tasklet 0 performs the first partitioning step, the pivot divides the longer run into two equally long halves.
 However, the pivot is strictly less or greater than any element in the shorter run, meaning the shorter run keeps its length of about \(n/2\) many elements as the division point is at one of its ends.
 Such unbalanced divisions carry on to further partitioning steps.
-The ratio between the least and the greatest number of assigned elements in the last round of parallel merging is about 2.3 for zero-one inputs and 4 for the three kinds of sorted inputs when the number of tasklets is 16.
-A modified binary search as described in \cref{sec:mram:par:aspects} would presumably help bringing these little parallel speedups on par with those on the uniform and Zipf's input distribution.
+When the number of tasklets is sixteen, the ratio between the least and the greatest number of assigned elements in the last round of parallel merging is about \num{2.3} for zero-one inputs and \num{4} for the three kinds of sorted inputs.
 
-\Cref{fig:par:phases} shows the wall-clock times of the unstable parallel \MS{}.
+\Cref{fig:par:phases} shows the wall-clock times.
 The measurements are subdivided into the three phases of the parallel \MS{}, that is the sequential \ac{WRAM} phase, the sequential \ac{MRAM} phase, and the parallel \ac{MRAM} phase.
 On the one hand, most results are unsurprising.
 The sorted, reverse sorted, and zero-one input distribution are sorted quickly as they lead to short first and second phases, whilst the uniform and Zipf's input distribution make these two phases last longer.
-The third phase always takes roughly the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
+The third phase always takes approximately the same amount of time, implying that workload imbalances are cancelled out by earlier flushes, although the effect is weaker for 64-bit integers where computation is more costly.
 %The greater parallel speedup of the uniform and Zipf's input distribution shines through by the third phase being short compared to the relatively long first and second phase.
 
 Almost sorted inputs, on the other hand, are clear outsiders because of the remarkably long third phase, making them the worst case amongst all benchmarked ones.
@@ -167,17 +166,17 @@ A few great elements placed in a run of mostly little elements delays flushes, a
 	\label{fig:par:phases}
 \end{figure}
 
-The measurements for the stable parallel \MS{} are shown in \cref{fig:par:speedup_unstable,fig:par:phases_unstable}.
-For the uniform and Zipf's input distributions, the wall-clock time is only somewhat increased.
-Because the \ac{WRAM} \MS{} is hardly slower than the \ac{WRAM} \QS{}, the first phase takes hardly longer.
-The second phase is not altered algorithmically, but it makes up the majority of the total runtime increase due to its starting runs being only half as long as in the unstable case.
-For uniformly distributed input, the third phase takes just as long as before since duplicates are virtually non-existent.
-For inputs following Zipf's law, the third phase takes only slightly longer, as duplicates start to accumulate significantly only in later rounds.
-Since the first two phases affect also the sequentially executed \MS{} and the third phase remains largely the same, the speedups drop slightly but remain above~10.
-
-For the sorted and almost sorted input distributions, the picture is mostly the same.
-For the reverse sorted input distribution, the wall-clock time increases significantly.
-Because this input distribution constitutes the worst-case of the \ac{WRAM} \MS{}, the first phase takes about one-and-a-half times as long.
-Its speedup actually manages to rise slightly.
-We would expect the biggest speedup drop for the zero-one input distribution, where plentiful duplicates should worsen workload imbalances.
-Unfortunately, the buggy implementation renders an analysis of the runtime pointless.
+%The measurements for the stable parallel \MS{} are shown in \cref{fig:par:speedup_unstable,fig:par:phases_unstable}.
+%For the uniform and Zipf's input distributions, the wall-clock time is only somewhat increased.
+%Because the \ac{WRAM} \MS{} is hardly slower than the \ac{WRAM} \QS{}, the first phase takes hardly longer.
+%The second phase is not altered algorithmically, but it makes up the majority of the total runtime increase due to its starting runs being only half as long as in the unstable case.
+%For uniformly distributed input, the third phase takes just as long as before since duplicates are virtually non-existent.
+%For inputs following Zipf's law, the third phase takes only slightly longer, as duplicates start to accumulate significantly only in later rounds.
+%Since the first two phases affect also the sequentially executed \MS{} and the third phase remains largely the same, the speedups drop slightly but remain above~10.
+%
+%For the sorted and almost sorted input distributions, the picture is mostly the same.
+%For the reverse sorted input distribution, the wall-clock time increases significantly.
+%Because this input distribution constitutes the worst-case of the \ac{WRAM} \MS{}, the first phase takes about one-and-a-half times as long.
+%Its speedup actually manages to rise slightly.
+%We would expect the biggest speedup drop for the zero-one input distribution, where plentiful duplicates should worsen workload imbalances.
+%Unfortunately, the buggy implementation renders an analysis of the runtime pointless.
