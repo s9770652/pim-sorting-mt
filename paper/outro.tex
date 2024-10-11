@@ -2,10 +2,10 @@
 \label{sec:conclusion}
 
 In this thesis, we engineered several sequential and parallel integer sorting algorithms utilising \acf{PIM} on \upmem{}-based \acfp{DPU}.
-\Acp{DPU} are threaded general-purpose processors which reside on the memory banks of \acs{DRAM} modules.
+\Acp{DPU} are threaded general-purpose processors which reside next to the memory banks of \acs{DRAM} modules.
 Due to this spatial proximity, the latency of memory accesses is greatly reduced.
-However, the computational capabilities of a \ac{DPU} are low.
-The memory hierarchy of a \ac{DPU} is two-tiered, entailing a small but fast scratch pad memory called \acf{WRAM} and a larger but slower \acf{MRAM}.
+However, the computational capability of a \ac{DPU} is low.
+The memory hierarchy of a \ac{DPU} is three-tiered, entailing registers, a small but fast scratchpad memory called \acf{WRAM} and a larger but slower \acf{MRAM}.
 
 In \cref{sec:tasklet}, we focused on sequentially sorting data which fits entirely into the \ac{WRAM}.
 A crucial means to optimise the performance of a \ac{DPU} algorithm proved to be the reduction of the instruction count, as all instructions are executed in the same amount of time and \ac{WRAM} accesses are uniform.
@@ -16,9 +16,7 @@ The performance by \MS{} is strong as well, mostly following suit and in some ca
 Both \QS{} and \MS{} make use of \IS{}, which we found to perform well on short inputs with about 16 elements or fewer.
 
 In \cref{sec:mram}, we focused on sorting data which have to be stored in the \ac{MRAM} for size reasons.
-We proposed sorting algorithms both for sequential execution by a single tasklet and parallel execution by an entire \ac{DPU}.
-These algorithms are based on \MS{} to allow for stable sorting, but there are also unstable variants which are faster than their stable counterparts.
-We designed an elaborate two-tier merge procedure to lower the instruction count.
+We adapted \MS{} for sequential execution by a single tasklet and parallel execution by an entire \ac{DPU}, designing an elaborate two-tier merge procedure to lower the instruction count.
 An additional challenge was the reuse of allocated memory and the management of data transfers between the \ac{MRAM} and the \ac{WRAM}.
 For the latter, \upmem{} provides a software utility called sequential reader, which we optimised to gain a further speedup of \num{1.6}.
 In case of the parallel sorting algorithm, communication and synchronisation were implemented using shared memory.
@@ -33,7 +31,32 @@ We conjecture that such an \ac{MRAM} \QS{} would be very performant due to the u
 Our optimised sequential reader could aid with the latter, as it is trivially expanded to support the two different directions in which \QS{} reads data.
 Furthermore, own cursory experiments have shown that sorting networks are a strong contender to \IS{}.
 More suggestions concerning the sequential sorting algorithms can be found in \cref{sec:tasklet:conclusion}.
-Last but not least, we believe that the suboptimal parallel speedup in some cases is remediable by a technique for more balanced workloads which we sketched in \cref{sec:mram:par:aspects}.
+In case of the parallel sorting algorithms, there are two main areas needing improvement:
+Load imbalances lead to a worse speedup on some input distributions, and the stability property is lost despite being based on \MS{}.
+Therefore, we propose the following methods as possible future changes to the parallel merge method.
+
+\paragraph{Load Imbalances}
+Recall that the two halves assigned to a tasklet contain between \qty{25}{\percent} and \qty{75}{\percent} of the elements of the respective runs, which can lead to workload imbalances.
+A more even workload of \qty{50}{\percent} would be achieved if the median of the merged run were chosen as pivot and the runs divided accordingly.
+Finding the two positions where the runs should be divided according to this common median requires a modification to the binary search.
+Two search intervals are set up, one for either run.
+Then, the medians of both runs are determined.
+If this does not produce valid division points, then one of the runs has more little elements in its front half than the other run.
+This means that the front half of this run must become longer and the front half of the other run shorter.
+Therefore, the search intervals can be narrowed down to the righthand side of the run with the less elements and to the lefthand side of the run with the greater elements.
+The process can now be repeated until two valid division points are found.
+
+\paragraph{Stability}
+The parallel merge method is unstable because one or both runs may contain the pivot value multiple times and a division point may separate the duplicates.
+Therefore, it must be ensured that all duplicates of a run remain within the same half.
+To do so, once the median is determined, it is checked if the left neighbour of the median has the same value.
+If so, there may be even more duplicates so a binary search is employed to find the earliest occurrence of the pivot value within the longer run.
+This earliest occurrence marks the division point for the longer run.
+Similarly, the binary search in the shorter run now has to find the earliest possible division point, too.
+%Clearly, the guarantee that a partitioning step yields two halves with a length ratio of no more than 3 is lost under this strict partitioning.
+%When duplicates are plentiful, work-load imbalances become worse and the runtime suffers.
+
+\bigskip
 
 Currently, the implementations of the sorting algorithms support only 32-bit and 64-bit integers.
 Supporting shorter integers or compound data types would probably complicate memory alignment, but ultimately, the performance should remain largely the same.
@@ -41,7 +64,7 @@ Supporting floating point numbers, however, would likely hurt the performance ir
 The reason is that \acp{DPU} have no hardware support for floating point arithmetic, so comparisons between floating point numbers require emulation in software.
 
 Then next greater step in sorting integers would be the employment of multiple \acp{DPU}.
-This poses new challenges for communication and synchronisation as there is no direct communication channel between \acp{DPU}, much less shared memory.
+New challenges for communication and synchronisation open up, as there is no direct communication channel between \acp{DPU}, much less shared memory.
 Instead, any inter-\acs{DPU} communication must be overseen by a host \ac{CPU}.
 Moreover, \acp{DPU} are grouped together, and the host cannot access a \ac{DPU} until all \acp{DPU} of its group have finished executing.
-This introduces an inherent lockstep to the execution, thereby hurting performance.
+%This introduces an inherent lockstep to the execution, thereby hurting performance.
