@@ -16,7 +16,7 @@ Effectively, this initialisation introduces one more instruction.
 % This is a consequence of reusing the register of the \lstinline|start| pointer for \lstinline|pred| instead of for \lstinline|i|, whose incremented value is put into another register.
 
 These changes fully explain the extension of the runtime by nine instructions:
-The optimised version invokes one \lstinline|add| instruction at the beginning of the function to advance the starting position and loops 15 times in total, each time initialising the pointer \lstinline|curr|.
+The optimised version invokes one instruction at the beginning of the function to advance the starting position and loops 15 times in total, each time initialising the pointer \lstinline|curr|.
 The naïve version loops 16 times, invoking seven instructions for naught in the first iteration.
 
 \begin{figure}
@@ -114,7 +114,7 @@ void InsertionSort(int *start, int *end) {
 \end{figure}
 
 Multiple workarounds exist to sidestep this problem.
-One workaround is to take the unoptimised code and change the starting position via inline assembler.
+One of them is to take the unoptimised code and change the starting position via inline assembler.
 This is trivial for the explicit \IS{} since one can simply inject an \lstinline|add| instruction at the beginning of the function to increment the pointer \lstinline|start|.
 The implicit and the sentinel-less \IS*{} need to know the original starting address \lstinline|start| later on, though, and initialise the actual starting point rather late;
 injecting inline assembler proves more difficult as a consequence.
@@ -128,7 +128,7 @@ Doing so makes the runtime drop as expected.
 Recall how in the faster version (\cref{fig:insertion:impl:pred_first}), the pointer \lstinline|pred| is always deduced from the pointer \lstinline|curr| using an offset.
 This gives the cue for yet another workaround:
 In \cref{fig:insertion:impl:offset_first,fig:insertion:impl:offset_sec}, every occurrence of \lstinline|pred| is replaced with \lstinline|curr - 1|.
-As a consequence, the code of \cref{fig:insertion:impl:offset_first} compiles the very same as the one of \cref{fig:insertion:impl:pred_first}, while \cref{fig:insertion:impl:offset_sec} yields the same compilation as the versions with the wrapper function or the inline assembly.
+As a consequence, the code of \cref{fig:insertion:impl:offset_first} compiles the very same as the one of \cref{fig:insertion:impl:pred_first}, whilst \cref{fig:insertion:impl:offset_sec} yields the same compilation as the versions with the wrapper function or the inline assembly.
 This workaround is clearly the best of the three and, hence, the one used in the rest of this thesis.
 
 Alas, the eternal struggle with the compiler endeth not herewith.
@@ -142,6 +142,6 @@ A deeper look into the compilation reveals the following sequence:
 	\end{tabular}
 \end{center}
 Without delving further into its significance \Dash the second \lstinline|move r3, r0| is unneeded as it is impossible to jump directly to it nor to return via \lstinline|jleu|.
-Also, \lstinline|move| does not set the zero or carry flag, so such a side effect as justification can be ruled out.
+%Also, \lstinline|move| does not set the zero or carry flag, so such a side effect as justification can be ruled out.
 Copying the whole assembler code and injecting it as inline assembler but without this second \lstinline|move r3, r0| pushes the runtime even further down whilst maintaining the correctness of the output.
 New issues, especially for inlining, are introduced, though, and we deem a proper assembly implementation as out of scope for this thesis.

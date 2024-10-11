@@ -1,9 +1,9 @@
 \section{\texorpdfstring{\IS{}}{InsertionSort}}
 \label{sec:tasklet:insertion}
 
-\IS{} works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements with indices \(0\) to \(i - 1\) are already sorted \cites[83]{maurer1974datenstrukturen}[Chapter~2.2.1]{wirth1975algorithmen}.
-Its asymptotic runtime is above the theoretical minimum of \(\bigoh{n \log n}\), reaching \(\bigoh*{n^2}\) not only in the worst case but also in the average case, since any of the \(\binom{n}{2}\) pairs of input elements is in wrong order, needing to be swapped at some point in the execution, with probability \qty{50}{\percent}.
-Nonetheless, \IS{} does have some saving graces:
+\IS{} works by moving the \(i\)th element leftwards as long as its left neighbour is greater, assuming that the elements with indices \(0\) to \(i - 1\) are already sorted \cites[83]{maurer1974datenstrukturen}[Section~2.2.1]{wirth1975algorithmen}.
+Its asymptotic runtime is above the theoretical minimum of \(\bigomega{n \log n}\), reaching \(\bigomega*{n^2}\) not only in the worst case but also in the average case, since any of the \(\binom{n}{2}\) pairs of input elements is in wrong order, needing to be swapped at some point in the execution, with probability \qty{50}{\percent}.
+Nonetheless, \IS{} does have more than one silver lining:
 \begin{enumerate}
 	\item
 	If the input array is mostly or even fully sorted, the runtime drops down to \(\bigoh{n}\).
