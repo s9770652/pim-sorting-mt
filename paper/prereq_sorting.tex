@@ -3,7 +3,7 @@
 
 This \lcnamecref{sec:prereq:sorting} is concerned with algorithm which solve the sorting problem for numbers.
 \begin{problem}[Sorting]
-	Given an input sequence \(\left\langle a_1, a_2, \dots, a_n \right\rangle\) of \(n\) numeric elements, find a permutation \(\pi\) of the set \(\{ 1, \dots, n \}\) such that \(a_{\pi(1)} \le a_{\pi(2)} \le \dots \le a_{\pi(n)}\) holds.
+	Given an input sequence \(\chevrons{ a_1, a_2, \dots, a_n }\) of \(n\) numeric elements, find a permutation \(\pi\) of the set \(\{ 1, \dots, n \}\) such that \(a_{\pi(1)} \le a_{\pi(2)} \le \dots \le a_{\pi(n)}\) holds.
 \end{problem}
 Albeit important, the runtime is not the only distinguishing feature of a sorting algorithm.
 Stability and the memory footprint are remarkable, too.
@@ -19,8 +19,8 @@ We specify space complexity in the form of the count of indices, pointers, or nu
 
 As already pointed out in \cref{sec:intro}, sorting is a fundamental problem in computer science and is being worked on at least since the middle of the 20th century~\cite{hoare1962quicksort,williams1964heapsort,floyd1964treesort}.
 Multiple types of sorting algorithms have emerged throughout the decades.
-For instance, if every input element is of one of \(k\) possible values, a \CS{} may be used where the input sequence is scanned and particular counters are incremented when passing elements, thereby achieving a runtime in \(\bigoh{n +  k}\).
-If the input range is unknown or too big, \RS{} may be used.
+For instance, if every input element is of one of \(k\) possible values, one may use a \CS{} where the input sequence is scanned and particular counters are incremented when passing elements, thereby achieving a runtime in \(\bigoh{n +  k}\).
+If the input elements have few significant digits, \RS{} may be useful.
 \RS{} has \(k\) rounds if the input elements have \(k\) digits, and in the \(i\)th round, elements are distributed amongst buckets according to their \(i\)th digit, whereby a runtime in \(\bigoh{kn}\) is achieved.
 The arguably most extensive category are comparison-based sorting algorithms, which need a comparison operation establishing a total preorder over the data.
 Their runtimes can differ greatly from one another and also between input sequences, however, there is a lower bound on the runtime.
@@ -52,14 +52,14 @@ Pattern-defeating \QS{}~\cite{peters2021patterndefeatingquicksort} switches to \
 Both hybrids fall back to the asymptotically suboptimal \IS{} if the problem size is sufficiently reduced \Dash a technique shared with the \MS{}-based \TS{}~\cite{peters2002timsort}.
 Fallback algorithms are also useful on \acp{DPU} thanks to their reduction of the instruction count, as will be seen in later \lcnamecrefs{sec:tasklet}.
 
-Another source of performance gains lies in \emph{loop transformations}.
-This includes loop unrolling where the step size is multiplied with an unroll factor \(x\) and the loop body is repeated \(x\) times (see \cref{sec:tasklet:merge:aspects} for a more profound discussion).
+Another source of performance gains arises from \emph{loop transformations}.
+This includes loop unrolling where the step size is multiplied by an unroll factor \(x\) and the loop body is repeated \(x\) times (see \cref{sec:tasklet:merge:aspects} for a more profound discussion).
 Not only is this advantageous on \acp{CPU} in sorting algorithms like \IPSo{}~\cite{axtmann2020engineering}, \SSSSS{}~\cite{bingmann2015engineering} or \SkaS{}~\cite{skarupke2016ska} but also on \acp{DPU} where reducing the instruction counts in hot loops is critical.
 Other loop transformations, however, have little to no effect on a \ac{DPU} or might be even hurting performance through an increased loop overhead.
 \SSSSS{} uses loop fission, that is, it breaks loop bodies apart and puts them into own loops.
 This can be useful if, for example, one were to calculate \lstinline|arr[i] = 2 × arr[i] + 1| in a lopp.
 The loop can be broken apart such that a first loop calculates \lstinline|arr[i] = 2 × arr[i]| and a subsequent one \lstinline|arr[i] = arr[i] + 1|.
-Now, the calculation is eligible for vectorisation, that is the simultaneous exertion of the same operation on multiple elements of which a \ac{DPU} is incapable.
+Now, the calculation is eligible for vectorisation, that is the simultaneous exertion of the same operation on multiple elements, of which a \ac{DPU} is incapable.
 
 Other enhancements are not applicable to \acp{DPU}, too.
 When a \ac{CPU} encounters a branch, it speculates on whether the branch will be taken and fills its pipeline accordingly before the evaluation of the branch condition is finished.
@@ -67,16 +67,16 @@ When a misprediction happens, the work was in vain and the pipeline of the \ac{C
 According to information theory, \QS{} is the fastest when the problem size is perfectly halved in each step.
 However, with a perfect fifty-fifty split, no branch predictor can effectively speculate on the future of individual elements.
 For this reason, a skewed split can improve the runtime in spite of an increase of the instruction count~\cite{kaligosi2009misprediction}.
-\BQS{}~\cite{edelkamp2016misprediction} and \IPSo{} eliminate branch prediction altogether by writing the indices of wrongly ordered elements to buffers off which is taken care at a later time.
-They do so by maintaining an index of the current position in the buffer and write the index of every element to this index unconditionally.
-The comparison result of the check on whether an element needs to be displaced is cast to either zero or one and is added to said index.
-As a result, the indices of elements which need no displacement get overwritten.
-Similarly, \IPSo{} and \SSSSS{} use casting to calculate positions in a decision tree branchlessly.
-It is reasonable to assume that these techniques would be disadvantageous on a \ac{DPU} as they do effectively nothing except for increasing the instruction count.
+\BQS{}~\cite{edelkamp2016misprediction} and \IPSo{} eliminate branch prediction altogether by writing the indices of wrongly ordered elements to buffers of which is taken care at a later time.
+They do so by maintaining an index of the current position in the buffer and writing the index of every element to this index unconditionally.
+The comparison result of the check on whether an element needs to be displaced is cast to either zero or one and added to said index.
+As a result, the index of an element which needs no displacement gets overwritten upon visiting the next element.
+Similarly, \IPSo{} and \SSSSS{} use casting to calculate positions in a decision tree branchlessly to quickly distribute elements amongst buckets.
+It is reasonable to assume that these techniques would be disadvantageous on a \ac{DPU} as they do effectively nothing besides increasing the instruction count.
 
 Of course, there are also design decisions which are related to memory accesses.
 \IPSo{} was contrived with the parallel external memory model in mind in order to limit \abb{I/O} on systems with non-uniform memory access.
-In this model, each thread has a private cache of size \(M\) and can access the main memory in blocks of size \(B\).
-Such a consideration is not inappropriate in the context of \ac{DPU} algorithms, for already the \ac{WRAM} and the \ac{MRAM} of the same \ac{DPU} are not accessed in the same way.
+In this model, each thread has a small private cache of size \(M\) and can access the large external memory in blocks of size \(B\).
+Such a consideration is not inappropriate in the context of \ac{DPU} algorithms, for a single \ac{DPU} already accesses memory not in a uniform way due to the split of \ac{WRAM} and \ac{MRAM}.
 The non-uniformity is exacerbated when considering algorithms where \acp{DPU} access the \ac{MRAM} of others.
 Indeed, limiting \acp{DMA} is subject of \cref{sec:mram:merge} although our use case is simple enough to omit a theoretical analysis via the external memory model.
