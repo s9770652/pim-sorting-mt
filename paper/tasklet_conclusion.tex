@@ -13,7 +13,7 @@ It also gives an outlook on future improvements.
 
 \paragraph{\IS{}}
 This algorithm works in place and is stable.
-It is arguably the best for short inputs with up to 16 elements as it offers the best performance on the benchmarked input distributions and, additionally, sorts stable and in place.
+It is arguably the best for short inputs with up to 16 elements as it offers the best performance on the benchmarked input distributions and, additionally, exhibits both the stability and the in-place property.
 Sentinel values enabled significant speedups \Dash a theme shared with most sorting algorithms.
 However, there is still room for improvement as its compilation is suboptimal, especially in case of the \IS{} with implicit sentinel values.
 
@@ -23,13 +23,13 @@ Testing various code snippets~\cites[9]{codish2017sortingnetworks}{m2015fastestw
 
 
 \paragraph{\ShS{}}
-This algorithm works in place but is not stable.
+This algorithm works in place but is unstable.
 It offers a significant speedup over \IS{} as long as the input is fairly distant from being sorted.
 Optimising it for long inputs will take some effort, though.
 
 
 \paragraph{\HS{}}
-This algorithm works in place but is not stable.
+This algorithm works in place but is unstable.
 The runtime is guaranteed to be in \(\bigoh{n \log n}\) and also proved to be mostly oblivious to the benchmarked input distributions.
 Nevertheless, it is severely outpaced by \QS{} and \MS{}, as becomes quite clear in \cref{fig:tasklet:conclusion:runtime}.
 Unless the runtime guarantee is absolutely needed and \MS{} is not an option because of its memory footprint, \HS{} should not be used.
@@ -41,21 +41,21 @@ Exploratory implementations, however, show that the performance suffers from thi
 
 
 \paragraph{\QS{}}
-This algorithm does not work in place and is not stable.
+This algorithm works out of place and is unstable.
 Its runtime is in \(\bigoh{n \log n}\) only in expectation, but the worst-case runtime of \(\bigoh*{n^2}\) is, thanks to random medians being selected as pivots, highly unlikely.
 \QS{} generally delivers top performance which becomes even better with deterministic medians as pivots if the input is known to be random enough.
 There is serious work needed to be done, however.
 So far, there is no prioritisation of shorter partitions, which is needed to prevent an overflow of the call stack, due to problems in the compilation.
 These problems currently also make both recursion and iteration necessary, depending on the data type, and we cannot rule out other impairments hidden in the compilation.
 
-Besides fixing these issues, future work could revolve around different partitioning patterns similar to those of dual-pivot~\cite{wild2012averagecase} or patter-defeating \QS{}~\cite{peters2021patterndefeatingquicksort}.
+Besides fixing these issues, future work could revolve around different partitioning patterns similar to those of dual-pivot~\cite{wild2012averagecase} or patter-defeating \QS{}.
 The latter makes use of \HS{} as fallback algorithm in worst cases.
-Since the maximum input length is limited on \acp{DPU}, perhaps a carefully tuned \ShS{} may be used instead.
+Since the maximum input length is rather limited on \acp{DPU}, perhaps a carefully tuned \ShS{} may be used instead.
 For this reason, \cref{fig:tasklet:conclusion:runtime} includes also \ShS{}, which starkly contrasts \HS{} despite its yet unoptimised step sizes.
 
 
 \paragraph{\MS{}}
-This algorithm does not work in place but is stable.
+This algorithm  works out of place but is stable.
 The runtime is guaranteed to be in \(\bigoh{n \log n}\) although it fluctuates somewhat, depending on the input distribution and input length.
 Having said that, the leeway to \QS{} is not too big most of the time, making it unlikely that a stabilised \QS{} with likewise increased memory footprint would be much of a benefit.
 Deferred copying of runs and fine-tuned unrolling could make the runtime of \MS{} drop even further.
@@ -65,7 +65,7 @@ A not-yet-implemented strategy to speed up flushing is the interpretation of two
 The compiler can be prescribed to do so by casting the involved 32-bit integer pointers to their 64-bit counterparts.
 Special care, however, is required with regards to the alignment, as the addresses of 32-bit integers are aligned to four bytes, whereas those of 64-bit integers are aligned to eight bytes~\cite[DPU ABI -- Data types]{upmemSDK}.
 A trivial implementation of such a flushing yielded both gains and losses for the runtime in the single-digits percentagewise, depending on the \MS{} and the input length.
-A feature, last but not least, worthwhile to implement should be the detection of natural runs~\cites[Chapter~2.6]{lang2009algorithmen}[Chapter~2.3.2]{wirth1975algorithmen}, that is runs already present in the input.
+A feature, last but not least, worthwhile to implement should be the detection of natural runs~\cites[Section~2.6]{lang2009algorithmen}[Section~2.3.2]{wirth1975algorithmen}, that is runs already present in the input.
 
 \begin{figure}[p]
 	\captionsetup[subfigure]{aboveskip=0mm, belowskip=1mm}
@@ -74,15 +74,19 @@ A feature, last but not least, worthwhile to implement should be the detection o
 		adaptive group=2 by 3,
 		groupplot ylabel={Cycles / \((n \lb n)\)},
 		x from 16 to 1024 minor,
-		/tikz/mark repeat=2,
+		not merge/.style={ /tikz/mark repeat=2, },
+		is merge/.style={ /tikz/mark indices={3,5,...,21}, },
 	}
 
 	\NewDocumentCommand{\allalgos}{m}{
-		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_32#1}
+		\plotpernlognwitherrors[not merge]{TrivialBC}{tableQuickRand_32#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors{MergeHalfSpace}{tableMerge_32#1}
-		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_32#1}
-		\plotpernlognwitherrors{Ciura}{tableShellCiura_32#1}
+		\begin{scope}
+			\clip (16, 0) rectangle (1024, 200);
+			\plotpernlognwitherrors[is merge]{MergeHalfSpace}{tableMerge_32#1}
+		\end{scope}
+		\plotpernlognwitherrors[not merge]{HeapOnlyDown}{tableHeap_32#1}
+		\plotpernlognwitherrors[not merge]{Ciura}{tableShellCiura_32#1}
 	}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{tasklet_summary_32}
@@ -117,11 +121,14 @@ A feature, last but not least, worthwhile to implement should be the detection o
 	\end{subfigure}
 
 	\RenewDocumentCommand{\allalgos}{m}{
-		\plotpernlognwitherrors{TrivialBC}{tableQuickRand_64#1}
+		\plotpernlognwitherrors[not merge]{TrivialBC}{tableQuickRand_64#1}
 		\pgfplotsset{update limits=false}
-		\plotpernlognwitherrors{MergeHalfSpace}{tableMerge_64#1}
-		\plotpernlognwitherrors{HeapOnlyDown}{tableHeap_64#1}
-		\plotpernlognwitherrors{Ciura}{tableShellCiura_64#1}
+		\begin{scope}
+			\clip (16, 0) rectangle (1024, 200);
+			\plotpernlognwitherrors[is merge]{MergeHalfSpace}{tableMerge_64#1}
+		\end{scope}
+		\plotpernlognwitherrors[not merge]{HeapOnlyDown}{tableHeap_64#1}
+		\plotpernlognwitherrors[not merge]{Ciura}{tableShellCiura_64#1}
 	}
 	\begin{subfigure}{\textwidth}
 		\tikzsetnextfilename{tasklet_summary_64}
