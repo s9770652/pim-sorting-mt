@@ -13,7 +13,7 @@
 }
 \def\quickalgos{Normal,TrivInThresh,NoTrivial,ThreshThenTriv,TrivialBC,ThreshBC,ThreshTrivBC,OneInsertion}
 
-The quality of the compilation of \QS{} is highly erratic to such an extent that \Dash even with the same pivots \Dash one implementation variant may see a runtime reduction of \qty{25}{\percent} from another one where none would be expected.
+The quality of the compilation is highly erratic to such an extent that \Dash even with the same pivots \Dash one implementation variant may see a speedup of \num{1.33} over another one where none would be expected.
 There are small details influencing the runtime.
 For instance, storing the value of the pivot in a dedicated variable instead of accessing it through a pointer changes the runtime by a few percentage points in both directions, depending on the rest of implementation.
 But as hinted at in \cref{sec:tasklet:quick:aspects}, there are four major parameters to examine:
@@ -22,18 +22,18 @@ Before the findings are discussed, the first parameter shall be explained in mor
 
 Besides falling back to \IS{} if 18 elements or fewer remain (\enquote{treshold undercut}), another base case is imaginable, namely a termination if at most one element remains (\enquote{trivial length}).
 Realistically speaking, it should not be needed to check for trivial lengths because even though it would take just one additional instruction, such tiny partitions are rare, and \IS{} would terminate after a few instructions anyway.
-Nonetheless, its inclusion or exclusion can have significant impacts as does the position at which the checks for the two base cases happen.
+Nonetheless, its inclusion or exclusion can have significant impact as does the position at which the checks for the two base cases happen.
 The following \lcnamecrefs{imp:normal} were benchmarked:
 \begin{enumerate}[label=(\liningnums{\arabic*})]
 	\item\label[implementation]{imp:normal}
 	If the length is trivial, terminate immediately.
 	Otherwise, if the threshold is undercut, sort with \IS{} and terminate.
-	Otherwise, partition the input and use \QS{} on both partitions.
+	If neither, partition the input and invoke \QS{} on both partitions.
 %	\textcolor{red}{[Normal]}
 
 	\item\label[implementation]{imp:triviality_within_threshold}
-	If the threshold is undercut, check if the length is trivial and terminate immediately or sort with \IS{} and terminate, respectively.
-	Otherwise, partition the input and use \QS{} on both partitions.
+	If the threshold is undercut, check if the length is trivial and either terminate immediately or sort with \IS{} and terminate afterwards.
+	Otherwise, partition the input and invoke \QS{} on both partitions.
 %	\textcolor{red}{[TrivInThresh]}
 	\begin{itemize}
 		\item
@@ -42,17 +42,17 @@ The following \lcnamecrefs{imp:normal} were benchmarked:
 
 	\item\label[implementation]{imp:no_triviality}
 	If the threshold is undercut, sort with \IS{} and terminate.
-	Otherwise, partition the input and use \QS{} on both partitions.
+	Otherwise, partition the input and invoke \QS{} on both partitions.
 %	\textcolor{red}{[NoTrivial]}
 	\begin{itemize}
 		\item
-		This \lcnamecref{imp:no_triviality} forgoes the check on triviality completely, at the cost of some unneeded uses of \IS{}.
+		This \lcnamecref{imp:no_triviality} forgoes the check on triviality completely at the cost of some unneeded invocations of \IS{}.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_then_triviality}
 	If the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, if the length is trivial, terminate immediately.
-	Otherwise, partition the input and use \QS{} on both partitions.
+	If neither, partition the input and invoke \QS{} on both partitions.
 %	\textcolor{red}{[ThreshThenTriv]}
 	\begin{itemize}
 		\item
@@ -63,37 +63,37 @@ The following \lcnamecrefs{imp:normal} were benchmarked:
 	\item\label[implementation]{imp:triviality_before_call}
 	If the threshold is undercut, sort with \IS{} and terminate.
 	Otherwise, partition the input.
-	Then, check for either partition if its length is trivial and use \QS{} on it if not.
+	Then, check for either partition if its length is trivial and invoke \QS{} on it if not.
 %	\textcolor{red}{[TrivialBC]}
 	\begin{itemize}
 		\item
-		This \lcnamecref{imp:triviality_before_call}, as well as the next two, eliminates some unneeded uses\todo[info]{Ich kann nicht entfziffern, was Du hierzu schriebst.} of \QS{}.
+		This \lcnamecref{imp:triviality_before_call}, as well as the next two, eliminates some unneeded invocations of \QS{}.
 %		In the recursive case, these \lcnamecrefs{imp:triviality_before_call} lose the property of being tail-recursive.
 	\end{itemize}
 
 	\item\label[implementation]{imp:threshold_before_call}
 	Partition the input.
-	Check for either partition if the threshold is undercut and use either \IS{} or \QS{} on it.
+	Check for either partition if the threshold is undercut and invoke either \IS{} or \QS{} on it.
 %	\textcolor{red}{[ThreshBC]}
 
 	\item\label[implementation]{imp:threshold_and_triviality_before_call}
 	Partition the input.
-	Check for either partition if its length is trivial or if the threshold is undercut and use either \IS{}, \QS{}, or nothing on it.
+	Check for either partition if its length is trivial or if the threshold is undercut and invoke either \IS{}, \QS{}, or nothing on it.
 %	\textcolor{red}{[ThreshTrivBC]}
 
 	\item\label[implementation]{imp:one_insertion}
 	If the threshold is undercut, terminate immediately.
-	Otherwise, partition the input and use \QS{} on both partitions.
+	Otherwise, partition the input and invoke \QS{} on both partitions.
 	After all \QS*{} are done, sort the whole input array with \IS{}.
 %	\textcolor{red}{[OneInsertion]}
 	\begin{itemize}
 		\item
 		This \lcnamecref{imp:one_insertion} always does one pass of \IS{}.
-		For example, the other \lcnamecrefs{imp:normal} use \IS{} roughly 91 times on 1024 uniformly distributed elements.
+		For example, the other \lcnamecrefs{imp:normal} invoke \IS{} roughly 91 times on 1024 uniformly distributed elements.
 	\end{itemize}
 \end{enumerate}
 The performances of all benchmarked implementation on 32-bit integers are shown in \cref{fig:quick:implementations}.
-The measurements were conducted on uniform input distributions so the deterministic pivots are, in expectation, of the same quality as the random ones.
+The measurements were conducted on uniform input distributions, so the deterministic pivots are, in expectation, of the same quality as the random ones.
 
 \pgfplotsset{
 	quick matrix/.style={
@@ -287,5 +287,5 @@ There is a great variety in the compilations but some of the common occurrences 
 This focus on the left pointer \lstinline|i| is partially explainable by it being used to calculate the final position of the pivot and, thus, the inner boundaries of both new partitions.
 As explained earlier under \enquote{\nameref{sec:tasklet:quick:imp:sentinels}}, the right pointer \lstinline|j| stops ultimately either on the left pointer \lstinline|i| directly (\lstinline|j == i|) or on the element behind it (\lstinline|j == (i - 1)|).
 Since the pivot is moved to address \lstinline|i|, the inner boundaries of the partitions are \lstinline|i - 1| and \lstinline|i + 1|.
-Implementations using the right pointer alone or both of them to calculate the boundaries were spot-checked to see whether it alleviates the problems but the results were mixed:
+Implementations using the right pointer alone or both of them to calculate the boundaries were spot-checked to see whether it alleviates the problems, but the results were mixed:
 from betterment over indifference to worsening, everything was observable.

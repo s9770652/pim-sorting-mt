@@ -45,9 +45,9 @@ For this reason, the random median is used as default method throughout this the
 \Cref{fig:quick:runtime} shows the runtime of \QS{} in it default configuration.
 \Cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} additionally contain the runtimes with deterministic medians as well as the standard errors of the measurements.
 The mean runtimes are rather close across all input distributions, a consequence of using random medians and of swapping elements equal to the pivot.
-In fact, it is \IS{} that primarily causes the discrepancies, as measurements with the threshold set to one element do prove.
-This also explains why \QS{} performs better, the longer an input following Zipf's law becomes:
-Zipf's law generates many duplicates, and the longer the total input becomes, the more partitions contain only one or two different values, speeding \IS{} up significantly.
+In fact, it is \IS{} that primarily causes the discrepancies, as measurements with the threshold set to one element prove.
+This also explains why \QS{} performs better, the longer an input with Zipf's distribution becomes:
+Zipf's distribution generates many duplicates, and the longer the total input becomes, the more partitions contain only one or two different values, speeding \IS{} up significantly.
 
 One might expect \QS{} to perform even better on sorted and reverse sorted input, since everything is either already in the correct position or because the two pointers quickly invert large portions of the inputs.
 However, a side effect of swapping the pivot twice can be that many elements are displaced by one position from where they should be in the sorted output.
@@ -56,19 +56,20 @@ Assume that the element \(n/2\) is selected as pivot out of the elements \(n\), 
 The pivot gets swapped with the last element, that is with \(1\).
 The array equals now the sequence
 \begin{equation*}
-	n, \: n - 1, \: \dots, \: n/2 + 1, \: 1, \: n/2 - 1, \: \dots, \: 3, \: 2, \: n/2 \mperiod
+	\chevrons{\: n, \: n - 1, \: \dots, \: n/2 + 1, \: 1, \: n/2 - 1, \: \dots, \: 3, \: 2, \: n/2 \:} \mperiod
 \end{equation*}
 Thereupon, the two pointers invert the rest of the input, producing
 \begin{equation*}
-	2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2 + 1, \: \dots, \: n - 1, \: n, \: n/2 \mperiod
+	\chevrons{\: 2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2 + 1, \: \dots, \: n - 1, \: n, \: n/2 \:} \mperiod
 \end{equation*}
 Swapping the pivot with the first element of the right-hand partition turns the array into
 \begin{equation*}
-	2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2, \: n/2 + 2, \: \dots, \: n - 1, \: n, \: n/2 + 1 \mperiod
+	\chevrons{\: 2, \: 3, \: \dots, \: n/2 - 1, \: 1, \: n/2, \: n/2 + 2, \: \dots, \: n - 1, \: n, \: n/2 + 1 \:} \mperiod
 \end{equation*}
 If the median is selected from random elements, subsequent partitioning will continue to roughly halve the partitions, bringing \(1\) and \(n/2 + 1\) closer to their output locations, so \IS{} will not need too many elements.
 Still, an implementation without swapping the pivot delivers better performance for such cases, but in exploratory benchmarks, the performance on more random input distributions suffered drastically.
-However, if the median is selected from deterministic elements, the performance now degrades, which is why the respective plots in \cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} leave the charts.
+
+Because of the partition pattern described above, the performance degrades on reverse sorted inputs if the median is selected from deterministic elements.
 The pivot for the right-hand partition will be selected out of the elements \(n/2 + 2\), \(3/4n\), and \(n/2 + 1\).
-Obviously, the pivot \(n/2 + 2\) barely reduces the problem size, and subsequent pivots exhibit essentially the same behaviour.
-Indeed, this leads to an eventual overflow of the call stack.
+Obviously, the pivot \(n/2 + 2\) barely reduces the problem size, and subsequent pivots exhibit essentially the same behaviour, which is why the respective plots in \cref{fig:quick:runtime_uint32,fig:quick:runtime_uint64} leave the charts.
+Indeed, an overflow of the call stack occurs eventually.

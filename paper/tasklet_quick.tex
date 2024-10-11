@@ -1,23 +1,22 @@
 \section{\texorpdfstring{\QS{}}{QuickSort}}
 \label{sec:tasklet:quick}
 
-\QS{} \cites{hoare1962quicksort}[88-91]{maurer1974datenstrukturen}[Chapter~2.2.6]{wirth1975algorithmen} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh*{n^2}\).
-It selects a so-called \emph{pivot} element from the input array, then, scans the whole input array and moves elements less or greater than the pivot are moved to the left-hand or right-hand side of the array, that is the \emph{partitions}, respectively;
-elements equal to the pivot are allowed to be in either partition.
+\QS{} \cites{hoare1962quicksort}[88-91]{maurer1974datenstrukturen}[Section~2.2.6]{wirth1975algorithmen} uses partitioning to sort in an expected average runtime of \(\bigoh{n \log n}\) and a worst-case runtime of \(\bigoh*{n^2}\).
+It selects a so-called \emph{pivot} element from the input array, then, scans the whole input array and moves elements less or greater than the pivot to the left-hand or right-hand side of the array, that is the \emph{partitions}, respectively.
+Elements equal to the pivot are allowed to be in either partition.
 Finally, \QS{} calls itself recursively on the left-hand and right-hand partition.
+\QS{} sorts out of place, as additional space of size \(\bigoh{\log n}\) is needed for a call stack.
+Furthermore, \QS{} is unstable.
 
 The partitioning is implemented using a modification of \citeauthor{hoare1962quicksort}'s original scheme \cite{hoare1962quicksort}:
 After the pivot \lstinline|p| is selected, two pointers \lstinline|i| and \lstinline|j| are set to either end of the array.
 The left pointer \lstinline|i| moves rightwards until finding an element at least as great as the pivot (\lstinline|*i >= *p|).
 Then, the right pointer \lstinline|j| moves leftwards until finding an element at most as great as the pivot (\lstinline|*j <= *p|).
-If the two elements found are not equal, they need to be swapped to put them in the correct partition.
+If the two elements found are unequal, they need to be swapped to put them in the correct partition.
 But even if they are equal, swapping them anyway does not put them in an incorrect partition.
 After swapping the elements, the pointers move onwards as described.
 This process of repeated swaps continues until the pointers pass each other.
 The position where the right pointer \lstinline|j| came to rest marks the end of the left-hand partition, and where the left pointer \lstinline|i| did marks the beginning of the right-hand partition.
-
-\QS{} does not sort in place, as additional space of size \(\bigoh{\log n}\) is needed for a call stack.
-Furthermore, \QS{} is not stable.
 
 \input{tasklet_quick_aspects}
 
