@@ -30,27 +30,26 @@
 
 For decades, processor and memory technology have developed in opposite directions.
 In case of processors, particular attention has been paid to speed, whereas it has been capacity for memory.
-As a consequence, the performance of a processor core has grown by up to \qty{52}{\percent} year after year, whilst the latency of \ac{DRAM}, for example, has been improving only by \qty{7}{\percent} (see \cref{fig:intro:memory wall}).
+As a consequence, the performance of a processor core has grown by up to \qty{52}{\percent} year after year, whilst the latency of \acrolabel{DRAM}dynamic random-access memory\acused{DRAM} (\acs{DRAM}), for example, has been improving only by \qty{7}{\percent} (see \cref{fig:intro:memory wall}).
 The improvements in bandwidth, though not as bad as those in latency, could not keep up with processor improvements as well.
 The emergence of multicore architectures has aggravated the discrepancies.
 Thus looms the \emph{memory wall} which gets hit when a processor is forced to idle whilst waiting for data.
 Techniques like prefetching and multi-level caches have been developed to defer the impact, and yet, idle times make up as much as \qty{60}{\percent} of the total runtime~\cite{mutlu23memorycentric}.
-Additionally, despite latency improvements being partially slowed down due to energy concerns~\cite[130]{hennessy2012computer}, memory transfers are also responsible for much of the total power consumption of a system.
-In consumer devices, \qty{63}{\percent} of the total power consumption is spent on memory transfers~\cite{boroumand2018google}, and \qty{40}{\percent} in scientific applications~\cite{kestor2013quantifying}.
+Additionally, despite latency improvements being partially slowed down due to energy concerns~\cite[130]{hennessy2012computer}, memory transfers are responsible for much of the total power consumption of a system, accounting for \qty{63}{\percent} of the total in consumer devices~\cite{boroumand2018google} and \qty{40}{\percent} in scientific applications~\cite{kestor2013quantifying}.
 
 One approach to tear the memory wall down is \acrolabel{PIM}\emph{\acl{PIM}}\acused{PIM} (also \emph{processing in memory}, \acs{PIM}), which is further divisible into \acl*{PuM} and \acl*{PnM}~\cite{mutlu23memorycentric,mutlu2022Benchmarking,peccerillo2022survey}.
 \Acfi{PuM} denotes analogue computation through repurposing existing structures within a memory device, like memory storage cells or and peripheral circuitry.
 This allows mainly for simple bitwise operations but also for random number generation.
-Even vector-matrix multiplication is possible in memory built from crossbar arrays, allowing for more complex tasks like signal processing, compression, and image filtering~\cite{li2017analogue}.
+Even vector-matrix multiplication is possible in memory built from crossbar arrays, enabling more complex tasks like signal processing, compression, and image filtering~\cite{li2017analogue}.
 
 \Acfi{PnM} denotes digital computation through additional compute engines close to or in the memory device.
 The memory latency improves because of the proximity to the storage, and the bandwidth scales naturally with the size of the memory.
-Separate circuitry allows for more complex applications like weather modelling~\cite{gagandeep2020nero} or personalised recommendation~\cite{liu2020recnmp}.
+Such separate circuitry allows for more complex applications like weather modelling~\cite{gagandeep2020nero} or personalised recommendation~\cite{liu2020recnmp}.
 
-The \ac{PnM} solution offered by \upmem{} augments regular \ac{DRAM} modules by adding general-purpose \acp*{DPU}, leading to potentially thousands of \acsp*{DPU} in a fully equipped system.
+The \ac{PnM} solution offered by \upmem{} augments regular \ac{DRAM} modules by adding general-purpose \acp*{DPU}, of which there may be thousands in a fully equipped system.
 The parallelism potential is elevated by each \acs*{DPU} being capable of thread-level parallelism.
-Next to the memory of a \acsp*{DRAM} module, which is also referred to as \acf*{MRAM}, each \acs*{DPU} possesses a private scratchpad memory called \acf*{WRAM} which is smaller but faster than the \acs*{MRAM}.
-Despite the rather limited computational prowess of individual \acsp*{DPU}, the architecture has sparked interest~\cite{mutlu23memorycentric,mutlu2022Benchmarking,peccerillo2022survey,hyun2024pathfinding} and promising performance in applications like sparse matrix-vector multiplication~\cite{giannoula2022sparse}, time series analysis~\cite{mutlu2022Benchmarking}, reinforcement learning~\cite{gogineni2024swiftrl}, deep learning recommendation models~\cite{chen2024updlrm}, and compression~\cite{nider2021casestudy} make further investigations worthwhile.
+Next to the memory of a \acs*{DRAM} module, to which is also referred as \acf*{MRAM}, each \acs*{DPU} possesses a private scratchpad memory called \acf*{WRAM} which is smaller but faster than the \acs*{MRAM}.
+Despite the rather limited computational prowess of individual \acsp*{DPU}, the architecture has sparked interest~\cite{mutlu23memorycentric,mutlu2022Benchmarking,peccerillo2022survey,hyun2024pathfinding} and promising performance in applications like sparse matrix-vector multiplication~\cite{giannoula2022sparse}, time series analysis~\cite{mutlu2022Benchmarking}, reinforcement learning~\cite{gogineni2024swiftrl}, deep-learning recommendation models~\cite{chen2024updlrm}, and compression~\cite{nider2021casestudy} make further investigations worthwhile.
 
 One possible new application for \ac{PIM} is sorting.
 Sorted data is crucial in many applications, as it allows to search in logarithmic time instead of linear time through a binary search, determine whether a data set is a subset of another one, delete duplicates trivially, or impose a topological ordering on a directed acyclic graph of dependencies for time-forward processing.
@@ -87,3 +86,4 @@ Taking our cue from \citeauthor{axtmann2020engineering}~\cite{axtmann2020enginee
 \end{description}
 The range of possible values in the uniform input distribution is motivated by a simplification of the input generation.
 There is no impact on the performance on 64-bit integers by their 33 most significant bits being always set to zero.
+The program code can be downloaded from \url{https://github.com/s9770652/pim-sorting}.
