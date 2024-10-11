@@ -3,12 +3,12 @@
 
 This \lcnamecref{sec:tasklet} is concerned with sorting data which fits into the \ac{WRAM} entirely.
 The presented sorting algorithms are designed for sequential execution by a single tasklet.
-Key characteristics of the \ac{DPU} architecture which are of especial importance in this \lcnamecref{sec:tasklet} are the uniform access to \ac{WRAM} data and the uniform cost of instructions.
+Key characteristics of the \ac{DPU} architecture which are of especial importance in this \lcnamecref{sec:tasklet} are the uniform access to \ac{WRAM} data and the unit-cost of instructions.
 
 \Cref{sec:tasklet:insertion} discusses \IS{} which is a component of all algorithms presented thereafter as it is lightweight and performant on short inputs.
 \Cref{sec:tasklet:shell} covers \ShS{} which is a generalisation of \IS{}.
 \hyperref[sec:tasklet:heap]{\nameCrefs{sec:tasklet:heap} }\labelcref{sec:tasklet:heap}, \labelcref{sec:tasklet:quick}, and \labelcref{sec:tasklet:merge} deal with \HS{}, \QS{}, and \MS{}, respectively, which are more elaborate algorithms suitable for long inputs.
-These \lcnamecrefs{sec:tasklet:insertion} give a short presentation of their respective algorithm at the beginning, ensued by a discussion of key parameters in their designs.
+Every \lcnamecref{sec:tasklet:insertion} gives a short presentation of its respective algorithm at the beginning, ensued by a discussion of key parameters in their designs.
 This is usually followed by an insight into non-algorithmic challenges faced during development caused by the compiler whose optimisations are often of suboptimal quality.
 Finally, an evaluation of the performance of the respective algorithm completes each \lcnamecref{sec:tasklet:insertion}.
 \Cref{sec:tasklet:conclusion} summarises the findings on the presented algorithms and gives a brief outlook on future improvements.

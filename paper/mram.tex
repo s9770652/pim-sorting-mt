@@ -3,8 +3,8 @@
 
 This \lcnamecref{sec:mram} is concerned with sorting data which resides in the \ac{MRAM}.
 Both a sequential sorting algorithm for execution by a single tasklet as well as a parallel sorting algorithm for execution by a whole \ac{DPU} are presented.
-We restrict ourselves to varieties of \MS{} since it allow for stable sorting and, also, the performance of \MS{} proved to be competitive in sorting \ac{WRAM} data in \cref{sec:tasklet}.
-Next to the uniform cost of instructions, key characteristics of the \ac{DPU} architecture which are of especial importance in this \lcnamecref{sec:mram} are the two-tier memory hierarchy and inter-tasklet communication through shared memory.
+We restrict ourselves to varieties of \MS{} since it allows for stable sorting and, also, the performance of \MS{} proved to be competitive in sorting \ac{WRAM} data in \cref{sec:tasklet}.
+Next to the unit-cost of instructions, key characteristics of the \ac{DPU} architecture which are of especial importance in this \lcnamecref{sec:mram} are the memory hierarchy and inter-tasklet communication through shared memory.
 
 A challenge in designing an algorithm for \ac{MRAM} data is the management of data transfers between the large \ac{MRAM} and the small \ac{WRAM}.
 A key aspect of the transfer management is the use of the sequential reader, that is a software abstraction provided by \upmem{} which simplifies moving data from the \ac{MRAM} to the \ac{WRAM}.
@@ -14,7 +14,7 @@ A key aspect of the transfer management is the use of the sequential reader, tha
 Finally, the parallel \ac{MRAM} \MS{} is built from the sequential one and analysed in \cref{sec:mram:par}.
 
 In some instances, we employ \lstinline|T| to denote the data type of the input and \lstinline[keywords={}]|sizeof(T)| to denote the size of an element of type \lstinline|T| in bytes.
-Every measurement presented in this \lcnamecref{sec:mram} was repeated ten times, which is a sufficient number given the large inputs and the low runtime variance of the \MS*{}.
+Every measurement presented in this \lcnamecref{sec:mram} was repeated ten times, which is a sufficient number given the large inputs and the low runtime variance of the \ac{MRAM} \MS*{}.
 \Cref{apx:mram} contains further measurements but the ones essential for following the content of this \lcnamecref{sec:mram} are also presented in figures herein.
 
 \input{mram_reader}
