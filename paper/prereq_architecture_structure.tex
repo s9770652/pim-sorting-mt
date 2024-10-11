@@ -10,17 +10,17 @@
 		mem d/.style={ fill=accentcolor!10!white },
 		mem u/.style={ fill=accentcolor!25!white },
 	]
-		\def\lenx{25}
+		\def\lenx{25.5}
 		\def\pad{0.5}
 		\def\numdpu{4}
 		\def\paddpu{0.45}
 		\def\paddpuflow{\paddpu}
 		\def\intermem{1}
 		\def\lendpux{(\lenx-2*\pad-\numdpu*\paddpu)}
-		\def\lendpuy{(5)}
+		\def\lendpuy{(5.6)}
 		\def\lencontrolx{((\lenx-2*\pad-\intermem)/2)}
-		\def\lencontroly{1}
-		\def\leny{(\lendpuy+\lencontroly+2*\pad+\numdpu*\paddpu+1)}
+		\def\lencontroly{1.1}
+		\def\leny{(\lendpuy+\lencontroly+2*\pad+\numdpu*\paddpu+1.5)}
 
 		% DPUs.
 %		\draw (0, 0) rectangle +(\lenx, \leny);
@@ -78,24 +78,24 @@
 
 	\caption{
 		Schematic depiction of a \ac{PIM} chip.
-		The bright components are part of a standard \ac{DDR} package, the dark components are exclusive to \ac{PIM} chips.~\cite{upmem2019HotChips}
+		The bright components are part of a standard \ac{DRAM} package, the dark components are exclusive to \ac{PIM} chips.~\cite{upmem2019HotChips}
 	}
 	\label{fig:arch:chip}
 \end{figure}
 
 A \ac{PIM} chip (\cref{fig:arch:chip}) contains eight \ac{DRAM} banks of \qty{64}{\mebi\byte} each.
 These are connected with a regular \ac{DDR} interface through which a host \ac{CPU} can access the memory.
-Next to each \ac{DRAM} bank, there is a \ac{DPU} which possesses a direct connection to it, thus bypassing the \ac{DDR} interface.
-Such an access is also called a \acfi{DMA} and is handled by the \emph{\ac{DMA} engine}.
+Next to each \ac{DRAM} bank, there is a \ac{DPU} with a direct connection to it, thus bypassing the \ac{DDR} interface.
+An access to the memory bank is also called a \acfi{DMA} and is handled by the \emph{\ac{DMA} engine}.
 Furthermore, the eight \acp{DPU} are connected with a special control interface which, in turn, is connected with the memory controller.
-This allows the host to communicate with the \acp{DPU} but it does not allow \acp{DPU} to access \ac{DRAM} banks other than their own.
+This enables the host to communicate with the \acp{DPU} but it does not allow \acp{DPU} to access \ac{DRAM} banks other than their own.
 It is not possible for a \ac{DPU} and the host to access a \ac{DRAM} bank concurrently.
 
 \Acp{DPU} contain several major and minor memories.
 The memory of the \ac{DRAM} bank is also referred to as \acfi{MRAM}.
-It is by far the largest memory of a \ac{DPU} and typically holds both the input provided by the host and the output calculated by the \ac{DPU}.
+It is by far the largest memory of a \ac{DPU} and typically holds the input provided by the host and the output calculated by the \ac{DPU}.
 However, the \ac{MRAM} is also the slowest memory, for each \ac{DMA} comes with a latency of dozens of cycles.
-Also, despite the theoretical maximum bandwidth of \qty{17.9}{\gibi\byte\per\second} of \ac{DDR}-2400\todo[info]{Darf man überhaupt so rechnen?}, the empirically measured bandwidth of a \ac{DMA} is \qty{603}{\mebi\byte\per\second} on a v1A \ac{DPU}.
+Also, despite the theoretical peak bandwidth of \qty{2.2}{\gibi\byte\per\second} of \ac{DDR}-2400, the empirically measured bandwidth of a \ac{DMA} is \qty{0.6}{\gibi\byte\per\second} on a v1A \ac{DPU}.
 
 The \acfi{WRAM} is based on faster but more expensive and less dense static \ac{RAM}.
 For this reason, the \ac{WRAM} is far smaller, comprising only \qty{64}{\kibi\byte}, yet its latency is practically zero, and the measured bandwidth for a v1A \ac{DPU} reaches \qty{2688}{\mebi\byte\per\second}.
@@ -111,7 +111,7 @@ The \ac{IRAM} has a size of \qty{24}{\kibi\byte} which translates to a maximum o
 \footnote{
 	In fact, a v1B \ac{DPU} can hold \qty{2}{\kibi\byte} of data less in its \ac{MRAM} and 128 instructions fewer in its \ac{IRAM} since parts of those are \textquote{reserved for production and quality control purposes.}~\cite[Introduction~-- DPU chip characteristics]{upmemSDK}
 }
-This memory can be modified only by the host, as the \ac{DPU} can only read it, which is an automated process usually.
+This memory can be modified only by the host, as the \ac{DPU} can only read it in usually automated processes.
 
 Next to these major memories, there is also a \qty{256}{\bits} large \emph{atomic memory} whose bits are accessible in a thread-safe way, allowing for mutual exclusion, barriers, and similar.
 Furthermore, there is a \qty{64}{\bits} large \emph{run memory} through which individual threads can be booted, suspended, and resumed by setting the corresponding status bit.

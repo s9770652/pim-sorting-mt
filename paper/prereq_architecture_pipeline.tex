@@ -6,9 +6,9 @@ Once a stage has been completed, the respective transistors are free to process 
 The pipeline is \emph{scalar}, meaning there is at most one instruction per stage at any time, and \emph{executes in order}, meaning instructions are statically scheduled and executed in the order as indicated by the compilation.
 Threads can have only one scheduled instruction in the pipeline.
 However, all threads use the same pipeline, so a nominal throughput of one instruction per cycle is achieved if enough threads are active for all stages of the pipeline to be continuously performed (\cref{fig:arch:pipeline}).
-The pipeline consists of fourteen stages, amongst these the fetching of the instruction from the \ac{IRAM}, the reading of the operands from the registers, and the performing of the operation itself while accessing the \ac{WRAM} if needed.
+The pipeline consists of fourteen stages such as the fetching of the instruction from the \ac{IRAM}, the reading of the operands from the registers, and the performing of the operation itself while accessing the \ac{WRAM} if needed.
 The last three stages can be interleaved, that is performed in parallel, with the first three stages.
-Thence, the pipeline length is effectively reduced to eleven, meaning only eleven active threads are needed to exploit the full computing capabilities of a DPU.
+Thence, the pipeline length is effectively reduced to eleven, meaning only eleven active threads are needed to exploit the computing capabilities of a \ac{DPU} in full capacity.
 
 \begin{figure}
 	\centering
@@ -49,6 +49,6 @@ Whilst a thread is performing a \ac{DMA}, it is suspended and removed from the p
 Therefrom, the employment of more than eleven threads allows to hide \ac{DMA} latency by keeping the pipeline full.
 
 As concluding remark, it shall be mentioned that there are circumstances under which the execution of an instruction takes twelve cycles instead of eleven.~\cite[Instruction Set Architecture -- Efficient scheduling]{upmemSDK}
-This is related to the identifiers of the registers used, however, the compiler usually manages to avoid these situations.
-Hence, one can regard a \ac{DPU} as a \emph{uniform-cost machine} where each instruction takes eleven cycles to complete with the seldom exception of some taking twelve cycles and with the exception of \acp{DMA}.
+This is related to the identifiers of the registers used, however, the compiler usually manages to evade these circumstances.
+Hence, one can regard a \ac{DPU} as a \emph{unit-cost machine} where each instruction takes eleven cycles to complete with the seldom exception of some taking twelve cycles and with the exception of \acp{DMA}.
 Counting instructions is, therefore, a valid technique to assess the performance of some piece of code.

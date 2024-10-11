@@ -1,9 +1,9 @@
 \subsection{Programming a Kernel}
 \label{sec:prereq:arch:code}
 
-Executing tasks on \acp{DPU} requires both a program executed on the host \ac{CPU} and a kernel executed on the \acp{DPU}.
-\Acp{DPU} are handled in groups, called \emph{ranks}, of up to 64 \acp{DPU} from the same side of a \ac{DIMM}.
-The ranks, in turn, are aggregated in a \emph{\ac{DPU} set}.
+Executing tasks on an \upmem{} system requires both a program executed on the host \ac{CPU} and a kernel executed on the \acp{DPU}.
+\Acp{DPU} are handled in groups of up to 64 \acp{DPU} from the same rank of a \ac{DIMM}.
+The groups, in turn, are aggregated in a \emph{\ac{DPU} set}.
 A typical course of action is the following:
 \begin{enumerate}
 	\item
@@ -19,10 +19,10 @@ A typical course of action is the following:
 	Read the output from the \ac{MRAM} and/or \ac{WRAM}.
 
 	\item
-	Go back to the third step if needed.
+	Go back to the second or third step if needed.
 \end{enumerate}
 When kernels are executed synchronously, the host cannot access the memory of a \ac{DPU} until all \acp{DPU} in the whole set have finished.
-But even with an asynchronous execution, the host cannot access the memory until all \acp{DPU} in the respective rank have finished.
+But even with an asynchronous execution, the host cannot access the memory until all \acp{DPU} in the same rank have finished.
 Note that data is generally not deleted when a kernel finishes, so subsequent executions can hark back to previous results.
 Also, any communication between the host and the \acp{DPU} must be initiated by the host.
 The host program can be written in \langC{}, \langCpp{}, \langJava{}, or \langPython{}.
@@ -31,9 +31,9 @@ Apart from a few additional functionalities provided by the \upmem{} \ac{API} fo
 The software development kit includes a simulator which allows to run kernels on machines without \upmem{} \acp{DIMM}.
 The kernel has to be written in either \langC{} or assembler, but we will focus on the former.
 Its entry point is the \lstinline|main| function, thence one can proceed as in any \langC{} program.
-All tasklets execute the same kernel but their control flow can be changed by simply including conditionals on the tasklet identifiers.
+All tasklets execute the same kernel, but their control flow can be changed by simply including conditionals on the tasklet identifiers.
 Synchronisation between tasklets can be achieved, amongst others, via barriers, mutual exclusion, and semaphores.
-Communication between tasklets is achievable by defining global variables in the \ac{WRAM}.
+Communication between tasklets is achievable by defining global variables.
 The \langC{} standard library is only partially available as some compute-intensive functionalities have been not been implemented, for example the entire \lstinline|math| library.
 
 The biggest changes to a regular \langC{} program are in relation to the memory.
@@ -56,13 +56,13 @@ There is also no model of ownership, so tasklets can write to any memory address
 Heed must be paid when structuring the scarce \ac{WRAM}, which is subject again in \cref{sec:mram:triple}.
 
 As hinted before, transferring data between the \ac{MRAM} and the \ac{WRAM} is in the responsibility of the programmer.
-When only single elements are to be accessed, \ac{MRAM} data can be treated like normal variables.
+When only single elements are to be accessed, variables in the \ac{MRAM} can be treated like normal variables.
 For example, \lstinline|var = arr[i]| is valid code no matter whether the array \lstinline|arr|, the variable \lstinline|var|, or the index \lstinline|i| have been declared to reside in the WRAM or the MRAM.
 However, this still constitutes one or more \acp{DMA} on each use, and each \ac{DMA} comes at a cost.
 According to measurements~\cite{mutlu2022Benchmarking}, reading from the \ac{MRAM} has an overhead of \qty{77}{\cycles}, whilst writing to the \ac{MRAM} has an overhead of \qty{61}{\cycles}.
 The transfer of each byte costs a further \qty{0.5}{\cycles}.
-This means that \acp{DMA} for about \qty{128}{\byte} of data or less are dominated by the overhead.
-Therefore, it recommended to move large blocks of \ac{MRAM} data into the \ac{WRAM}, perform calculations there, and move the modified data block back to the \ac{MRAM}.
+This means that \acp{DMA} of about \qty{128}{\byte} or less are dominated by the overhead.
+Therefore, it is recommended to move large blocks of \ac{MRAM} data into the \ac{WRAM}, perform calculations there, and move the modified data block back to the \ac{MRAM}.
 This way, the overhead is mitigated.
 Note that, like for \ac{WRAM} data, the time to access \ac{MRAM} data is independent of the exact location \Dash only the memory type matters.
 
@@ -90,12 +90,13 @@ For a performant kernel execution, it is generally recommended to restrict onese
 Some 64-bit functionalities are executed in eleven cycles, like loads and stores, but most take twice or even thrice as long.
 Multiplication, division, and floating point arithmetic are emulated in software, so they should be avoided if necessary.
 In their stead, addition, subtraction, and bitwise logic should be used.
-Also, due to the uniform-cost model, a decrease in the count of instructions translates into a performance gain.
+Also, due to the unit-cost model, a decrease in the count of instructions translates into a performance gain.
 Unfortunately, a common issue is a nosediving quality of the compilation, perhaps resulting from a wrong configuration of the \abb{LLVM}-based compiler.
-Investigating the compilation and trying different approaches \Dash including even mundane alternatives like reordering independent \lstinline|if| statements \Dash is paramount when aiming for top performance and, thus, a recurring theme in this thesis.
-General experience shows that explicitly saving the result of a computation if the value is reused later on prevents the compiler from issuing a recalculation which would hurt elsewise due to the compute-boundedness of the architecture.
+Investigating the compilation and trying different approaches \Dash including even mundane alternatives like reordering independent \lstinline[keywords={}]|if| statements \Dash is paramount when aiming for top performance and, therefore, a recurring theme in this thesis.
+In our experience, explicitly saving the result of a computation if the value is reused at a later time prevents the compiler from issuing a recalculation which would elsewise hurt due to the compute-boundedness of the architecture.
 Also, it seems that pointer logic tends to be compiled better than index logic.
 Lastly, inlining leads to a performance gain oftentimes as the overhead for function calls is quite heavy.
 Even though the call itself is a mere jump taking elven cycles, several registers must be saved and reloaded on entering and exiting a function;
-for an empty function with two arguments, we determined a call overhead of \qty{144}{\cycles}, which can easily rise with heavier register usage.
+for an empty function with two arguments, we determined a call overhead of \qty{144}{\cycles}.
+This number can easily rise with heavier register usage.
 This may also explain why turning arguments into global variables nets a performance gain in some cases as well.

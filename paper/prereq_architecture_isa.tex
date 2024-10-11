@@ -2,15 +2,16 @@
 \label{sec:prereq:arch:isa}
 
 Each thread owns several private \emph{general-purpose registers} labelled \lstinline|r0| to \lstinline|r23| which can hold arbitrary 32-bit values and are freely readable and writeable by the respective thread.
-Any even Register \lstinline|r|\(\mathtt{(2i)}\) and subsequent odd Register \lstinline|r|\(\mathtt{(2i+1)}\) form the 64-bit Register \lstinline|d|\(\mathtt{(2i)}\).
+An even Register \lstinline|r|\(\mathtt{(2i)}\) and subsequent odd Register \lstinline|r|\(\mathtt{(2i+1)}\) form the 64-bit Register \lstinline|d|\(\mathtt{(2i)}\).
 Furthermore, there are the read-only Registers \lstinline|id|, \lstinline|id2|, \lstinline|id4|, and \lstinline|id8|, which hold the identifier of the respective thread, multiplied by 1, 2, 4, and 8.
 Also, there are special registers for the program counter holding the \ac{IRAM} index of the next instruction to execute, a performance counter used for measuring the time, a carry bit, and the zero flag.
 Last but not least, there are four read-only registers which are shared by all threads:
 the Registers~\lstinline|zero| and \lstinline|one| hold, as their names suggest, the constants \(0\) and \(1\), whereas the Registers~\lstinline|lneg| and \lstinline|mneg| hold the least negative and most negative 32-bit values, that is \(-1\) and \(-2^{31}\).
 
-A \ac{DPU} is a \ac{RISC} with mainly 32-bit instructions \Dash most 64-bit instructions are pieced together from several 32-bit ones, thereby taking more than eleven cycles.
-There is no hardware support for multiplication or division, so these are emulated by bitwise instructions, thereby taking even longer.
+A \ac{DPU} is a \ac{RISC} with mainly 32-bit instructions \Dash most 64-bit operations are pieced together from several 32-bit ones, thereby taking more than eleven cycles.
+There is no hardware support for multiplication or division, so these are emulated by functions, thereby taking even longer.
 On top of that, there is no hardware support for floating point arithmetic, requiring costly emulation as well.
+
 Instructions follow a 3-operands design, meaning there can be up to three register arguments to an instruction, with the target register coming first.
 Next to registers, it is also possible to pass \emph{immediate values}, that is constant values passed directly without a register, and \emph{labels}, which are effectively \ac{IRAM} indices of instructions.
 %The usage of instructions is intuitive and similar to ordinary assembler code.
@@ -33,23 +34,23 @@ Some examples:
 	\lstinline|jump .LABEL| sets the program counter to the index of the labelled instruction.
 \end{itemize}
 Despite their name, some of the general-purpose registers do have conventional uses.
-The Registers~\lstinline|r0| to \lstinline|r7| are filled with the up to eight arguments of a function before it is called.
-The return value of a function is written to the Registers~\lstinline|r0| or \lstinline|d0|, depending on whether it is \qty{32}{\bits} or \qty{64}{\bits} large.
+The Registers~\lstinline|r0| to \lstinline|r7| are filled with the arguments of a function before it is called.
+The return value of a function is written to the Registers~\lstinline|r0| or \lstinline|d0|, depending on whether it is \qty{32}{\bits} or \qty{64}{\bits} long.
 Register~\lstinline|r22| contains the stack pointer, that is the address of the currently last element in the stack of the respective tasklet.
 When a function is called and it need store data on the stack, it saves the original value of the stack pointer on the stack itself before incrementing the stack pointer, therethrough allocating new memory.
 When the function terminates, it loads the original stack pointer value back into Register~\lstinline|r22|, therethrough deallocating memory.
 Register~\lstinline|r23| contains the return address, that is the \ac{IRAM} index of the instruction whither to jump after the termination of a function.
 Here, the instruction to load and store 64-bit large double words are of particular use.
 By invoking \lstinline|sd r22, <offset>, d22|, the content of both Registers~\lstinline|r22| and \lstinline|r23| is stored to some position relative to the current stack pointer, whence it can be recovered by invoking \lstinline|ld d22, -<offset>, r22| later on.
-Thereby, the bandwidth of the \ac{WRAM} is effectively doubled and the instruction count is reduced.
+Thereby, the bandwidth of the \ac{WRAM} is effectively doubled and the instruction count reduced.
 
 The capabilities of \ac{DPU} instructions is substantially enhanced by the plethora of \emph{conditions}, of which there are a total of 51.
-Conditions are binary flags which are passed as additional arguments to instructions so that they act as either test operation or combo operations.
-A \emph{test operation} performs its usual purpose but stores the evaluation of the condition in the target register.
+Conditions are binary flags which are passed as additional arguments to instructions so that those act as either test operation or combo operations.
+A \emph{test instruction} performs its usual purpose but stores the evaluation of the condition in the target register.
 For example, the instruction \lstinline|add r0, r0, -1, pl| takes the content of Register~\lstinline|r0|, decrements it, and checks the condition \lstinline|pl|.
 This condition evaluates to true if the result is greater than or equal to zero.
 Therefore, Register~\lstinline|r0| will contain the value \(1\) if and only if Register~\lstinline|r0| used to store the number \(1\) or greater, and will contain \(0\) otherwise.
-A \emph{combo operation} takes a label as yet another argument.
+A \emph{combo instruction} takes a label as yet another argument.
 The instruction performs its usual purpose, checks whether the result fulfils the condition, and, if yes, performs a jump to the label.
 An example is the instruction \lstinline|add r0, r0, -1, pl, .LABEL_LOOP|, where Register~\lstinline|r0| holds a loop index which get decremented.
 Should Register~\lstinline|r0| now hold a value greater or equal to zero, a jump back to the beginning of the loop body marked by the label \lstinline|.LABEL_LOOP| is performed.
