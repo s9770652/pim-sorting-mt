@@ -108,7 +108,7 @@ This means that the page stored in the second half of the buffer is loaded from 
 	\caption{
 		An exemplary sequential reader with \seqreadcachesize{} set to 16 being used to transfer 32-bit elements from the \ac{MRAM} (top row) into the sequential-read buffer (bottom row).
 		The hexadecimal numbers denote the addresses of the respective elements within the \ac{MRAM}.
-		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| are also loaded at some point.
+		Only the elements with addresses from \lstinline|0x28| to \lstinline|0x74| are sought to be read, however, the page model requires that the elements with addresses \lstinline|0x20|, \lstinline|0x24|, and \lstinline|0x78| to \lstinline|0x8c| be also loaded at some point.
 		The pointer \lstinline|buffer| constantly points to the beginning of the sequential-read buffer.
 		The pointer \lstinline|from| points to the \ac{MRAM} address of the first byte within the buffer.
 		The pointer \lstinline|curr| moves from left to right, 4 bytes at a time.
@@ -118,7 +118,7 @@ This means that the page stored in the second half of the buffer is loaded from 
 \end{figure}
 
 The acclaimed speedup through more performant bounds checks happens within the function \lstinline|seqread_get|, which in turn calls the function \lstinline|__builtin_dpu_seqread_get|.
-An inspection of its compilation with \(\seqreadcachesize{} = \twotoi\) reveals the use of a combo operation.
+An inspection of its compilation with \(\seqreadcachesize{} = \twotoi\) reveals the use of a combo instruction.
 The pointer to the current element is advanced by invoking an \lstinline|add| instruction to increase the stored address.
 This \lstinline|add| instruction uses a condition to detect the generation of the \(i\)th carry bit.
 To be more precise, this carry bit is set to \(\text{\lstinline|op1[i:0]|} + \text{\lstinline|op2[i:0]|}\), where \lstinline|op1[i:0]| and \lstinline|op2[i:0]| are the \(i + 1\) least significant bits of the involved operands, in this case the pointer and the number of bytes to advance.~\cite[DPU Handbook -- Specific Conditions Common To Addition and Subtraction]{upmemSDK}
