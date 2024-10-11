@@ -9,7 +9,7 @@
 }
 
 Let us first focus on short inputs where only two passes with step sizes~\(\stepsizes = \paren{1, \stepsizes_1}\) suffice.
-The previous results on \IS{} suggest that a fast \ShS{} should make use of~\(\stepsizes_1\) sentinel values.
+The previous results on \IS{} suggest that a fast \ShS{} ought to make use of~\(\stepsizes_1\) sentinel values.
 \Cref{fig:shell:two-tier,fig:shell:two-tier_uint32,fig:shell:two-tier_uint64} show that, with the exception of the \ShS{} with step size \(\stepsizes_1 = 2\), the additional pass starts to pay off at around 16 elements for both 32-bit and 64-bit values with the uniform random input distribution, reaching a speedup of around \numrange{1.15}{1.2} at 24 elements.
 In case of the reverse sorted input, the speedup is practically always above \(1\) even for very short inputs, reaching around \numrange{1.25}{2.1} at 24 elements.
 On sorted and almost sorted inputs, \ShS{} exhibits a slowdown in the benchmarked range of input lengths.
@@ -118,17 +118,17 @@ When moving to greater input lengths (\cref{fig:shell:three-tier,fig:shell:three
 %especially the ones with \(\stepsizes_1 = 3\) and \(\stepsizes_1 = 4\) fall off whereas the one with \(\stepsizes_1 = 6\) holds its ground quite well.
 Between 48 and 64 elements, three passes get worthwhile to consider.
 %Interestingly, many \ShS*{} with \(\stepsizes_2 = 4\) take the lead whilst the ones with \(\stepsizes_2 = 6\) are mid-table.
-On the one hand, the findings are in accordance with the well-known ones by\todo[info]{Was nochmal war Dein Gegenvorschlag?} \citeauthor{10.1007/3-540-44669-9_12}~\cites{10.1007/3-540-44669-9_12}[cf.][]{skean2023optimization} who, for 128 elements, determined \(\stepsizes = \paren{1, 9}\) to be the optimal pair and \(\stepsizes = \paren{1, 4, 17}\) to be the optimal triplet, which is also the case in \cref{fig:shell:three-tier}.
+On the one hand, the findings are in accordance with the widely used ones by \citeauthor{10.1007/3-540-44669-9_12}~\cites{10.1007/3-540-44669-9_12}[cf.][]{skean2023optimization} who, for 128 elements, determined \(\stepsizes = \paren{1, 9}\) to be the optimal pair and \(\stepsizes = \paren{1, 4, 17}\) to be the optimal triplet, which is also the case in \cref{fig:shell:three-tier}.
 On the other hand, the gain from doing three passes is far smaller:
 \Citeauthor{10.1007/3-540-44669-9_12} calculated an average speedup of \num{1.33} over doing two passes, while it is only \num{1.16} on a \ac{DPU}.
 In contrast to his findings, this also makes it unlikely that four passes would yield any gains at this input length.
-This shows that past findings on non-uniform cost models cannot be applied one-to-one to \acp{DPU}.
+This shows that past findings on non–unit-cost models cannot be applied one-to-one to \acp{DPU}.
 
 But would pushing the limits of \ShS{} even be rewarding?
 Greater input lengths require greater steps \Dash presumably well into the three digits for \(n \approx 1000\) \cite{skean2023optimization,10.1007/3-540-44669-9_12} \Dash and those in turn require more sentinel values.
 Implicit sentinel values could provide relief since the slowdown from implicitness should vanish for longer inputs, as was the case for \IS{}.
 Still, finding the best step sizes for longer inputs would be more complex because the length and, thus, the number of reasonable combinations of step sizes become larger.
 Unfortunately, longer optimal tuples cannot be constructed straightforwardly from shorter optimal ones.
-Its application, on the other hand, would likely be niche.
+The usefulness of such an endeavour, on the other hand, would likely be niche.
 \ShS{} is outperformed by other algorithms presented hereafter, and those have no use for a \ShS{} adjusted to longer inputs.
-Its only silver lining could be its in-place property (especially when relying solely on implicit sentinel values) combined with its medium speed, as discussed in \cref{sec:tasklet:conclusion}.
+Its only saving grace could be its in-place property (especially when relying solely on implicit sentinel values) combined with its medium speed, as discussed in \cref{sec:tasklet:conclusion}.
