@@ -135,7 +135,7 @@
 \DeclareSIUnit{\cycles}{cycles}
 \DeclareSIUnit{\transfer}{T}
 
-\titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
+%\titlehead{Group of Algorithm Engineering\hfill Summer Semester 2024 \\ Institute for Computer Science \\ Goethe University Frankfurt}
 \subject{Master's Thesis}
 %\title{Sorting \\ for a \\ Processing-in-Memory \\ Architecture}
 %\title{Sorting \\ on a \\ Processing-in-Memory \\ Architecture}
@@ -144,7 +144,7 @@
 %\title{Engineering Sorting Algorithms \\ for a Processing-in-Memory Architecture}
 %\title{Engineering Sorting Algorithms \\ for Processing-in-Memory}
 %\subtitle{Some cool subtitle if need be}
-\subtitle{Implementation and Evaluation \dots{} / Engineering \dots{} / Exploring \dots{}}
+%\subtitle{Implementation and Evaluation \dots{} / Engineering \dots{} / Exploring \dots{}}
 %\subtitle{Engineering Algorithms for UPMEM-based DRAM Processing Units}
 \author{\texorpdfstring{Ƶ}{Z}eno Adrian \texorpdfstring{\Lss05{W\kern-1.5pt}}{W}eil}
 \publishers{\begin{tabular}{r @{~}l}
@@ -164,18 +164,38 @@
 \begin{document}
 	\frontmatter
 
-	\maketitle
+%	\maketitle
+
+	\begin{titlepage}
+		\centering
+		\vspace*{\baselineskip}
+		\rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt}
+		\rule{\textwidth}{0.4pt}\\[0.5\baselineskip]
+		{\huge \textit{On} \\ Efficient Sorting \\ Through \\[0.225\baselineskip] In-Memory Processing}\\[0.2\baselineskip]
+		\rule{0.5\textwidth}{0.3pt}\\[\baselineskip]
+		%		\rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt}
+		%		\rule{\textwidth}{1.6pt}\\[\baselineskip]
+		\sffamily
+		Master's Thesis\par
+		\vspace*{2\baselineskip}
+		Submitted by \\%[0.5\baselineskip]
+		{\normalfont\LARGE Zeno Adrian Weil\\
+			\normalsize\sffamily Matriculation Number: 9875792\par}
+		\vspace*{2\baselineskip}
+		Supervisor \\%[0.5\baselineskip]
+		{\normalfont\Large Dr. Manuel Penschuck\par}
+		\vfill
+		{\itshape Johann Wolfgang Goethe-Universität} \\
+		Frankfurt am Main, 11th October 2024
+	\end{titlepage}
 
 	\include{abstract}
 
+	\include{dedication}
+
 	\tableofcontents
 
-	\listoftodos
-
 	\mainmatter
-
-	\todo[inline]{Unterscheidung Größe/Länge. Außerdem: little/less/least und great/greater/greatest für Eingabeelemente}
-	\todo[inline]{Zipf's law überall heraus?}
 
 	\include{intro}
 
@@ -193,7 +213,11 @@
 
 	\include{apxmram}
 
+	\backmatter
+
 	\include{acronyms}
 
 	\mybibliography[heading=bibintoc]
+
+	\include{declaration}
 \end{document}
