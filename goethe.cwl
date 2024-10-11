@@ -61,6 +61,8 @@
 
 \hairspace
 
+\acrolabel{label}#l
+
 #keyvals:\todo,\setuptodonotes,\todostyle
 info
 #endkeyvals
@@ -138,6 +140,7 @@ info
 \braces[size]{formula}#m
 \brackets[size]{formula}#m
 \ceil{formula}#m
+\chevrons{formula}#m
 \floor{formula}#m
 \given#m
 \given[size]#m
