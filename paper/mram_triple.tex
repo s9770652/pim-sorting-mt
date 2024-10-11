@@ -20,8 +20,7 @@ To ensure the contiguity of the triple buffer if more than one tasklet is presen
 The entire triple buffer has the size \(\triplebuffersize ≔ \cachesize{} + 4 × \seqreadcachesize{}\), which is, for simplicity, the minimum number of allocated bytes and, therefore, the same for all tasklets even if some calls of \lstinline|seqread_alloc| introduced padding.
 Note that padding may appear in front of each first sequential-read buffer only, since the heap pointer is necessarily at a multiple of \seqreadcachesize{} after any call of \lstinline|seqread_alloc|.
 Because of otherwise wasted memory, it makes little sense to set \cachesize{} to a value which is not a multiple of \seqreadcachesize{}.
-The optimal values for both \cachesize{} and \seqreadcachesize{} are determined in \cref{sec:mram:merge:performance}.
-\todo[info]{Welche Alternativformulierungen wolltest Du auf dieser Seite haben? Ich vergaß sie leider.}
+The optimal values for \cachesize{} and \seqreadcachesize{} are determined in \cref{sec:mram:merge:performance}.
 
 \begin{figure}[b]
 	\centering
