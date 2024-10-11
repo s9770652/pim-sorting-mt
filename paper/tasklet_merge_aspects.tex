@@ -18,7 +18,7 @@ A simple implementation of \MS{} (termed \emph{full-space}) writes all merged ru
 After a round is finished and all pairs of runs have been merged, the input array and the auxiliary array switch roles and the merging begins anew.
 If the final sorted elements are supposed to be saved in the original input array, a final round with a write-back from the auxiliary array to the input array is needed if the number of rounds is odd.
 
-A slightly more sophisticated implementation (termed \emph{half-space}) needs space for only \(n/2\) additional elements~\cite[Chapter~2.5]{lang2009algorithmen}:
+A slightly more sophisticated implementation (termed \emph{half-space}) needs space for only \(n/2\) additional elements~\cite[Section~2.5]{lang2009algorithmen}:
 When two adjacent runs are to be merged, the first one is copied to an auxiliary array.
 Then, the copy and the second run are merged to the beginning of the first run.
 As a side effect, no write-back is ever needed and, additionally, the merging of two runs can be terminated prematurely once the last element of the copied run is merged, since the last elements of the other run are already in place.
@@ -37,7 +37,7 @@ This \emph{deferred} copying, although examined during development, was not in u
 There are four common reasons for \emph{flushing}, that is writing consecutive elements unconditionally:
 \begin{enumerate}
 	\item
-	When two runs are merged and the end of one of them is reached, that is, when one run is depleted, the remaining elements of the non-depleted run can be moved safely to the output location.
+	When two runs are merged and the end of one of them is reached, that is, when one run is \emph{depleted}, the remaining elements of the non-depleted run can be moved safely to the output location.
 	Especially with the sorted, reverse sorted, and almost sorted input distributions, the number of remaining elements will be high.
 
 	\item
@@ -77,7 +77,7 @@ A drawback of unrolling is the increased kernel size, since the instruction coun
 Larger unroll factors lead to an \ac{IRAM} overflow.
 
 A more refined unrolled merging can be deduced from \IS{} not using a dedicated pointer to access a preceding element.
-Instead, \IS{} utilised the pointer to the current element together with an offset of \lstinline|-4|.
+Recall how \IS{} utilises the pointer to the current element together with an offset of \lstinline|-4|.
 A similar technique can be used with \MS{}, which maintains two pointers \lstinline|i| and \lstinline|j|, each pointing the current element of a run to merge.
 If, for example, it holds \lstinline|*i <= *j|, then the next element can be loaded via \lstinline|*(i + 1)|.
 Finally, depending on whether \lstinline|*(i + 1) <= *j| holds, either both pointers \lstinline|i| and \lstinline|j| are incremented by~\lstinline|1| or pointer \lstinline|i| is incremented by \lstinline|2|.

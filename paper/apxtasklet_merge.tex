@@ -34,14 +34,15 @@
 			yshift=-1mm,
 		},
 	},
+	no first tick/.style={ /tikz/mark indices={2,...,21}, },
 }
 
 \NewDocumentCommand{\addmergeplot}{m m m}{
 	\nextgroupplot[#2]
-	\clip (0, 0) rectangle (1024, 200);
+	\clip (16, 0) rectangle (1024, 200);
 
 	\pgfplotsset{update limits=false}
-	\plotpernlognwitherrors{#3}{tableMerge_#1#2}
+	\plotpernlognwitherrors[no first tick]{#3}{tableMerge_#1#2}
 	\pgfplotsset{update limits=true}
 
 	\addplot +[opacity=0] coordinates {(16, 50)  (1024, 50)};  % needed for all x ticks to appear

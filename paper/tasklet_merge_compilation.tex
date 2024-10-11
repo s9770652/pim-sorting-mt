@@ -193,8 +193,8 @@ With the half-space \MS{}, some merge iterations take 5 instructions.
 The reason is that the second pointer \lstinline|j| is never incremented directly.
 Instead, whenever an element of the second run is merged, a counter is incremented and, then, the new address of pointer \lstinline|j| is calculated by taking the address of the first element of the second run and adding the counter.
 The fix is to change the loop which iterates over the pairs of runs to merge.
-Instead of using the ends of the second runs as natural loop index, it has to be iterated over the ends of the first runs.
+Rather than using the ends of the second runs as natural loop index, it has to be iterated over the ends of the first runs.
 
-An honourable mention shall be given to the merge function used by the half-space \MS{}.
-Passing the copied run as second argument and the uncopied run as the first one nets a noticeably decrease in runtime compared to an implementation with flipped arguments and, of course, flipped logic.
+A last mention shall be given to the merge function used by the half-space \MS{}.
+Passing the copied run as second argument and the uncopied run as the first one nets a noticeably speedup over an implementation with flipped arguments and, of course, flipped logic.
 Sadly, we could not pinpoint the fundamental cause for this phenomenon.

@@ -36,19 +36,31 @@ For \(n = \twotoi + 1\) input elements, the root has a leaf with one element as 
 			ymax=150,
 		]
 			\nextgroupplot[title/.add={}{Without Write-Backs}]
+			\clip (0, 0) rectangle (1024, 200);
+			\pgfplotsset{update limits=false}
 			\pgfplotsinvokeforeach{sorted,reverse,uniform}{
 				\plotpernlogn{Merge}{tableMerge_32#1}
 			}
+			\pgfplotsset{update limits=true}
+			\addplot +[opacity=0] coordinates {(16, 0)  (1024, 150)};  % needed for all x ticks to appear
 			%
 			\nextgroupplot[title/.add={}{With Write-Backs}]
+			\clip (0, 0) rectangle (1024, 200);
+			\pgfplotsset{update limits=false}
 			\pgfplotsinvokeforeach{sorted,reverse,uniform}{
 				\plotpernlogn{MergeWriteBack}{tableMerge_32#1}
 			}
+			\pgfplotsset{update limits=true}
+			\addplot +[opacity=0] coordinates {(16, 0)  (1024, 150)};  % needed for all x ticks to appear
 			%
 			\nextgroupplot[title/.add={}{Half-Space}]
+			\clip (0, 0) rectangle (1024, 200);
+			\pgfplotsset{update limits=false}
 			\pgfplotsinvokeforeach{sorted,reverse,uniform}{
 				\plotpernlogn{MergeHalfSpace}{tableMerge_32#1}
 			}
+			\pgfplotsset{update limits=true}
+			\addplot +[opacity=0] coordinates {(16, 0)  (1024, 150)};  % needed for all x ticks to appear
 			\pgfplotsset{legend to name=leg:merge:runtime, legend entries={Sorted, Reverse Sorted, Uniform}}
 		\end{groupplot}
 	\end{tikzpicture}
@@ -62,7 +74,7 @@ For \(n = \twotoi + 1\) input elements, the root has a leaf with one element as 
 
 The measurements show that any \MS{} guarantees a runtime of \(\bigtheta{n \log n}\) for the benchmarked input distributions as expected.
 The differences in runtime between the different input distributions get smaller with increasing input length and are ascribable to \IS{} and to the differing effectiveness of unrolling flushes.
-Mainly because of \IS{}, sorted inputs take the shortest and reverse sorted ones the longest;
+In fact, \IS{} is the main reason why sorted inputs take the shortest and reverse sorted ones the longest;
 cases where the usage of \IS{} worsened the runtime are unbeknown.
 The differences across the input distributions become smaller with increasing input length but remain large even for \(n \approx 1000\) elements.
 For the full-space \MS*{} and with \(n \approx 1000\), reverse sorted inputs get sorted \qty{85}{\percent} slower than sorted inputs of 32-bit integers and \qty{100}{\percent} slower than sorted inputs of 64-bit integers.
@@ -75,7 +87,7 @@ For the other inputs, the speedup of half-space \MS{} over the full-space \MS{} 
 The gap to the full-space \MS{} with write-backs is even smaller.
 This slowdown, albeit small, is likely because of the elements of the first runs being both copied and moved and of most elements of the second runs being moved forwards anyway.
 
-\Cref{apx:tasklet:merge} contains further measurements on \MS{}, showing why a starting run length of 16 is a good choice.
+\Cref{apx:tasklet:merge} contains further measurements on \MS{}, showing why a starting run length of 14 is a good choice.
 \Cref{fig:merge:starting_runs_is_uint32,fig:merge:starting_runs_is_uint64} show the average runtimes of starting runs of lengths 12 to 16, all sorted with \IS{}.
 Overall, the differences are small, yet a length of~14 delivers a solid performance throughout all benchmarked input distributions.
 \Cref{fig:merge:starting_runs_shs_uint32,fig:merge:starting_runs_shs_uint64} include longer starting runs of lengths between 24 and 96 in order to see whether giving up stability by using \ShS{} can yield substantial gains.
