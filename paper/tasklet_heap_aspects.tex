@@ -29,7 +29,7 @@ The bottom-up \HS{} can be brought to swap parity with the top-down \HS{} by the
 The sifting downwards is traced but the vertices are not actually moved.
 Once the leaf where the hole would end up is reached, the sifting is backtracked until the bottommost vertex which is greater than the last leaf.
 The position found is where the last leaf would end up after sifting upwards, so all vertices below can stay put and all vertices above move to their parents' positions, that is, thither the swaps from sifting downwards would have put them.
-This implementation variant makes sifting downwards even cheaper, but it must be sifted upwards all the way to the root now.
+This implementation variant makes sifting downwards even cheaper, but it must be sifted upwards all the way to the root then.
 
 
 \paragraph{Sentinel Values}
@@ -42,12 +42,12 @@ Thus, if it has been confirmed that a left child exists, a right one does also e
 Bounds checks on whether a left child exists are still required lest \HS{} loses its in-place property, since there are about \(n/2\) leaves of which all would need sentinel children.
 
 Likewise, whenever \HS{} sifts upwards and considers the parent \(i \div 2\) of a vertex \(i\), it will only proceed if the parent is less.
-Since the parentless root has index \(1\), the formula \(i \div 2\) yields~\(0\), so it makes sense to set the element with index \(0\) to the greatest possible value to stop any upwards sift.
+Since the root has index \(1\), the formula \(i \div 2\) yields~\(0\), so it makes sense to set the element with index \(0\) to the greatest possible value to stop any upwards sift.
 The speedup from using sentinel values is about \num{1.15}.
 
 
 \paragraph{Code Duplication}
-A strategy particularly useful for \HS{}, although also employed in other sorting algorithms, is \emph{code duplication}.
+A strategy particularly useful for \HS{} \Dash although employed in other sorting algorithms, too \Dash is \emph{code duplication}.
 Sifting downwards can be broken down into two steps:
 \begin{enumerate*}
 	\item
@@ -56,7 +56,7 @@ Sifting downwards can be broken down into two steps:
 	\item
 	Perform some operations on said child.
 \end{enumerate*}
-A natural, low-maintenance implementation would determine the greater child and, then, store it in a variable on which the operations are performed afterwards.
+A natural and concise implementation would determine the greater child and, then, store its index in a variable on which the operations are performed afterwards.
 However, the quality of the compilation improves if the operations are implemented twice, once for either child, and executed conditionally.
 This approach led to a speedup of about \num{1.07}.
 

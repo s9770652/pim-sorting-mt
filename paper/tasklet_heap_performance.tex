@@ -42,9 +42,9 @@
 
 The measurements are visualised in \cref{fig:heap:runtime,fig:heap:runtime_uint32,fig:heap:runtime_uint64}.
 In general, the performance of \HS{} is hardly volatile and mostly independent from the input distribution.
-Reverse sorted inputs are sorted faster than most since they are already max-heaps so building the heap is quick, whereas sorted inputs are sorted the slowest since they are min-heaps essentially needing inversion.
+Reverse sorted inputs are sorted faster than most since they are already max-heaps so building the heap is quick, whereas sorted inputs are sorted the slowest since they are min-heaps, essentially needing inversion.
 Nonetheless, the reverse sorted inputs get sorted at most \qty{10}{\percent} faster than the sorted ones.
-An extraördinary outlier are zero-one inputs on which the top-down \HS{} achieves a speedup of \num{1.8} over the bottom-up \HS{}.
+An extraordinary outlier are zero-one inputs on which the top-down \HS{} achieves a speedup of \num{1.8} over the bottom-up \HS{}.
 With zero-one inputs, roughly half of the elements are zeroes and roughly half are ones.
 After building the min-heap, the first half of the array consists of ones and the second half of zeroes.
 About half of the ones and about half of the zeroes are already in these respective halves of the input, so building the heap is fairly quick, too.
@@ -69,4 +69,4 @@ Indeed, at around 2000 elements, the bottom-up \HS{} with swap disparity overtak
 The bottom-up \HS{} with swap parity consistently trails behind.
 This comes as no surprise since the overhead of its considerably prolonged upwards sift bears no proportion to the few swaps saved.
 This holds true even for 64-bit integers as moves still cost only one instruction so the savings do not increase.
-Unrolling the upwards sift (cf.\ \cref{sec:tasklet:merge}) proved to be unhelpful.
+Unrolling the upwards sift proved to be unhelpful.
