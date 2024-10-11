@@ -1,10 +1,10 @@
 \section{Sequential \texorpdfstring{\MS{}}{MergeSort}}
 \label{sec:mram:merge}
 
-The \ac{MRAM} \MS{} is based on the full-space \ac{WRAM} \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations of the merging to the two-tier memory hierarchy are discussed.
-As precondition for the presented algorithm to work, it is demanded that run sizes be multiples of~8 and that the runs and the output location be aligned to 8 bytes.
+The \ac{MRAM} \MS{} is based on the full-space \ac{WRAM} \MS{} as presented in \cref{sec:tasklet:merge} so only the adaptations of the merging to the memory hierarchy are discussed.
+As precondition for the presented algorithm to work, it is required that run sizes be multiples of eight and that the runs and the output location be aligned to \qty{8}{\byte}.
 This precondition simplifies \acp{DMA} and is trivially met for 64-bit elements.
-To meet it for 32-bit elements, one can insert a single dummy element set to the maximum possible value into the input and discard the last element of the sorted output.
+To meet it for 32-bit elements, one can insert a single dummy element, set to the maximum possible value, into the input and discard the last element of the sorted output.
 
 \input{mram_merge_presentation}
 

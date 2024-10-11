@@ -33,25 +33,132 @@
 	columns={dist,half,full}
 ]{6}{\tableMergeMramHalfFullStableLxiv}
 
+%\begin{figure}[!ht]
+%	\captionsetup[subfigure]{aboveskip=-2mm, belowskip=1mm}
+%
+%	\begin{subfigure}{\textwidth}
+%		\tikzsetnextfilename{merge_mram_uint32}
+%		\begin{tikzpicture}[plot]
+%			\begin{groupplot}[
+%				adaptive group=1 by 2,
+%				barplot,
+%				ymax=1.2e9,
+%%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+%				yticklabels={,\(0.0\), \(0.2\), \(0.4\), \(0.6\), \(0.8\), \(1.0\), \(1.2\)},
+%			]
+%				\nextgroupplot[title/.add={}{Unstable}]
+%				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullXxxii};
+%				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullXxxii};
+%				%
+%				\nextgroupplot[title/.add={}{Stable}]
+%				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableXxxii};
+%				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableXxxii};
+%			\end{groupplot}
+%		\end{tikzpicture}
+%		\caption{
+%			32-bit integers (\(n = {}\)\liningnums{2\textsuperscript{19}})
+%		}
+%	\end{subfigure}
+%
+%	\begin{subfigure}{\textwidth}
+%		\tikzsetnextfilename{merge_mram_uint64}
+%		\begin{tikzpicture}[plot]
+%			\begin{groupplot}[
+%				adaptive group=1 by 2,
+%				barplot,
+%				ymax=1e9,
+%%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+%				yticklabels={,\(0.0\), \(0.2\), \(0.4\), \(0.6\), \(0.8\), \(1.0\)},
+%			]
+%				\nextgroupplot[title/.add={}{Unstable}]
+%				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullLxiv};
+%				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullLxiv};
+%				%
+%				\nextgroupplot[title/.add={}{Stable}]
+%				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableLxiv};
+%				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableLxiv};
+%			\end{groupplot}
+%		\end{tikzpicture}
+%		\caption{
+%			64-bit integers (\(n = {}\)\liningnums{2\textsuperscript{18}})
+%		}
+%	\end{subfigure}
+%
+%	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:mram}\hfil\tikzexternalenable
+%	\caption{
+%		An extension to \cref{fig:merge:mram} with \QS{} (stable) and \MS{} (unstable) used during the run formation.
+%	}
+%	\label{fig:merge:mram_unstable}
+%\end{figure}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=true/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/stable/uint32/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint32/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParStableXxxii}
+
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParFirst}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParFirst}{data/merge_par/phase_1/STABLE=true/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergeFS/.style={}, create on use/σ_MergeFS/.style={}, columns={n,µ_MergeFS,σ_MergeFS}]{0}{\tableMergeParSec}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParSec}{data/merge_mram/stable/uint64/#1.txt}
+}
+\pgfplotstablenew[create on use/n/.style={}, create on use/µ_MergePar/.style={}, create on use/σ_MergePar/.style={}, columns={n,µ_MergePar,σ_MergePar}]{0}{\tableMergeParThird}
+\expandafter\pgfplotsinvokeforeach\expandafter{\alldists}{
+	\pgfplotstablevertcat{\tableMergeParThird}{data/merge_par/NR_TASKLETS=16/STABLE=true/uint64/#1.txt}
+}
+\pgfplotstablenew[
+	create on use/dist/.style={create col/set list={Sorted,Reverse S.,Almost S.,Zero-One,Uniform,Zipf's}},
+	create on use/first/.style={create col/copy column from table={\tableMergeParFirst}{µ_MergePar}},
+	create on use/second/.style={create col/copy column from table={\tableMergeParSec}{µ_MergeFS}},
+	create on use/third/.style={create col/copy column from table={\tableMergeParThird}{µ_MergePar}},
+	columns={dist,first,second,third},
+]{6}{\tableMergeParStableLxiv}
+
 \begin{figure}[!ht]
 	\captionsetup[subfigure]{aboveskip=-2mm, belowskip=1mm}
 
 	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_mram_uint32}
+		\tikzsetnextfilename{par_phases_uint32}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[
 				adaptive group=1 by 2,
 				barplot,
-				ymax=1.2e9,
+				ybar=-\pgfkeysvalueof{/pgf/bar width},
+%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+				ymax=1.1e9,
+%				ytick distance=4e8,
+				ytick={0, 4e8, 8e8, 1.1e9},
+				yticklabels={\(0.0\), \(0.4\), \(0.8\), \(1.1\), \(0.8\), \(1.0\)},
 			]
 				\nextgroupplot[title/.add={}{Unstable}]
-				\pgfplotsset{legend to name=leg:merge:mram, legend entries={Full-Space, Half-Space}}
-				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullXxxii};
-				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullXxxii};
+				\pgfplotsset{cycle list shift=1}
+				\addplot+ table[x=dist, y=second] {\tableMergeParUnstableXxxii};
+				\pgfplotsset{cycle list shift=-1}
+				\addplot+ table[x=dist, y=first] {\tableMergeParUnstableXxxii};
 				%
 				\nextgroupplot[title/.add={}{Stable}]
-				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableXxxii};
-				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableXxxii};
+				\pgfplotsset{cycle list shift=1}
+				\addplot+ table[x=dist, y=second] {\tableMergeParStableXxxii};
+				\pgfplotsset{cycle list shift=-1}
+				\addplot+ table[x=dist, y=first] {\tableMergeParStableXxxii};
+				\pgfplotsset{legend to name=leg:merge:phases, legend entries={Second Phase,First Phase}, legend reversed}
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
@@ -60,21 +167,28 @@
 	\end{subfigure}
 
 	\begin{subfigure}{\textwidth}
-		\tikzsetnextfilename{merge_mram_uint64}
+		\tikzsetnextfilename{par_phases_uint64}
 		\begin{tikzpicture}[plot]
 			\begin{groupplot}[
 				adaptive group=1 by 2,
 				barplot,
-				ymax=1e9,
+				ybar=-\pgfkeysvalueof{/pgf/bar width},
+%				yticklabel style={/pgf/number format/.cd, precision=1, fixed, zerofill},  % Cool, it is bugged out, so I have to place all ticks and labels manually…
+				ymax=0.9e9,
+				ytick distance=3e8,
+				yticklabels={,\(0.0\), \(0.3\), \(0.6\), \(0.9\)},
 			]
 				\nextgroupplot[title/.add={}{Unstable}]
-				\pgfplotsset{legend to name=leg:merge:mram, legend entries={Full-Space, Half-Space}}
-				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullLxiv};
-				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullLxiv};
+				\pgfplotsset{cycle list shift=1}
+				\addplot+ table[x=dist, y=second] {\tableMergeParUnstableLxiv};
+				\pgfplotsset{cycle list shift=-1}
+				\addplot+ table[x=dist, y=first] {\tableMergeParUnstableLxiv};
 				%
 				\nextgroupplot[title/.add={}{Stable}]
-				\addplot+ table[x=dist, y=full] {\tableMergeMramHalfFullStableLxiv};
-				\addplot+ table[x=dist, y=half] {\tableMergeMramHalfFullStableLxiv};
+				\pgfplotsset{cycle list shift=1}
+				\addplot+ table[x=dist, y=second] {\tableMergeParStableLxiv};
+				\pgfplotsset{cycle list shift=-1}
+				\addplot+ table[x=dist, y=first] {\tableMergeParStableLxiv};
 			\end{groupplot}
 		\end{tikzpicture}
 		\caption{
@@ -82,10 +196,9 @@
 		}
 	\end{subfigure}
 
-	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:mram}\hfil\tikzexternalenable
+	\tikzexternaldisable\hfil\pgfplotslegendfromname{leg:merge:phases}\hfil\tikzexternalenable
 	\caption{
-		An extension to \cref{fig:merge:mram} with \QS{} (stable) and \MS{} (unstable) used during the run formation.
-		\todo[inline]{Phasen}
+		An extension to \cref{fig:merge:mram} with both a stable and an unstable full-space \MS{}.
 	}
 	\label{fig:merge:mram_unstable}
 \end{figure}
@@ -190,7 +303,6 @@
 	\caption{
 		An extension to \cref{tab:mram:sizes}.
 		The input size per tasklet is fixed to \qty[exponent-mode=input]{2}{\mebi\byte}.
-		\todo[inline]{Prozente/Speedups}
 	}
 	\label{tab:mram:sizes_same_n}
 \end{table}

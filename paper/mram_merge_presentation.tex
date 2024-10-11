@@ -14,10 +14,10 @@ The first tier is in operation as long as there are more than \unrollfactor{} ma
 This is verifiable through the function \lstinline|seqread_tell|, which returns the corresponding \ac{MRAM} address of an element within a sequential-read buffer (\cref{alg:mram:two-tier merge:first tier}).
 First, an unrolled loop with \unrollfactor{} many iterations is executed, with each iteration comparing the current elements of both runs, writing the less one to the cache, and advancing the respective pointer (\cref{alg:mram:unrolled loop}).
 The less run cannot become depleted during this loop, so depletion checks after each iteration are unnecessary.
-Afterwards, it is checked whether the cache is filled with \unrolledcachelength{} many elements (\cref{alg:mram:two-tier merge:check fill level}), with \unrolledcachelength{} being a multiple of \unrollfactor{} and \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|} \le \cachesize{}\) being a multiple of 8.
+Afterwards, it is checked whether the cache is filled with \unrolledcachelength{} many elements (\cref{alg:mram:two-tier merge:check fill level}), with \unrolledcachelength{} being a multiple of \unrollfactor{} and \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|} \le \cachesize{}\) being a multiple of eight.
 If the fill level is too low, it is jumped back to the beginning of the tier.
 If, however, the maximum is indeed reached, the cache is emptied before jumping back (\crefrange{alg:mram:two-tier merge:empty start}{alg:mram:two-tier merge:empty end}).
-Because the output location is aligned to 8 bytes and \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|}\) is a multiple of 8, emptying the cache is possible through a simple call of \lstinline|mram_write|.
+Because the output location is aligned to \qty{8}{\byte} and \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|}\) is a multiple of eight, emptying the cache is possible through a simple call of \lstinline|mram_write|.
 
 Once there are \unrollfactor{} many elements or fewer left in the less run, the second tier begins.
 This one is structurally equal to the first tier with a single exception, for there is no guarantee that the unrolled loop will be executed in full:
@@ -26,9 +26,9 @@ When it occurs, the cache is emptied and the greater run flushed, completing the
 To flush the run, its remainder is iteratively transferred from its original position in the \ac{MRAM} to the output location in blocks of size \qty{2048}{\byte} using \lstinline|mram_read| and \lstinline|mram_write|.
 Since the sequential readers are of no use anymore, the whole triple buffer may be used during the transfers in case that \cachesize{} is below 2048.
 Emptying the cache requires checking the fill level in case of 32-bit elements as input.
-Should the number of elements within the cache be odd, then the size of the cache content is not a multiple of 8.
-In addition, the size of the remainder of the greater run is also not a multiple of 8, given that both the sizes of the two runs as well as \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|}\) were such.
-For this reason, the current element of the greater run is moved to the cache in order to bring the size of its content to a multiple of 8, rendering it unproblematic to empty the cache and flush the greater run via \lstinline|mram_read| and \lstinline|mram_write|.
+Should the number of elements within the cache be odd, then the size of the cache content is not a multiple of eight.
+In addition, the size of the remainder of the greater run is also not a multiple of eight, given that both the sizes of the two runs as well as \(\unrolledcachelength{} × \text{\lstinline[keywords={}]|sizeof(T)|}\) were such.
+For this reason, the current element of the greater run is moved to the cache in order to bring the size of its content to a multiple of eight, rendering it unproblematic to empty the cache and flush the greater run via \lstinline|mram_read| and \lstinline|mram_write|.
 
 \SetArgSty{}
 \SetFuncArgSty{}

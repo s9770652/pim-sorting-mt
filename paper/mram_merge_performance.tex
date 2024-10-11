@@ -123,7 +123,7 @@ The effect is dampened by the latency hiding, as tasklets performing a \ac{DMA} 
 Of course, using more than eleven tasklets may also be more convenient from an algorithmic point of view.
 %This is the case for the parallel \MS{} presented in \cref{sec:mram:par}, where sixteen tasklets are easier to handle than twelve and twelve easier than eleven.
 For this reason, we will look at the influence of different values for \cachesize{} and \seqreadcachesize{} with eleven, twelve and sixteen tasklets in this \lcnamecref{sec:mram:merge:performance}.
-Please note that \unrollfactor{} is always set to 8 and cannot be set greater, for the kernel would, otherwise, not fit within the \ac{IRAM} anymore.
+Please note that \unrollfactor{} is always set to eight and cannot be set greater, for the kernel would, otherwise, not fit within the \ac{IRAM} anymore.
 Also, \unrolledcachelength{} is always set to \cachesize{} / \lstinline[keywords={}]|sizeof(T)|.
 
 \begin{table}[t]
@@ -231,7 +231,7 @@ Indeed, the effect of the overfull pipeline becomes apparent either when computi
 \end{figure}
 
 Next, we look at the performance of the sequential \MS{}, both in a half-space and a full-space variant, across all benchmarked input distributions.
-Even though the parallel sorting algorithm presented in \cref{sec:mram:par} is a type of \MS{}, its performance is improved when forgoing stability.
+Even though the parallel sorting algorithm presented in \cref{sec:mram:par} is a type of \MS{}, its performance is improved by forgoing stability.
 Thence, it makes sense to analyse the performance of the sequential \ac{MRAM} \MS{} with both \QS{} and \MS{} as \ac{WRAM} sorting algorithms used during the formation of the starting runs.
 With \QS{}, \cref{fig:merge:mram} shows that like its \ac{WRAM} counterpart, the full-space \ac{MRAM} \MS{} works the fastest on sorted inputs, which is because one of the runs in each pair of runs is flushed in its entirety without overhead from comparisons and elementwise moves.
 Reverse sorted inputs are sorted slower despite the same flushing pattern.
